@@ -1,0 +1,37 @@
+[
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "ISSS626 - Geospatial Analytics and Applications",
+    "section": "",
+    "text": "Welcome to ISSS626 Geospatial Analytics and Application.\nThis website collects my course work and hands-on exercises. Use the top navigation bar to open each page.\n\n\n\n\n\n\nHow to use this site\n\n\n\n\nHome (this page): overview, quick links, and status.\nAbout: short profile and tools used.\nHand-on Exercise (menu): open individual assignments.\n\n\n\n\n\n\n👉 Hand-on Exercise 1: Open the assignment\n\n👉 About: Course and tooling\n\n\n\n\n\nDemonstrate step-by-step workflows for geospatial tasks that a beginner can follow.\nUse clear, descriptive names and relative file paths so the website renders correctly on Netlify.\nProvide reproducible results with the same structure for every assignment.\n\n\n\n\n\nCode with explanations for beginners\nEvery code block includes plain-language comments. No unexplained acronyms are used.\nOutputs\nStatic maps, tables, and charts are embedded in the assignment pages."
+  },
+  {
+    "objectID": "index.html#quick-links",
+    "href": "index.html#quick-links",
+    "title": "ISSS626 - Geospatial Analytics and Applications",
+    "section": "",
+    "text": "👉 Hand-on Exercise 1: Open the assignment\n\n👉 About: Course and tooling"
+  },
+  {
+    "objectID": "index.html#objectives-of-my-hands-on-work",
+    "href": "index.html#objectives-of-my-hands-on-work",
+    "title": "ISSS626 - Geospatial Analytics and Applications",
+    "section": "",
+    "text": "Demonstrate step-by-step workflows for geospatial tasks that a beginner can follow.\nUse clear, descriptive names and relative file paths so the website renders correctly on Netlify.\nProvide reproducible results with the same structure for every assignment."
+  },
+  {
+    "objectID": "index.html#what-you-will-find-here",
+    "href": "index.html#what-you-will-find-here",
+    "title": "ISSS626 - Geospatial Analytics and Applications",
+    "section": "",
+    "text": "Code with explanations for beginners\nEvery code block includes plain-language comments. No unexplained acronyms are used.\nOutputs\nStatic maps, tables, and charts are embedded in the assignment pages."
+  },
+  {
+    "objectID": "about.html",
+    "href": "about.html",
+    "title": "About",
+    "section": "",
+    "text": "About this site\n\n1 + 1\n\n[1] 2"
+  }
+]
