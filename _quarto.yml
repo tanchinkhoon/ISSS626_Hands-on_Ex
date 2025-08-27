@@ -1,19 +1,22 @@
 project:
   type: website
+  output-dir: _site
 
 website:
-  title: "Hands-on_Ex"
+  title: "ISSS626-Geospatial_Analytics_and_Applications"
   navbar:
     left:
-      - href: index.qmd
-        text: Home
-      - about.qmd
+      - text: "Hand-on Exercise"
+        menu:
+          - text: "Hand-on Exercise 1"
+            href: Hands-on_Ex/Hands-on_Ex01/hands-on_ex01.qmd
+    right:
+      - text: "Home"
+        href: index.qmd
+      - text: "About"
+        href: about.qmd
 
 format:
   html:
-    theme: cosmo
     css: styles.css
-    toc: true
-
-editor: visual
 
