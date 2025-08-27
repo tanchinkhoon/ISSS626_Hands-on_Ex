@@ -10,7 +10,7 @@ Welcome to **Geospatial Analytics and Application (ISSS626)**. This website coll
 
 ## Quick links
 
--   👉 **Hand-on Exercise 1**: [Open the assignment](Hands-on-Ex01\hand-on_ex01.qmd)
+-   👉 **Hand-on Exercise 1**: [Open the assignment](Hands-on_Ex01\hand-on_ex01.qmd)
 -   👉 **About**: [Course and tooling](about.qmd)
 
 ## Objectives of my hands-on work
