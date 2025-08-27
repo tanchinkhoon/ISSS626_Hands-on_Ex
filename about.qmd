@@ -1,9 +1,1 @@
----
-title: "About"
----
-
-About this site
-
-```{r}
-1 + 1
-```
+![TAN Chin Profile](CKTAN_Profile.png)
