@@ -3,15 +3,15 @@ Welcome to **Geospatial Analytics and Application (ISSS626)**. This website coll
 ::: callout-note
 ### How to use this site
 
--   **Home** (this page): overview, quick links, and status.
--   **About**: short profile and tools used.
--   **Hand-on Exercise** (menu): open individual assignments.
+-   **Home** (this page): Overview, quick links, and status.
+-   **About**: Short profile of the student.
+-   **Hand-on Exercise** (menu): Open individual assignments.
 :::
 
 ## Quick links
 
 -   👉 **Hand-on Exercise 1**: [Open the assignment](Hands-on_Ex01\hand-on_ex01.qmd)
--   👉 **About**: [Course and tooling](about.qmd)
+-   👉 **About**: [Student profile](about.qmd)
 
 ## Objectives of my hands-on work
 
