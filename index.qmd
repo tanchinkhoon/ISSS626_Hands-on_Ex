@@ -1,32 +1,20 @@
----
-title: "ISSS626"
----
-
-# ISSS626-Demo
-
-Welcome to **ISSS626 Geospatial Analytics and Application**. This website collects my course work and hands-on exercises. Use the top navigation bar to open each page.
+Welcome to **Geospatial Analytics and Application (ISSS626)**. This website collects my course work and hands-on exercises. Use the top navigation bar to open each page.
 
 ::: callout-note
 ### How to use this site
-- **Home** (this page): overview, quick links, and status.
-- **About**: short profile and tools used.
-- **Hand-on Exercise** (menu): open individual assignments.
+
+-   **Home** (this page): overview, quick links, and status.
+-   **About**: short profile and tools used.
+-   **Hand-on Exercise** (menu): open individual assignments.
 :::
 
 ## Quick links
 
-- 👉 **Hand-on Exercise 1**: [Open the assignment](Hands-on_Ex/Hands-on_Ex01/hands-on_ex01.qmd)  
-- 👉 **About**: [Course and tooling](about.qmd)
+-   👉 **Hand-on Exercise 1**: [Open the assignment](Hands-on_Ex/Hands-on_Ex01/hands-on_ex01.qmd)\
+-   👉 **About**: [Course and tooling](about.qmd)
 
 ## Objectives of my hands-on work
 
-1. Demonstrate step-by-step workflows for geospatial tasks that a beginner can follow.
-2. Use clear, descriptive names and relative file paths so the website renders correctly on Netlify.
-3. Provide reproducible results with the same structure for every assignment.
-
-## What you will find here
-
-- **Code with explanations for beginners**  
-  Every code block includes plain-language comments. No unexplained acronyms are used.
-- **Outputs**  
-  Static maps, tables, and charts are embedded in the assignment pages.
+1.  Demonstrate step-by-step workflows for geospatial tasks that a beginner can follow.
+2.  Use clear, descriptive names and relative file paths so the website renders correctly on Netlify.
+3.  Provide reproducible results with the same structure for every assignment.

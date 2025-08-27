@@ -3,7 +3,7 @@ project:
   output-dir: _site
 
 website:
-  title: "ISSS626-Geospatial_Analytics_and_Applications"
+  title: "ISSS626"
   navbar:
     left:
       - text: "Hand-on Exercise"
