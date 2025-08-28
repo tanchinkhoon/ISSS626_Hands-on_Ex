@@ -1,3 +1,8 @@
+
+---
+title: ISSS626
+---
+
 Welcome to **Geospatial Analytics and Application (ISSS626)**. This website collects my course work and hands-on exercises. Use the top navigation bar to open each page.
 
 ::: callout-note

@@ -2,7 +2,6 @@
 title: "Hands-on_Ex01"
 author: "TAN Chin Khoon"
 date: "`r Sys.Date()`"
-output: html_document
 ---
 
 # 1 Geospatial Data Science with R
