@@ -6,10 +6,10 @@ website:
   title: "ISSS626"
   navbar:
     left:
-      - text: "Hand-on Exercise"
+      - text: "Hands-on Exercise"
         menu:
-          - text: "Hand-on Exercise 1"
-            href: Hands-on_Ex01/hand-on_ex01.qmd
+          - text: "Hands-on Exercise 1"
+            href: Hands-on_Ex01/Hand-on_Ex01.qmd
     right:
       - text: "Home"
         href: index.qmd
