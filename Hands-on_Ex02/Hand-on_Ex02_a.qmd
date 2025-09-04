@@ -4,9 +4,9 @@ author: "TAN Chin Khoon"
 date: "`r Sys.Date()`"
 ---
 
-# 1st Order Spatial Point Patterns Analysis Methods
+# 4 1st Order Spatial Point Patterns Analysis Methods
 
-## 4.3 Installing and Loading the R packages
+## 4.3 Installing and Loading the R packagesn
 
 ```{r,}
 # Install 'pacman' once if you do not have it (uncomment next line and run only once)
@@ -254,64 +254,25 @@ ce_MC
 
 ```
 
+# 4.7 Kernel Density Estimation (KDE) Method
 
+**Goal:** Turn points into a smooth surface to reveal hotspots. Bandwidth controls smoothness; kernel controls the spread shape.
 
+### 4.7.1 Working with automatic bandwidth selection method
 
 ```{r}
-
+kde_SG_diggle <- density(          # Create KDE surface and save to object 'kde_SG_diggle'
+  childcareSG_ppp,                 # Input: childcare centres dataset in 'ppp' format
+  sigma = bw.diggle,               # Bandwidth: automatic smoothing radius (Diggle’s selector)
+  edge  = TRUE,                    # Apply edge correction to fix boundary underestimation
+  kernel = "gaussian"              # Kernel type: Gaussian (bell-shaped smoothing function)
+)                                  # End of density() call
 
 ```
 
-
-
-
 ```{r}
-
-
-```
-
-
-
-```{r}
-
-
-```
-
-
-
-
-```{r}
-
-
-```
-
-
-
-
-```{r}
-
-
-```
-
-
-```{r}
-
-
-```
-
-
-
-
-```{r}
-
-
-```
-
-
-
-
-```{r}
-
+# Plot the kernel density estimation surface for childcare centres
+plot(kde_SG_diggle)        
 
 ```
 
@@ -319,148 +280,336 @@ ce_MC
 
 ```{r}
 
+summary(kde_SG_diggle)
+
+```
+
+```{r}
+# Calculate optimal bandwidth (smoothing parameter) using Diggle’s method
+bw <- bw.diggle(childcareSG_ppp)             
+bw   # Display the selected bandwidth value
+
+```
+
+### 4.7.2 Rescalling KDE values
+
+```{r}
+childcareSG_ppp_km <- rescale.ppp(    # Rescale the point pattern dataset from metres to kilometres
+  childcareSG_ppp, 1000, "km")        # Display the selected bandwidth value 
 
 ```
 
 
 ```{r}
-
+kde_childcareSG_km <- density(      # Compute kernel density estimation on rescaled dataset
+  childcareSG_ppp_km,               # Input point pattern in kilometres
+  sigma = bw.diggle,                # Use Diggle’s optimal bandwidth (sigma)
+  edge  = TRUE,                     # Apply edge correction to fix boundary bias
+  kernel = "gaussian"               # Use Gaussian kernel for smoothing
+)
 
 ```
-
-
 
 
 ```{r}
+# Plot KDE surface for childcare centres (units in km)
+plot(kde_childcareSG_km)
 
+```
+### 4.7.3 Working with different automatic badwidth methods
+
+```{r}
+# Compute bandwidth using Cronie & van Lieshout method
+bw.CvL(childcareSG_ppp_km)
 
 ```
 
+```{r}
+# Compute bandwidth using Scott’s rule-of-thumb method
+bw.scott(childcareSG_ppp_km)
 
+```
 
 
 ```{r}
-
+# Compute bandwidth using likelihood cross-validation (PPL)
+bw.ppl(childcareSG_ppp_km)
 
 ```
 
+```{r}
+# Re-compute bandwidth using Diggle’s method (on km scale)
+bw.diggle(childcareSG_ppp_km)
 
+```
+
+```{r}
+kde_childcareSG_ppl <- density(              # KDE using PPL bandwidth for smoothing
+  childcareSG_ppp_km,                        # Input dataset in kilometres
+  sigma = bw.ppl,                            # Use bandwidth chosen by PPL
+  edge  = TRUE,                              # Apply edge correction
+  kernel = "gaussian"                        # Gaussian smoothing kernel
+)
+
+par(mfrow=c(1,2))                            # Set plot area into 1 row, 2 columns for comparison
+plot(kde_childcareSG_km, main = "bw.diggle") # Plot KDE using Diggle bandwidth
+plot(kde_childcareSG_ppl, main = "bw.ppl")   # Plot KDE using PPL bandwidth
+
+```
+### 4.7.4 Working with different kernel methods
+
+```{r}
+par(mfrow=c(2,2))                               # Divide plotting window into 2 rows × 2 columns
+
+plot(density(childcareSG_ppp_km,                # KDE with Gaussian kernel
+             sigma=0.2959712, edge=TRUE, 
+             kernel="gaussian"), 
+     main="Gaussian")                           # Title for Gaussian plot
+
+plot(density(childcareSG_ppp_km,                # KDE with Epanechnikov kernel
+             sigma=0.2959712, edge=TRUE, 
+             kernel="epanechnikov"), 
+     main="Epanechnikov")                       # Title for Epanechnikov plot
+
+plot(density(childcareSG_ppp_km,                # KDE with Quartic kernel
+             sigma=0.2959712, edge=TRUE, 
+             kernel="quartic"), 
+     main="Quartic")                            # Title for Quartic plot
+
+plot(density(childcareSG_ppp_km,                # KDE with Disc kernel
+             sigma=0.2959712, edge=TRUE, 
+             kernel="disc"), 
+     main="Disc")                               # Title for Disc plot
+
+```
+## 4.8 Fixed and Adaptive KDE
+
+### 4.8.1 Computing KDE by using fixed bandwidth
+
+```{r}
+kde_childcareSG_fb <- density(   # KDE using fixed bandwidth method
+  childcareSG_ppp_km,            # Input childcare centres dataset (in km)
+  sigma = 0.6,                   # Fixed bandwidth = 0.6 km (600 metres)
+  edge  = TRUE,                  # Apply edge correction at boundaries
+  kernel = "gaussian"            # Gaussian smoothing kernel
+)
+
+plot(kde_childcareSG_fb)         # Plot the fixed bandwidth KDE result
+
+```
+### 4.8.2 Computing KDE by using adaptive bandwidth
+
+```{r}
+kde_childcareSG_ab <- adaptive.density(    # KDE using adaptive bandwidth method
+  childcareSG_ppp_km,                      # Input childcare centres dataset (in km)
+  method="kernel"                          # Kernel smoothing method
+)
+
+plot(kde_childcareSG_ab)                   # Plot the adaptive bandwidth KDE result
+
+```
+
+```{r}
+par(mfrow=c(1,2))                                      # Set plotting window to 1 row × 2 columns
+plot(kde_childcareSG_fb, main = "Fixed bandwidth")     # Show fixed bandwidth KDE
+plot(kde_childcareSG_ab, main = "Adaptive bandwidth")  # Show adaptive bandwidth KDE
+
+```
+## 4.9 Plotting cartographic quality KDE map
+
+### 4.9.1 Converting gridded output into raster
+
+```{r}
+# Convert KDE (im class) into SpatRaster object
+kde_childcareSG_bw_terra <- rast(kde_childcareSG_km)
+
+```
 
 
 ```{r}
-
+# Check the class of the raster object (should be "SpatRaster")
+class(kde_childcareSG_bw_terra)
 
 ```
-
 
 
 ```{r}
-
+# Print raster properties: resolution, extent, units, etc.
+kde_childcareSG_bw_terra
 
 ```
+### 4.9.2 Assigning projection systems
 
+```{r}
+# Assign projection system SVY21 / Singapore TM (EPSG:3414)
+crs(kde_childcareSG_bw_terra) <- "EPSG:3414"
 
+```
 
 
 ```{r}
-
+# Re-check raster details, now with CRS applied
+kde_childcareSG_bw_terra
 
 ```
+### 4.9.3 Plotting KDE map with tmap
 
+```{r}
+tm_shape(kde_childcareSG_bw_terra) +           # Define raster object to be plotted
+  tm_raster(col.scale =                        # Set raster colour scheme
+              tm_scale_continuous(values="viridis"), 
+            col.legend = tm_legend(            # Add legend for density values
+              title = "Density values",        # Legend title
+              title.size = 0.7,                # Legend title text size
+              text.size = 0.7),                # Legend labels text size
+            bg.color = "white",                # Background colour of map
+            bg.alpha = 0.7,                    # Transparency of background
+            position = tm_pos_in("right","bottom"), # Place legend bottom-right
+            frame = TRUE) +                    # Draw frame around raster
+  tm_graticules(labels.size = 0.7) +           # Add graticule grid with label size 0.7
+  tm_compass() +                               # Add compass to map
+  tm_layout(scale = 1.0)                       # Set layout scale
+
+```
+## 4.10 First Order SPPA at the Planning Subzone Level
+
+### 4.10.1 Geospatial data wrangling
+
+#### 4.10.1.1 Extracting study area
+
+```{r}
+pg <- mpsz_cl %>%                         # Create dataset 'pg' by filtering master plan polygons
+  filter(PLN_AREA_N == "PUNGGOL")         # Keep only polygons where planning area = Punggol
+
+tm <- mpsz_cl %>%                         # Create dataset 'tm'
+  filter(PLN_AREA_N == "TAMPINES")        # Keep only polygons where planning area = Tampines
+
+ck <- mpsz_cl %>%                         # Create dataset 'ck'
+  filter(PLN_AREA_N == "CHOA CHU KANG")   # Keep only polygons where planning area = Choa Chu Kang
+
+jw <- mpsz_cl %>%                         # Create dataset 'jw'
+  filter(PLN_AREA_N == "JURONG WEST")     # Keep only polygons where planning area = Jurong West
+
+```
 
 
 ```{r}
+par(mfrow=c(2,2))                              # Arrange plotting area into 2 rows × 2 columns
 
+plot(st_geometry(pg), main="Punggol")          # Plot polygon boundary of Punggol planning area
+plot(st_geometry(tm), main="Tampines")         # Plot polygon boundary of Tampines planning area
+plot(st_geometry(ck), main="Choa Chu Kang")    # Plot polygon boundary of Choa Chu Kang planning area
+plot(st_geometry(jw), main="Jurong West")      # Plot polygon boundary of Jurong West planning area
+
+
+```
+#### 4.10.1.2 Creating owin object
+
+```{r}
+pg_owin <- as.owin(pg)     # Convert Punggol polygon(s) to an 'owin' window (study region)
+tm_owin <- as.owin(tm)     # Convert Tampines polygon(s) to 'owin'
+ck_owin <- as.owin(ck)     # Convert Choa Chu Kang polygon(s) to 'owin'
+jw_owin <- as.owin(jw)     # Convert Jurong West polygon(s) to 'owin'
+
+```
+
+#### 4.10.1.3 Combining point events object and owin object
+
+```{r}
+childcare_pg_ppp <- childcare_ppp[pg_owin]  # Clip national points to Punggol window (points inside only)
+childcare_tm_ppp <- childcare_ppp[tm_owin]  # Clip points to Tampines window
+childcare_ck_ppp <- childcare_ppp[ck_owin]  # Clip points to Choa Chu Kang window
+childcare_jw_ppp <- childcare_ppp[jw_owin]  # Clip points to Jurong West window
+
+```
+
+```{r}
+childcare_pg_ppp_km <- rescale.ppp(            # Rescale Punggol points from metres → kilometres
+  childcare_pg_ppp, 1000, "km"                 # divide coords by 1000; label new unit as "km"
+)
+childcare_tm_ppp_km <- rescale.ppp(            # Rescale Tampines points to kilometres
+  childcare_tm_ppp, 1000, "km"
+)
+childcare_ck_ppp_km <- rescale.ppp(            # Rescale CCK points to kilometres
+  childcare_ck_ppp, 1000, "km"
+)
+childcare_jw_ppp_km <- rescale.ppp(            # Rescale Jurong West points to kilometres
+  childcare_jw_ppp, 1000, "km"
+)
 
 ```
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+```{r}
+par(mfrow = c(2,2))                             # Arrange plotting area into a 2×2 grid
+
+plot(unmark(childcare_pg_ppp_km),               # Plot Punggol points (unmark = hide text marks)
+     main = "Punggol")                          # Panel title
+
+plot(unmark(childcare_tm_ppp_km),               # Plot Tampines points
+     main = "Tampines")
+
+plot(unmark(childcare_ck_ppp_km),               # Plot Choa Chu Kang points
+     main = "Choa Chu Kang")
+
+plot(unmark(childcare_jw_ppp_km),               # Plot Jurong West points
+     main = "Jurong West")
+
+par(mfrow = c(1,1))                             # Reset plotting layout back to single panel
+
+```
+### 4.10.2 Clark and Evans Test
+
+```{r}
+clarkevans.test(childcare_ck_ppp,              # Clark–Evans test for the Choa Chu Kang point pattern
+  correction  = "none",                        # No edge correction (consistent with slides)
+  clipregion  = NULL,                          # Use the pattern's own observation window
+  alternative = c("two.sided"),                # Two-sided hypothesis (clustered or regular)
+  nsim        = 999                            # 999 CSR simulations for p-value
+)                                              # End of clarkevans.test call
+
+```
+#### 4.10.2.2 Tampines planning area
+
+```{r}
+clarkevans.test(childcare_tm_ppp,   # Clark–Evans test for the Tampines point pattern
+  correction  = "none",             # No edge correction (to match slides)
+  clipregion  = NULL,               # Do not clip by an additional region (use pattern's window)
+  alternative = c("two.sided"),     # Two-sided test: allow clustering (R<1) or regularity (R>1)
+  nsim        = 999                 # Monte-Carlo CSR simulations (999 replicates)
+)                                   # End of clarkevans.test call
+
+```
+### 4.10.3 Computing KDE surfaces by planning area
+
+```{r}
+par(mfrow = c(2,2))                            # Arrange plotting window into 2 rows × 2 columns
+
+plot(density(childcare_pg_ppp_km,              # KDE for Punggol (data already rescaled to km)
+             sigma = bw.diggle,                # Use Diggle’s automatic bandwidth selector
+             edge  = TRUE,                     # Apply edge correction (reduces boundary bias)
+             kernel = "gaussian"),             # Gaussian kernel (smooth bell-shaped influence)
+     main = "Punggol")                         # Panel title
+
+plot(density(childcare_tm_ppp_km,              # KDE for Tampines
+             sigma = bw.diggle,                # Same bandwidth rule for comparability
+             edge  = TRUE,                     # Edge correction on
+             kernel = "gaussian"),             # Gaussian kernel
+     main = "Tampines")                        # Panel title
+
+plot(density(childcare_ck_ppp_km,              # KDE for Choa Chu Kang
+             sigma = bw.diggle,                # Diggle bandwidth (km)
+             edge  = TRUE,                     # Edge correction on
+             kernel = "gaussian"),             # Gaussian kernel
+     main = "Choa Chu Kang")                   # Panel title
+
+plot(density(childcare_jw_ppp_km,              # KDE for Jurong West
+             sigma = bw.diggle,                # Diggle bandwidth (km)
+             edge  = TRUE,                     # Edge correction on
+             kernel = "gaussian"),             # Gaussian kernel
+     main = "Jurong West")                     # Panel title
+
+```
 
 
 
