@@ -920,9 +920,9 @@ plot(L_tm, . - r ~ r,                                      # plot (L_hat - r) vs
 
 To confirm the observed spatial patterns above, a hypothesis test will be conducted. The hypothesis and test are as follows:
 
-Ho = The distribution of childcare services at Tampines are randomly distributed.
+$H_0$ = The distribution of childcare services at Tampines are randomly distributed.
 
-H1= The distribution of childcare services at Tampines are not randomly distributed.
+$H_1$ = The distribution of childcare services at Tampines are not randomly distributed.
 
 The null hypothesis will be rejected if p-value is smaller than alpha value of 0.001.
 
@@ -937,57 +937,4 @@ plot(L_tm.csr, . - r ~ r,                                  # plot (L_hat - r) vs
      xlab = "d", ylab = "L(d)-r",                          # keep labels consistent with the slide
      xlim = c(0, 500))                                     # show 0–500 m window exactly as given
 
-
 ```
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
