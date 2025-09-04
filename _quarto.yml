@@ -10,6 +10,10 @@ website:
         menu:
           - text: "Hands-on Exercise 1"
             href: Hands-on_Ex01/Hand-on_Ex01.qmd
+          - text: "Hands-on Exercise 2a"
+            href: Hands-on_Ex02/Hand-on_Ex02_a.qmd
+          - text: "Hands-on Exercise 2b"
+            href: Hands-on_Ex02/Hand-on_Ex02_b.qmd
     right:
       - text: "Home"
         href: index.qmd

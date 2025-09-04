@@ -1,0 +1,537 @@
+---
+title: "Hands-on_Ex02(a)"
+author: "TAN Chin Khoon"
+date: "`r Sys.Date()`"
+---
+
+# 1st Order Spatial Point Patterns Analysis Methods
+
+## 4.3 Installing and Loading the R packages
+
+```{r,}
+# Install 'pacman' once if you do not have it (uncomment next line and run only once)
+# install.packages("pacman")
+
+# Use pacman::p_load() to install (if needed) and then load the listed packages automatically
+pacman::p_load(
+  sf,            # modern vector geospatial data handling (Simple Features)
+  terra,         # modern raster + vector geospatial data handling
+  spatstat,      # meta‑package: tools for spatial point pattern analysis (SPPA)
+  tmap,          # cartographic and interactive mapping
+  rvest,         # web‑scraping helper used here to parse HTML inside KML attributes
+  tidyverse      # data wrangling helpers (dplyr, purrr, stringr, readr, etc.)
+)
+
+```
+
+## 4.4 Importing and Wrangling Geospatial Data Sets
+
+Import the Master Plan 2019 Subzone (No Sea) polygons as sf and set projection to EPSG:3414 (SVY21 / Singapore TM)
+
+```{r}
+# Read the subzone boundary KML into an sf object named 'mpsz_sf'
+mpsz_sf <- sf::st_read("data/geospatial/MasterPlan2019SubzoneBoundaryNoSeaKML.kml") %>%
+  sf::st_zm(drop = TRUE, what = "ZM") %>%  # remove Z (elevation) and M (measure) dimensions to keep 2D only
+  sf::st_transform(crs = 3414)   
+
+```
+> **Why remove Z/M?** Our analysis is purely 2D on a planar map. Extra dimensions are unnecessary and can break some operations. \
+> **Why EPSG:3414?** This is the standard projected system for Singapore. Distances/areas become meaningful (meters) instead of degrees.
+
+Extract REGION_N, PLN_AREA_N, SUBZONE_N, SUBZONE_C from the Description field (HTML inside KML) (as in the guidance helper function)
+
+```{r}
+# Define a small helper function to pull one named item from the HTML table stored in the 'Description' field
+extract_kml_field <- function(html_text, field_name) {
+  if (is.na(html_text) || html_text == "") return(NA_character_) # if Description is empty, return NA immediately
+
+  page <- rvest::read_html(html_text)                              # parse the HTML string
+  rows <- rvest::html_elements(page, "tr")                         # get all table rows (<tr>)
+
+  # Find the row whose header cell (<th>) equals the field_name, then take the value in its <td>
+  value <- rows %>%
+    purrr::keep(~ rvest::html_text2(rvest::html_element(.x, "th")) == field_name) %>%
+    rvest::html_element("td") %>%
+    rvest::html_text2()
+
+  if (length(value) == 0) NA_character_ else value                 # if not found, return NA
+}
+
+```
+
+```{r}
+# Apply the function to build clean attributes from 'Description'
+mpsz_sf <- mpsz_sf %>%
+  dplyr::mutate(
+    REGION_N   = purrr::map_chr(Description, extract_kml_field, "REGION_N"),   # region name
+    PLN_AREA_N = purrr::map_chr(Description, extract_kml_field, "PLN_AREA_N"), # planning area name
+    SUBZONE_N  = purrr::map_chr(Description, extract_kml_field, "SUBZONE_N"),  # subzone name
+    SUBZONE_C  = purrr::map_chr(Description, extract_kml_field, "SUBZONE_C")   # subzone code
+  ) %>%
+  dplyr::select(-Name, -Description) %>%     # drop original noisy fields
+  dplyr::relocate(geometry, .after = dplyr::last_col())  # move geometry column to the end for readability
+
+```
+
+> **Checkpoint:** You now have clean polygon attributes and the proper CRS.
+
+(Optional) Filter out offshore/irrelevant areas exactly like in the slides
+
+```{r}
+# Create a cleaned version that excludes southern group, western islands, and north‑eastern islands (as per slides)
+mpsz_cl <- mpsz_sf %>%
+  dplyr::filter(
+    SUBZONE_N != "SOUTHERN GROUP",
+    PLN_AREA_N != "WESTERN ISLANDS",
+    PLN_AREA_N != "NORTH-EASTERN ISLANDS"
+  )
+
+# Save a small RDS for repeatability (optional)
+# readr::write_rds(mpsz_cl, "chap04/data/mpsz_cl.rds")
+
+```
+
+Import Child Care Services points as sf, drop Z/M, and project to EPSG:3414
+
+```{r}
+# Read childcare locations KML into an sf object named 'childcare_sf'
+childcare_sf <- sf::st_read("data/geospatial/ChildCareServices.kml") %>%
+  sf::st_zm(drop = TRUE, what = "ZM") %>%     # keep 2D only
+  sf::st_transform(crs = 3414)         
+
+```
+### 4.4.1 Mapping the Geospatial Data Sets
+
+```{r}
+# Quick mapping of both layers to verify alignment (childcare points inside planning subzones)
+tmap::tmap_mode("plot")  # ensure static plotting mode
+
+# Plot subzones with childcare points overlaid
+tmap::tm_shape(mpsz_cl) +
+  tmap::tm_polygons(col = "grey85", border.col = "black") +
+  tmap::tm_shape(childcare_sf) +
+  tmap::tm_dots(size = 0.2, col = "red")
+
+```
+> **What to check:** All childcare centres (black dots) fall neatly inside Singapore’s subzones (grey polygons). If not, check CRS and transformations.
+
+Interactive mapping with tmap + leaflet
+
+```{r}
+# Switch tmap into interactive mode (internally uses the leaflet library)
+tmap::tmap_mode("view")                # enable pan/zoom and feature popups
+
+# Draw an interactive point map on top of a web basemap
+# - Click a point to see its attributes
+# - Use the layer control to change basemaps (e.g., ESRI.WorldGrayCanvas, OpenStreetMap)
+tmap::tm_shape(childcare_sf) +         # select the childcare sf layer
+  tmap::tm_dots()                      # render as clickable points
+
+# IMPORTANT: After exploring, switch back to static plotting for the rest of the workflow
+# This avoids keeping too many active web-map connections during knitting/deployment
+tmap::tmap_mode("plot")               # restore static plotting mode
+
+```
+
+
+```{r}
+# Switch to interactive mode for web-map style exploration
+# tmap::tmap_mode("view")
+# 
+# # Create an interactive map where you can zoom and click points
+# tmap::tm_shape(mpsz_cl) +
+#   tmap::tm_polygons(col = "lightgrey", border.col = "white") +
+#   tmap::tm_shape(childcare_sf) +
+#   tmap::tm_dots(col = "blue", size = 0.5)
+# 
+# # Always switch back to static plotting when done
+# tmap::tmap_mode("plot")
+
+```
+
+> **Notes:** In interactive mode you can zoom, pan, and click childcare points to view their attributes. Remember to switch back to plot mode before continuing with static maps.
+
+## 4.5 Geospatial Data Wrangling
+
+### 4.5.1 Convert sf Point Data to ppp (planar point pattern)
+
+```{r}
+# Convert the sf point layer to spatstat's planar point pattern (ppp) object
+childcare_ppp <- spatstat.geom::as.ppp(childcare_sf)  # now suitable for SPPA functions
+
+```
+
+```{r}
+# Verify the class
+class(childcare_ppp)  # expect: "ppp"
+
+```
+
+```{r}
+# Peek at summary to understand the point pattern and its window
+summary(childcare_ppp)  # quick glance (number of points, intensity, window size)
+
+```
+
+### 4.5.2 Create an Owin (observation window) from the Singapore Boundary
+
+```{r}
+# Convert the cleaned subzones into a single observation window (owin) for clipping/analysis
+sg_owin <- spatstat.geom::as.owin(mpsz_cl)
+
+```
+
+```{r}
+# Verify the class
+class(sg_owin)  # expect: "owin"
+
+```
+
+```{r}
+# Visualize the boundary to confirm it looks right
+plot(sg_owin, main = "sg_owin — Singapore Observation Window")
+
+```
+
+## 4.3 Combine the ppp with the owin (keep only points inside Singapore)
+
+```{r}
+# Clip the point pattern to the Singapore window to exclude any points outside the boundary
+childcareSG_ppp <- childcare_ppp[sg_owin]
+
+```
+
+```{r}
+# Confirm the combined object (ppp with polygon window information)
+childcareSG_ppp  # should report a polygonal window and the point count
+
+```
+
+## 4.6 Clark-Evan Test for Nearest Neighbour Analysis
+
+**Hypotheses:**
+
+- $H_0$: Childcare centres are randomly distributed (Complete Spatial Randomness, CSR).
+
+- $H_1$: Childcare centres are not randomly distributed (clustered or regular).
+
+The 95% confident interval will be used.
+
+The Clark–Evans test returns an index *R*:
+
+- $R < 1 → clustered$.
+- $R = 1 → random$
+- $R > 1 → regular$
+
+### 4.6.1 Clark–Evans without CSR Simulation (Z-test)
+
+```{r}
+# Run Clark–Evans using observed pattern only (Z-test)
+ce_noCSR <- spatstat.explore::clarkevans.test(
+X = childcareSG_ppp, # ppp object of childcare centres
+correction = "none", # no edge correction (per slides)
+alternative = "clustered" # one-sided: test for clustering (R < 1)
+)
+
+# Show results
+ce_noCSR
+
+```
+
+### 4.6.2 Clark–Evans with CSR via Monte‑Carlo (nsim = 99)
+
+```{r}
+# Monte‑Carlo Clark–Evans: compare observed R to R from CSR simulations (nsim = 99)
+ce_MC <- spatstat.explore::clarkevans.test( # compute simulated p‑value under CSR
+X = childcareSG_ppp, # same ppp as above (metres)
+correction = "none", # keep consistent with slides
+alternative = "clustered", # one‑sided for clustering (R < 1)
+method = "MonteCarlo", # enable Monte‑Carlo simulation mode
+nsim = 99 # number of CSR replicates as per slides
+) # end clarkevans.test call
+
+ce_MC
+
+```
+
+
+
+
+```{r}
+
+
+```
+
+
+
+
+```{r}
+
+
+```
+
+
+
+```{r}
+
+
+```
+
+
+
+
+```{r}
+
+
+```
+
+
+
+
+```{r}
+
+
+```
+
+
+```{r}
+
+
+```
+
+
+
+
+```{r}
+
+
+```
+
+
+
+
+```{r}
+
+
+```
+
+
+
+```{r}
+
+
+```
+
+
+```{r}
+
+
+```
+
+
+
+
+```{r}
+
+
+```
+
+
+
+
+```{r}
+
+
+```
+
+
+
+
+```{r}
+
+
+```
+
+
+
+```{r}
+
+
+```
+
+
+
+
+```{r}
+
+
+```
+
+
+
+```{r}
+
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
