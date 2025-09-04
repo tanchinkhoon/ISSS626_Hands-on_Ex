@@ -1,7 +1,7 @@
 ---
 title: "Hands-on_Ex02(a)"
 author: "TAN Chin Khoon"
-date: "5 September 2025"
+date: "`r Sys.Date()`"
 ---
 
 # 4 1st Order Spatial Point Patterns Analysis Methods

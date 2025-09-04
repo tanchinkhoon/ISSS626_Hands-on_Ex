@@ -4,9 +4,11 @@ author: "TAN Chin Khoon"
 date: "5 September 2025"
 ---
 
+
 # 4 1st Order Spatial Point Patterns Analysis Methods
 
 ## 4.3 Installing and Loading the R packagesn
+
 
 ```{r,}
 # Install 'pacman' once if you do not have it (uncomment next line and run only once)
@@ -24,9 +26,11 @@ pacman::p_load(
 
 ```
 
+
 ## 4.4 Importing and Wrangling Geospatial Data Sets
 
 Import the Master Plan 2019 Subzone (No Sea) polygons as sf and set projection to EPSG:3414 (SVY21 / Singapore TM)
+
 
 ```{r}
 # Read the subzone boundary KML into an sf object named 'mpsz_sf'
@@ -35,10 +39,12 @@ mpsz_sf <- sf::st_read("data/geospatial/MasterPlan2019SubzoneBoundaryNoSeaKML.km
   sf::st_transform(crs = 3414)   
 
 ```
+
 > **Why remove Z/M?** Our analysis is purely 2D on a planar map. Extra dimensions are unnecessary and can break some operations. \
 > **Why EPSG:3414?** This is the standard projected system for Singapore. Distances/areas become meaningful (meters) instead of degrees.
 
 Extract REGION_N, PLN_AREA_N, SUBZONE_N, SUBZONE_C from the Description field (HTML inside KML) (as in the guidance helper function)
+
 
 ```{r}
 # Define a small helper function to pull one named item from the HTML table stored in the 'Description' field
@@ -73,9 +79,11 @@ mpsz_sf <- mpsz_sf %>%
 
 ```
 
+
 > **Checkpoint:** You now have clean polygon attributes and the proper CRS.
 
 (Optional) Filter out offshore/irrelevant areas exactly like in the slides
+
 
 ```{r}
 # Create a cleaned version that excludes southern group, western islands, and north‑eastern islands (as per slides)
@@ -91,7 +99,9 @@ mpsz_cl <- mpsz_sf %>%
 
 ```
 
+
 Import Child Care Services points as sf, drop Z/M, and project to EPSG:3414
+
 
 ```{r}
 # Read childcare locations KML into an sf object named 'childcare_sf'
@@ -100,7 +110,9 @@ childcare_sf <- sf::st_read("data/geospatial/ChildCareServices.kml") %>%
   sf::st_transform(crs = 3414)         
 
 ```
+
 ### 4.4.1 Mapping the Geospatial Data Sets
+
 
 ```{r}
 # Quick mapping of both layers to verify alignment (childcare points inside planning subzones)
@@ -113,9 +125,11 @@ tmap::tm_shape(mpsz_cl) +
   tmap::tm_dots(size = 0.2, col = "red")
 
 ```
+
 > **What to check:** All childcare centres (black dots) fall neatly inside Singapore’s subzones (grey polygons). If not, check CRS and transformations.
 
 Interactive mapping with tmap + leaflet
+
 
 ```{r}
 # Switch tmap into interactive mode (internally uses the leaflet library)
@@ -133,7 +147,6 @@ tmap::tmap_mode("plot")               # restore static plotting mode
 
 ```
 
-
 ```{r}
 # Switch to interactive mode for web-map style exploration
 # tmap::tmap_mode("view")
@@ -149,11 +162,13 @@ tmap::tmap_mode("plot")               # restore static plotting mode
 
 ```
 
+
 > **Notes:** In interactive mode you can zoom, pan, and click childcare points to view their attributes. Remember to switch back to plot mode before continuing with static maps.
 
 ## 4.5 Geospatial Data Wrangling
 
 ### 4.5.1 Convert sf Point Data to ppp (planar point pattern)
+
 
 ```{r}
 # Convert the sf point layer to spatstat's planar point pattern (ppp) object
@@ -173,7 +188,9 @@ summary(childcare_ppp)  # quick glance (number of points, intensity, window size
 
 ```
 
+
 ### 4.5.2 Create an Owin (observation window) from the Singapore Boundary
+
 
 ```{r}
 # Convert the cleaned subzones into a single observation window (owin) for clipping/analysis
@@ -193,7 +210,9 @@ plot(sg_owin, main = "sg_owin — Singapore Observation Window")
 
 ```
 
+
 ## 4.3 Combine the ppp with the owin (keep only points inside Singapore)
+
 
 ```{r}
 # Clip the point pattern to the Singapore window to exclude any points outside the boundary
@@ -206,6 +225,7 @@ childcareSG_ppp <- childcare_ppp[sg_owin]
 childcareSG_ppp  # should report a polygonal window and the point count
 
 ```
+
 
 ## 4.6 Clark-Evan Test for Nearest Neighbour Analysis
 
@@ -225,6 +245,7 @@ The Clark–Evans test returns an index *R*:
 
 ### 4.6.1 Clark–Evans without CSR Simulation (Z-test)
 
+
 ```{r}
 # Run Clark–Evans using observed pattern only (Z-test)
 ce_noCSR <- spatstat.explore::clarkevans.test(
@@ -238,7 +259,9 @@ ce_noCSR
 
 ```
 
+
 ### 4.6.2 Clark–Evans with CSR via Monte‑Carlo (nsim = 99)
+
 
 ```{r}
 # Monte‑Carlo Clark–Evans: compare observed R to R from CSR simulations (nsim = 99)
@@ -254,11 +277,13 @@ ce_MC
 
 ```
 
+
 # 4.7 Kernel Density Estimation (KDE) Method
 
 **Goal:** Turn points into a smooth surface to reveal hotspots. Bandwidth controls smoothness; kernel controls the spread shape.
 
 ### 4.7.1 Working with automatic bandwidth selection method
+
 
 ```{r}
 kde_SG_diggle <- density(          # Create KDE surface and save to object 'kde_SG_diggle'
@@ -276,8 +301,6 @@ plot(kde_SG_diggle)
 
 ```
 
-
-
 ```{r}
 
 summary(kde_SG_diggle)
@@ -291,14 +314,15 @@ bw   # Display the selected bandwidth value
 
 ```
 
+
 ### 4.7.2 Rescalling KDE values
+
 
 ```{r}
 childcareSG_ppp_km <- rescale.ppp(    # Rescale the point pattern dataset from metres to kilometres
   childcareSG_ppp, 1000, "km")        # Display the selected bandwidth value 
 
 ```
-
 
 ```{r}
 kde_childcareSG_km <- density(      # Compute kernel density estimation on rescaled dataset
@@ -310,13 +334,14 @@ kde_childcareSG_km <- density(      # Compute kernel density estimation on resca
 
 ```
 
-
 ```{r}
 # Plot KDE surface for childcare centres (units in km)
 plot(kde_childcareSG_km)
 
 ```
+
 ### 4.7.3 Working with different automatic badwidth methods
+
 
 ```{r}
 # Compute bandwidth using Cronie & van Lieshout method
@@ -329,7 +354,6 @@ bw.CvL(childcareSG_ppp_km)
 bw.scott(childcareSG_ppp_km)
 
 ```
-
 
 ```{r}
 # Compute bandwidth using likelihood cross-validation (PPL)
@@ -356,7 +380,9 @@ plot(kde_childcareSG_km, main = "bw.diggle") # Plot KDE using Diggle bandwidth
 plot(kde_childcareSG_ppl, main = "bw.ppl")   # Plot KDE using PPL bandwidth
 
 ```
+
 ### 4.7.4 Working with different kernel methods
+
 
 ```{r}
 par(mfrow=c(2,2))                               # Divide plotting window into 2 rows × 2 columns
@@ -382,9 +408,11 @@ plot(density(childcareSG_ppp_km,                # KDE with Disc kernel
      main="Disc")                               # Title for Disc plot
 
 ```
+
 ## 4.8 Fixed and Adaptive KDE
 
 ### 4.8.1 Computing KDE by using fixed bandwidth
+
 
 ```{r}
 kde_childcareSG_fb <- density(   # KDE using fixed bandwidth method
@@ -397,7 +425,9 @@ kde_childcareSG_fb <- density(   # KDE using fixed bandwidth method
 plot(kde_childcareSG_fb)         # Plot the fixed bandwidth KDE result
 
 ```
+
 ### 4.8.2 Computing KDE by using adaptive bandwidth
+
 
 ```{r}
 kde_childcareSG_ab <- adaptive.density(    # KDE using adaptive bandwidth method
@@ -415,9 +445,11 @@ plot(kde_childcareSG_fb, main = "Fixed bandwidth")     # Show fixed bandwidth KD
 plot(kde_childcareSG_ab, main = "Adaptive bandwidth")  # Show adaptive bandwidth KDE
 
 ```
+
 ## 4.9 Plotting cartographic quality KDE map
 
 ### 4.9.1 Converting gridded output into raster
+
 
 ```{r}
 # Convert KDE (im class) into SpatRaster object
@@ -425,20 +457,20 @@ kde_childcareSG_bw_terra <- rast(kde_childcareSG_km)
 
 ```
 
-
 ```{r}
 # Check the class of the raster object (should be "SpatRaster")
 class(kde_childcareSG_bw_terra)
 
 ```
 
-
 ```{r}
 # Print raster properties: resolution, extent, units, etc.
 kde_childcareSG_bw_terra
 
 ```
+
 ### 4.9.2 Assigning projection systems
+
 
 ```{r}
 # Assign projection system SVY21 / Singapore TM (EPSG:3414)
@@ -446,13 +478,14 @@ crs(kde_childcareSG_bw_terra) <- "EPSG:3414"
 
 ```
 
-
 ```{r}
 # Re-check raster details, now with CRS applied
 kde_childcareSG_bw_terra
 
 ```
+
 ### 4.9.3 Plotting KDE map with tmap
+
 
 ```{r}
 tm_shape(kde_childcareSG_bw_terra) +           # Define raster object to be plotted
@@ -471,11 +504,13 @@ tm_shape(kde_childcareSG_bw_terra) +           # Define raster object to be plot
   tm_layout(scale = 1.0)                       # Set layout scale
 
 ```
+
 ## 4.10 First Order SPPA at the Planning Subzone Level
 
 ### 4.10.1 Geospatial data wrangling
 
 #### 4.10.1.1 Extracting study area
+
 
 ```{r}
 pg <- mpsz_cl %>%                         # Create dataset 'pg' by filtering master plan polygons
@@ -492,7 +527,6 @@ jw <- mpsz_cl %>%                         # Create dataset 'jw'
 
 ```
 
-
 ```{r}
 par(mfrow=c(2,2))                              # Arrange plotting area into 2 rows × 2 columns
 
@@ -503,7 +537,9 @@ plot(st_geometry(jw), main="Jurong West")      # Plot polygon boundary of Jurong
 
 
 ```
+
 #### 4.10.1.2 Creating owin object
+
 
 ```{r}
 pg_owin <- as.owin(pg)     # Convert Punggol polygon(s) to an 'owin' window (study region)
@@ -513,7 +549,9 @@ jw_owin <- as.owin(jw)     # Convert Jurong West polygon(s) to 'owin'
 
 ```
 
+
 #### 4.10.1.3 Combining point events object and owin object
+
 
 ```{r}
 childcare_pg_ppp <- childcare_ppp[pg_owin]  # Clip national points to Punggol window (points inside only)
@@ -539,7 +577,6 @@ childcare_jw_ppp_km <- rescale.ppp(            # Rescale Jurong West points to k
 
 ```
 
-
 ```{r}
 par(mfrow = c(2,2))                             # Arrange plotting area into a 2×2 grid
 
@@ -558,7 +595,9 @@ plot(unmark(childcare_jw_ppp_km),               # Plot Jurong West points
 par(mfrow = c(1,1))                             # Reset plotting layout back to single panel
 
 ```
+
 ### 4.10.2 Clark and Evans Test
+
 
 ```{r}
 clarkevans.test(childcare_ck_ppp,              # Clark–Evans test for the Choa Chu Kang point pattern
@@ -569,7 +608,9 @@ clarkevans.test(childcare_ck_ppp,              # Clark–Evans test for the Choa
 )                                              # End of clarkevans.test call
 
 ```
+
 #### 4.10.2.2 Tampines planning area
+
 
 ```{r}
 clarkevans.test(childcare_tm_ppp,   # Clark–Evans test for the Tampines point pattern
@@ -580,7 +621,9 @@ clarkevans.test(childcare_tm_ppp,   # Clark–Evans test for the Tampines point 
 )                                   # End of clarkevans.test call
 
 ```
+
 ### 4.10.3 Computing KDE surfaces by planning area
+
 
 ```{r}
 par(mfrow = c(2,2))                            # Arrange plotting window into 2 rows × 2 columns
@@ -610,77 +653,4 @@ plot(density(childcare_jw_ppp_km,              # KDE for Jurong West
      main = "Jurong West")                     # Panel title
 
 ```
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
