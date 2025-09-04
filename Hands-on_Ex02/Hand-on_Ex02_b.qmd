@@ -1,10 +1,10 @@
 ---
 title: "Hands-on_Ex02(a)"
 author: "TAN Chin Khoon"
-date: "`r Sys.Date()`"
+date: "5 September 2025"
 ---
 
-# 4 1st Order Spatial Point Patterns Analysis Methods
+# 4. 1st Order Spatial Point Patterns Analysis Methods
 
 ## 4.3 Installing and Loading the R packagesn
 
