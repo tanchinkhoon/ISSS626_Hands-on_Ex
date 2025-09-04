@@ -1,10 +1,10 @@
 ---
-title: "Hands-on_Ex02(a)"
+title: "Hands-on_Ex02"
 author: "TAN Chin Khoon"
 date: "5 September 2025"
 ---
 
-# 4 1st Order Spatial Point Patterns Analysis Methods
+# 4. 1st Order Spatial Point Patterns Analysis Methods
 
 ## 4.1 Overview
 
@@ -246,6 +246,15 @@ ce_noCSR
 
 ```
 
+::: callout-note
+### Clark–Evans Test without CSR (Z-test)
+
+- **R = 0.53532 (< 1)** → indicates clustering.
+- **p-value < 2.2e-16 (< 0.05):** → reject H₀.
+- **Statistical conclusion:** Distribution is not random; strong clustering exists.
+- **Business communication:** Childcare centres are concentrated in specific neighbourhoods. This reflects demand-driven placement but may leave some areas underserved. Authorities should consider equity in future allocations.
+:::
+
 ### 4.6.2 Clark–Evans with CSR via Monte‑Carlo (nsim = 99)
 
 ```{r}
@@ -261,6 +270,15 @@ nsim = 99 # number of CSR replicates as per slides
 ce_MC
 
 ```
+
+::: callout-note
+### Clark–Evans Test with CSR (Monte Carlo, nsim=99)
+
+- **R = 0.53532 (< 1):** → clustering again.
+- **p-value = 0.01 (< 0.05)** → reject H₀ at 95% CI.
+- **Statistical conclusion:** Distribution is not random; clustering is statistically significant even under CSR simulations.
+- **Business communication:** Confirms earlier finding with stronger robustness. Clustering is not due to chance — it is systematic. Policymakers should expand childcare access in low-density areas to reduce inequality in service availability.
+:::
 
 # 4.7 Kernel Density Estimation (KDE) Method
 
@@ -619,27 +637,308 @@ plot(density(childcare_jw_ppp_km,              # KDE for Jurong West
 
 ```
 
+# 5.  2nd Order Spatial Point Patterns Analysis Methods
+
+## 5.5 Second-order Spatial Point Patterns Analysis
+
+**First-order** asks “where are points denser?”; **second-order** asks “how do points interact with each other across distance?”
+
+We’ll use four classical functions:
+- G(r) — nearest-neighbour distribution (from each event to its **nearest** event).
+- F(r) — empty-space distribution (from random locations to **nearest** event).
+- K(r) — accumulates neighbours within radius r; higher than CSR suggests clustering.
+- L(r) = √(K(r)/π) — variance-stabilised K; plot L(r) − r to read deviations easily.
+
+For each function your Prof shows **estimation** and a **Monte Carlo CSR test with envelopes**.
+
+## 5.6 Analysing Spatial Point Process Using G-Function
+
+### 5.6.1 Choa Chu Kang planning area
+
+#### 5.6.1.1 Computing G-function estimation
+
+```{r}
+set.seed(1234)                                             # fix the random seed so plots are reproducible for students
+G_CK <- Gest(childcare_ck_ppp, correction = "border")      # estimate nearest-neighbour CDF G(r) with border edge correction
+plot(G_CK, xlim = c(0, 500))                               # plot G(r) up to 500 m; dashed line shows CSR (Poisson) reference
+
+```
+#### 5.6.1.2 Performing Complete Spatial Randomness (CSR) Test — Monte Carlo
+
+To confirm the observed spatial patterns above, a hypothesis test will be conducted. The hypothesis and test are as follows:
+
+$H_0$ = The distribution of childcare services at Choa Chu Kang are randomly distributed.
+
+$H_1$ = The distribution of childcare services at Choa Chu Kang are not randomly distributed.
+
+The null hypothesis will be rejected if p-value is smaller than alpha value of 0.001.
+
+Monte Carlo test with G-fucntion
+
+```{r}
+# run 999 CSR simulations; compute simulation envelopes for G(r)
+G_CK.csr <- envelope(childcare_ck_ppp, Gest, nsim = 999)   
+
+```
+
+```{r}
+# plot observed G(r), CSR expectation, and 999-sim envelopes
+plot(G_CK.csr)    
+
+```
+::: callout-note
+### Reading the plot:
+
+If the **black observed** curve is mostly **above** the grey envelope → points are **clustered** at those distances.
+If it is **below → regular/repulsive** (inhibition). Inside the envelope → not significantly different from CSR at that scale.
+:::
+
+### 5.6.2 Tampines planning area
+
+#### 5.6.2.1 Computing G-function estimation
+
+```{r}
+G_tm <- Gest(childcare_tm_ppp, correction = "best")        # estimate G(r) using 'best' automatic edge correction
+plot(G_tm)                                                 # plot observed G(r) vs theoretical CSR G(r)
+
+```
+
+#### 5.6.2.2 Performing Complete Spatial Randomness Test
+
+To confirm the observed spatial patterns above, a hypothesis test will be conducted. The hypothesis and test are as follows:
+
+$H_o$ = The distribution of childcare services at Tampines are randomly distributed.
+
+$H_1$ = The distribution of childcare services at Tampines are not randomly distributed.
+
+The null hypothesis will be rejected is p-value is smaller than alpha value of 0.001.
+
+The code chunk below is used to perform the hypothesis testing.
+
+```{r}
+G_tm.csr <- envelope(childcare_tm_ppp, Gest,   # simulate CSR envelopes for G(r) at Tampines
+                     correction = "all",       # request all supported edge corrections inside envelope calc
+                     nsim = 999)               # use 999 simulations as in Prof’s slide
+plot(G_tm.csr)                                 # display observed curve, CSR, and envelopes
+
+```
+> **Decision rule (as per slides):** Reject $H_0$: CSR if the observed curve exits the envelope and the associated p-value < 0.001 (α = 0.001).
+
+## 5.7 Analysing Spatial Point Process Using F-Function
+
+### 5.7.1 Choa Chu Kang planning area
+
+#### 5.7.1.1 Computing F-function estimation
+
+```{r}
+F_CK <- Fest(childcare_ck_ppp)                             # estimate empty-space CDF F(r): distance from random locations to nearest facility
+plot(F_CK)                                                 # plot multiple estimators and the CSR reference curve F_pois(r)
+
+```
+### 5.7.2 Performing Complete Spatial Randomness Test
+
+To confirm the observed spatial patterns above, a hypothesis test will be conducted. The hypothesis and test are as follows:
+
+$H_0$ = The distribution of childcare services at Choa Chu Kang are randomly distributed.
+
+$H_1$ = The distribution of childcare services at Choa Chu Kang are not randomly distributed.
+
+The null hypothesis will be rejected if p-value is smaller than alpha value of 0.001.
+
+Monte Carlo test with F-fucntion
+
+```{r}
+F_CK.csr <- envelope(childcare_ck_ppp, Fest, nsim = 999)   # simulate 999 CSR patterns; compute F(r) envelopes
+
+```
+```{r}
+plot(F_CK.csr)
+
+```
 
 
 
+::: callout-note
+### Reading the plot:
+
+- **F(r) above CSR** → space tends to be **closer** to facilities than CSR (suggests clustering).
+- **F(r) below CSR** → **larger gaps** than expected (suggests inhibition).
+:::
+
+***5.7.3 Tampines planning area***
+
+****5.7.3.1 Computing F-function estimation****
+
+```{r}
+F_tm = Fest(childcare_tm_ppp, correction = "best")
+plot(F_tm)
+
+```
+
+#### 5.7.3.2 Performing Complete Spatial Randomness Test
+
+To confirm the observed spatial patterns above, a hypothesis test will be conducted. The hypothesis and test are as follows:
+
+Ho = The distribution of childcare services at Tampines are randomly distributed.
+
+H1= The distribution of childcare services at Tampines are not randomly distributed.
+
+The null hypothesis will be rejected is p-value is smaller than alpha value of 0.001.
+
+The code chunk below is used to perform the hypothesis testing.
+
+```{r}
+F_tm.csr <- envelope(childcare_tm_ppp, Fest, correction = "all", nsim = 999)
+
+```
+
+```{r}
+plot(F_tm.csr)
+
+```
+## 5.8 Analysing Spatial Point Process Using K-Function
+
+### 5.8.1 Choa Chu Kang planning area
+
+#### 5.8.1.1 Computing K-fucntion estimate
+
+```{r}
+# estimate K(r) using Ripley (isotropic) edge correction
+K_ck <- Kest(childcare_ck_ppp, correction = "Ripley")      
+
+plot(K_ck, . -r ~ r, ylab= "K(d)-r", xlab = "d(m)")
+
+```
+#### 5.8.1.2 Performing Complete Spatial Randomness Test
+
+To confirm the observed spatial patterns above, a hypothesis test will be conducted. The hypothesis and test are as follows:
+
+Ho = The distribution of childcare services at Choa Chu Kang are randomly distributed.
+
+H1= The distribution of childcare services at Choa Chu Kang are not randomly distributed.
+
+The null hypothesis will be rejected if p-value is smaller than alpha value of 0.001.
+
+```{r}
+K_tm.csr <- envelope(childcare_tm_ppp, Kest,               # build CSR envelopes for K(r) in Tampines
+                     nsim = 99,                            # 99 simulations exactly as shown
+                     rank = 1,                             # use rank-1 global envelope
+                     glocal = TRUE)                        # enable global+local envelope calculation
+plot(K_tm.csr, . - r ~ r,                                  # plot (K_hat - r) vs r using the formula used by Prof
+     xlab = "d", ylab = "K(d)-r",                          # match labels from the screenshot
+     xlim = c(0, 500))                                     # limit the x-axis to 0–500 m as in the slide
 
 
+```
+::: callout-note
+### Reading the plot:
+
+- Under CSR, K(r) = πr² and L(r) − r = 0.
+- **Curve above CSR** → clustering; **below** → inhibition; **inside envelopes** → not significantly different from CSR.
+:::
+
+### 5.8.2 Tampines planning area
+
+#### 5.8.2.1 Computing K-fucntion estimation
+
+```{r}
+K_tm = Kest(childcare_tm_ppp, correction = "Ripley")
+plot(K_tm, . -r ~ r, 
+     ylab= "K(d)-r", xlab = "d(m)", 
+     xlim=c(0,1000))
+
+```
+#### 5.8.2.2 Performing Complete Spatial Randomness Test
+
+To confirm the observed spatial patterns above, a hypothesis test will be conducted. The hypothesis and test are as follows:
+
+$H_0$ = The distribution of childcare services at Tampines are randomly distributed.
+
+$H_1$ = The distribution of childcare services at Tampines are not randomly distributed.
+
+The null hypothesis will be rejected if p-value is smaller than alpha value of 0.001.
+
+The code chunk below is used to perform the hypothesis testing.
+
+```{r}
+K_tm.csr <- envelope(childcare_tm_ppp, Kest, nsim = 99, rank = 1, glocal=TRUE)
+
+```
+```{r}
+plot(K_tm.csr, . - r ~ r, 
+     xlab="d", ylab="K(d)-r", xlim=c(0,500))
+
+```
+## 5.9 Analysing Spatial Point Process Using L-Function
+
+### 5.9.1 Choa Chu Kang planning area
+
+#### 5.9.1.1 Computing L Fucntion estimation
 
 
+```{r}
+L_ck <- Lest(childcare_ck_ppp, correction = "Ripley")      # estimate L(r) using Ripley edge correction
+plot(L_ck, . - r ~ r,                                      # plot (L_hat - r) vs r to centre CSR at zero
+     ylab = "L(d)-r", xlab = "d(m)")                       # match axis labels exactly as shown
+
+```
+#### 5.9.1.2 Performing Complete Spatial Randomness Test
+
+To confirm the observed spatial patterns above, a hypothesis test will be conducted. The hypothesis and test are as follows:
+
+$H_0$ = The distribution of childcare services at Choa Chu Kang are randomly distributed.
+
+$H_1$ = The distribution of childcare services at Choa Chu Kang are not randomly distributed.
+
+The null hypothesis will be rejected if p-value if smaller than alpha value of 0.001.
+
+The code chunk below is used to perform the hypothesis testing.
 
 
+```{r}
+L_ck.csr <- envelope(childcare_ck_ppp, Lest,               # generate L-function CSR envelopes for CK
+                     nsim = 99,                            # 99 simulations (as per screenshot)
+                     rank = 1,                             # rank-1 global envelope
+                     glocal = TRUE)                        # global+local envelope option
+plot(L_ck.csr, . - r ~ r,                                  # plot (L_hat - r) vs r using Prof’s plotting formula
+     xlab = "d", ylab = "L(d)-r")                          # axis labels exactly as in the slide
+
+```
+### 5.9.2 Tampines planning area
+
+#### 5.9.2.1 Computing L-function estimation
+
+```{r}
+L_tm <- Lest(childcare_tm_ppp, correction = "Ripley")      # estimate L(r) for Tampines
+plot(L_tm, . - r ~ r,                                      # plot (L_hat - r) vs r as in Prof’s figure
+     ylab = "L(d)-r", xlab = "d(m)",                       # axis labels to match the slide
+     xlim = c(0, 1000))                                    # distance window 0–1000 m as shown
+
+```
+
+#### 5.9.2.2 Performing Complete Spatial Randomness Test
+
+To confirm the observed spatial patterns above, a hypothesis test will be conducted. The hypothesis and test are as follows:
+
+Ho = The distribution of childcare services at Tampines are randomly distributed.
+
+H1= The distribution of childcare services at Tampines are not randomly distributed.
+
+The null hypothesis will be rejected if p-value is smaller than alpha value of 0.001.
+
+The code chunk below will be used to perform the hypothesis testing.
+
+```{r}
+L_tm.csr <- envelope(childcare_tm_ppp, Lest,               # CSR envelopes for L(r) in Tampines
+                     nsim = 99,                            # 99 simulations
+                     rank = 1,                             # rank-1 global envelope
+                     glocal = TRUE)                        # global+local envelope handling
+plot(L_tm.csr, . - r ~ r,                                  # plot (L_hat - r) vs r per Prof’s code
+     xlab = "d", ylab = "L(d)-r",                          # keep labels consistent with the slide
+     xlim = c(0, 500))                                     # show 0–500 m window exactly as given
 
 
-
-
-
-
-
-
-
-
-
-
+```
 
 
 
