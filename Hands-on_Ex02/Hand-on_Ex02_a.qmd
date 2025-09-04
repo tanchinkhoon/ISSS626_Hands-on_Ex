@@ -4,7 +4,15 @@ author: "TAN Chin Khoon"
 date: "5 September 2025"
 ---
 
-# 4.0 1st Order Spatial Point Patterns Analysis Methods
+# 4 1st Order Spatial Point Patterns Analysis Methods
+
+## 4.1 Overview
+
+The specific questions we would like to answer are as follows:
+
+- Are the childcare centres in Singapore randomly distributed throughout the country?
+- If the answer is not, then the next logical question is where are the locations with higher concentration of childcare centres?
+
 
 ## 4.3 Installing and Loading the R packagesn
 
