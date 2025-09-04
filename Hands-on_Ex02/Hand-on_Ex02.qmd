@@ -10,9 +10,8 @@ date: "5 September 2025"
 
 The specific questions we would like to answer are as follows:
 
-- Are the childcare centres in Singapore randomly distributed throughout the country?
-- If the answer is not, then the next logical question is where are the locations with higher concentration of childcare centres?
-
+-   Are the childcare centres in Singapore randomly distributed throughout the country?
+-   If the answer is not, then the next logical question is where are the locations with higher concentration of childcare centres?
 
 ## 4.3 Installing and Loading the R packagesn
 
@@ -43,7 +42,8 @@ mpsz_sf <- sf::st_read("data/geospatial/MasterPlan2019SubzoneBoundaryNoSeaKML.km
   sf::st_transform(crs = 3414)   
 
 ```
-> **Why remove Z/M?** Our analysis is purely 2D on a planar map. Extra dimensions are unnecessary and can break some operations. \
+
+> **Why remove Z/M?** Our analysis is purely 2D on a planar map. Extra dimensions are unnecessary and can break some operations.\
 > **Why EPSG:3414?** This is the standard projected system for Singapore. Distances/areas become meaningful (meters) instead of degrees.
 
 Extract REGION_N, PLN_AREA_N, SUBZONE_N, SUBZONE_C from the Description field (HTML inside KML) (as in the guidance helper function)
@@ -108,6 +108,7 @@ childcare_sf <- sf::st_read("data/geospatial/ChildCareServices.kml") %>%
   sf::st_transform(crs = 3414)         
 
 ```
+
 ### 4.4.1 Mapping the Geospatial Data Sets
 
 ```{r}
@@ -121,7 +122,8 @@ tmap::tm_shape(mpsz_cl) +
   tmap::tm_dots(size = 0.2, col = "red")
 
 ```
-> **What to check:** All childcare centres (black dots) fall neatly inside Singapore’s subzones (grey polygons). If not, check CRS and transformations.
+
+> **What to check:** All childcare centres (black dots) fall neatly inside Singapore's subzones (grey polygons). If not, check CRS and transformations.
 
 Interactive mapping with tmap + leaflet
 
@@ -140,7 +142,6 @@ tmap::tm_shape(childcare_sf) +         # select the childcare sf layer
 tmap::tmap_mode("plot")               # restore static plotting mode
 
 ```
-
 
 ```{r}
 # Switch to interactive mode for web-map style exploration
@@ -219,19 +220,19 @@ childcareSG_ppp  # should report a polygonal window and the point count
 
 **Hypotheses:**
 
-- $H_0$: Childcare centres are randomly distributed (Complete Spatial Randomness, CSR).
+-   $H_0$: Childcare centres are randomly distributed (Complete Spatial Randomness, CSR).
 
-- $H_1$: Childcare centres are not randomly distributed (clustered or regular).
+-   $H_1$: Childcare centres are not randomly distributed (clustered or regular).
 
 The 95% confident interval will be used.
 
-The Clark–Evans test returns an index *R*:
+The Clark--Evans test returns an index *R*:
 
-- $R < 1 → clustered$.
-- $R = 1 → random$
-- $R > 1 → regular$
+-   $R < 1 → clustered$.
+-   $R = 1 → random$
+-   $R > 1 → regular$
 
-### 4.6.1 Clark–Evans without CSR Simulation (Z-test)
+### 4.6.1 Clark--Evans without CSR Simulation (Z-test)
 
 ```{r}
 # Run Clark–Evans using observed pattern only (Z-test)
@@ -247,15 +248,15 @@ ce_noCSR
 ```
 
 ::: callout-note
-### Clark–Evans Test without CSR (Z-test)
+### Clark--Evans Test without CSR (Z-test)
 
-- **R = 0.53532 (< 1)** → indicates clustering.
-- **p-value < 2.2e-16 (< 0.05):** → reject H₀.
-- **Statistical conclusion:** Distribution is not random; strong clustering exists.
-- **Business communication:** Childcare centres are concentrated in specific neighbourhoods. This reflects demand-driven placement but may leave some areas underserved. Authorities should consider equity in future allocations.
+-   **R = 0.53532 (\< 1)** → indicates clustering.
+-   **p-value \< 2.2e-16 (\< 0.05):** → reject H₀.
+-   **Statistical conclusion:** Distribution is not random; strong clustering exists.
+-   **Business communication:** Childcare centres are concentrated in specific neighbourhoods. This reflects demand-driven placement but may leave some areas underserved. Authorities should consider equity in future allocations.
 :::
 
-### 4.6.2 Clark–Evans with CSR via Monte‑Carlo (nsim = 99)
+### 4.6.2 Clark--Evans with CSR via Monte‑Carlo (nsim = 99)
 
 ```{r}
 # Monte‑Carlo Clark–Evans: compare observed R to R from CSR simulations (nsim = 99)
@@ -272,12 +273,12 @@ ce_MC
 ```
 
 ::: callout-note
-### Clark–Evans Test with CSR (Monte Carlo, nsim=99)
+### Clark--Evans Test with CSR (Monte Carlo, nsim=99)
 
-- **R = 0.53532 (< 1):** → clustering again.
-- **p-value = 0.01 (< 0.05)** → reject H₀ at 95% CI.
-- **Statistical conclusion:** Distribution is not random; clustering is statistically significant even under CSR simulations.
-- **Business communication:** Confirms earlier finding with stronger robustness. Clustering is not due to chance — it is systematic. Policymakers should expand childcare access in low-density areas to reduce inequality in service availability.
+-   **R = 0.53532 (\< 1):** → clustering again.
+-   **p-value = 0.01 (\< 0.05)** → reject H₀ at 95% CI.
+-   **Statistical conclusion:** Distribution is not random; clustering is statistically significant even under CSR simulations.
+-   **Business communication:** Confirms earlier finding with stronger robustness. Clustering is not due to chance --- it is systematic. Policymakers should expand childcare access in low-density areas to reduce inequality in service availability.
 :::
 
 # 4.7 Kernel Density Estimation (KDE) Method
@@ -302,8 +303,6 @@ plot(kde_SG_diggle)
 
 ```
 
-
-
 ```{r}
 
 summary(kde_SG_diggle)
@@ -325,7 +324,6 @@ childcareSG_ppp_km <- rescale.ppp(    # Rescale the point pattern dataset from m
 
 ```
 
-
 ```{r}
 kde_childcareSG_km <- density(      # Compute kernel density estimation on rescaled dataset
   childcareSG_ppp_km,               # Input point pattern in kilometres
@@ -336,12 +334,12 @@ kde_childcareSG_km <- density(      # Compute kernel density estimation on resca
 
 ```
 
-
 ```{r}
 # Plot KDE surface for childcare centres (units in km)
 plot(kde_childcareSG_km)
 
 ```
+
 ### 4.7.3 Working with different automatic badwidth methods
 
 ```{r}
@@ -355,7 +353,6 @@ bw.CvL(childcareSG_ppp_km)
 bw.scott(childcareSG_ppp_km)
 
 ```
-
 
 ```{r}
 # Compute bandwidth using likelihood cross-validation (PPL)
@@ -382,6 +379,7 @@ plot(kde_childcareSG_km, main = "bw.diggle") # Plot KDE using Diggle bandwidth
 plot(kde_childcareSG_ppl, main = "bw.ppl")   # Plot KDE using PPL bandwidth
 
 ```
+
 ### 4.7.4 Working with different kernel methods
 
 ```{r}
@@ -408,6 +406,7 @@ plot(density(childcareSG_ppp_km,                # KDE with Disc kernel
      main="Disc")                               # Title for Disc plot
 
 ```
+
 ## 4.8 Fixed and Adaptive KDE
 
 ### 4.8.1 Computing KDE by using fixed bandwidth
@@ -423,6 +422,7 @@ kde_childcareSG_fb <- density(   # KDE using fixed bandwidth method
 plot(kde_childcareSG_fb)         # Plot the fixed bandwidth KDE result
 
 ```
+
 ### 4.8.2 Computing KDE by using adaptive bandwidth
 
 ```{r}
@@ -441,6 +441,7 @@ plot(kde_childcareSG_fb, main = "Fixed bandwidth")     # Show fixed bandwidth KD
 plot(kde_childcareSG_ab, main = "Adaptive bandwidth")  # Show adaptive bandwidth KDE
 
 ```
+
 ## 4.9 Plotting cartographic quality KDE map
 
 ### 4.9.1 Converting gridded output into raster
@@ -451,19 +452,18 @@ kde_childcareSG_bw_terra <- rast(kde_childcareSG_km)
 
 ```
 
-
 ```{r}
 # Check the class of the raster object (should be "SpatRaster")
 class(kde_childcareSG_bw_terra)
 
 ```
 
-
 ```{r}
 # Print raster properties: resolution, extent, units, etc.
 kde_childcareSG_bw_terra
 
 ```
+
 ### 4.9.2 Assigning projection systems
 
 ```{r}
@@ -472,12 +472,12 @@ crs(kde_childcareSG_bw_terra) <- "EPSG:3414"
 
 ```
 
-
 ```{r}
 # Re-check raster details, now with CRS applied
 kde_childcareSG_bw_terra
 
 ```
+
 ### 4.9.3 Plotting KDE map with tmap
 
 ```{r}
@@ -497,6 +497,7 @@ tm_shape(kde_childcareSG_bw_terra) +           # Define raster object to be plot
   tm_layout(scale = 1.0)                       # Set layout scale
 
 ```
+
 ## 4.10 First Order SPPA at the Planning Subzone Level
 
 ### 4.10.1 Geospatial data wrangling
@@ -518,7 +519,6 @@ jw <- mpsz_cl %>%                         # Create dataset 'jw'
 
 ```
 
-
 ```{r}
 par(mfrow=c(2,2))                              # Arrange plotting area into 2 rows × 2 columns
 
@@ -529,6 +529,7 @@ plot(st_geometry(jw), main="Jurong West")      # Plot polygon boundary of Jurong
 
 
 ```
+
 #### 4.10.1.2 Creating owin object
 
 ```{r}
@@ -565,7 +566,6 @@ childcare_jw_ppp_km <- rescale.ppp(            # Rescale Jurong West points to k
 
 ```
 
-
 ```{r}
 par(mfrow = c(2,2))                             # Arrange plotting area into a 2×2 grid
 
@@ -584,6 +584,7 @@ plot(unmark(childcare_jw_ppp_km),               # Plot Jurong West points
 par(mfrow = c(1,1))                             # Reset plotting layout back to single panel
 
 ```
+
 ### 4.10.2 Clark and Evans Test
 
 ```{r}
@@ -595,6 +596,7 @@ clarkevans.test(childcare_ck_ppp,              # Clark–Evans test for the Choa
 )                                              # End of clarkevans.test call
 
 ```
+
 #### 4.10.2.2 Tampines planning area
 
 ```{r}
@@ -606,6 +608,7 @@ clarkevans.test(childcare_tm_ppp,   # Clark–Evans test for the Tampines point 
 )                                   # End of clarkevans.test call
 
 ```
+
 ### 4.10.3 Computing KDE surfaces by planning area
 
 ```{r}
@@ -637,17 +640,13 @@ plot(density(childcare_jw_ppp_km,              # KDE for Jurong West
 
 ```
 
-# 5.  2nd Order Spatial Point Patterns Analysis Methods
+# 5. 2nd Order Spatial Point Patterns Analysis Methods
 
 ## 5.5 Second-order Spatial Point Patterns Analysis
 
-**First-order** asks “where are points denser?”; **second-order** asks “how do points interact with each other across distance?”
+**First-order** asks "where are points denser?"; **second-order** asks "how do points interact with each other across distance?"
 
-We’ll use four classical functions:
-- G(r) — nearest-neighbour distribution (from each event to its **nearest** event).
-- F(r) — empty-space distribution (from random locations to **nearest** event).
-- K(r) — accumulates neighbours within radius r; higher than CSR suggests clustering.
-- L(r) = √(K(r)/π) — variance-stabilised K; plot L(r) − r to read deviations easily.
+We'll use four classical functions: - G(r) --- nearest-neighbour distribution (from each event to its **nearest** event). - F(r) --- empty-space distribution (from random locations to **nearest** event). - K(r) --- accumulates neighbours within radius r; higher than CSR suggests clustering. - L(r) = √(K(r)/π) --- variance-stabilised K; plot L(r) − r to read deviations easily.
 
 For each function your Prof shows **estimation** and a **Monte Carlo CSR test with envelopes**.
 
@@ -663,7 +662,8 @@ G_CK <- Gest(childcare_ck_ppp, correction = "border")      # estimate nearest-ne
 plot(G_CK, xlim = c(0, 500))                               # plot G(r) up to 500 m; dashed line shows CSR (Poisson) reference
 
 ```
-#### 5.6.1.2 Performing Complete Spatial Randomness (CSR) Test — Monte Carlo
+
+#### 5.6.1.2 Performing Complete Spatial Randomness (CSR) Test --- Monte Carlo
 
 To confirm the observed spatial patterns above, a hypothesis test will be conducted. The hypothesis and test are as follows:
 
@@ -686,11 +686,11 @@ G_CK.csr <- envelope(childcare_ck_ppp, Gest, nsim = 999)
 plot(G_CK.csr)    
 
 ```
+
 ::: callout-note
 ### Reading the plot:
 
-If the **black observed** curve is mostly **above** the grey envelope → points are **clustered** at those distances.
-If it is **below → regular/repulsive** (inhibition). Inside the envelope → not significantly different from CSR at that scale.
+If the **black observed** curve is mostly **above** the grey envelope → points are **clustered** at those distances. If it is **below → regular/repulsive** (inhibition). Inside the envelope → not significantly different from CSR at that scale.
 :::
 
 ### 5.6.2 Tampines planning area
@@ -722,7 +722,8 @@ G_tm.csr <- envelope(childcare_tm_ppp, Gest,   # simulate CSR envelopes for G(r)
 plot(G_tm.csr)                                 # display observed curve, CSR, and envelopes
 
 ```
-> **Decision rule (as per slides):** Reject $H_0$: CSR if the observed curve exits the envelope and the associated p-value < 0.001 (α = 0.001).
+
+> **Decision rule (as per slides):** Reject $H_0$: CSR if the observed curve exits the envelope and the associated p-value \< 0.001 (α = 0.001).
 
 ## 5.7 Analysing Spatial Point Process Using F-Function
 
@@ -735,6 +736,7 @@ F_CK <- Fest(childcare_ck_ppp)                             # estimate empty-spac
 plot(F_CK)                                                 # plot multiple estimators and the CSR reference curve F_pois(r)
 
 ```
+
 ### 5.7.2 Performing Complete Spatial Randomness Test
 
 To confirm the observed spatial patterns above, a hypothesis test will be conducted. The hypothesis and test are as follows:
@@ -751,23 +753,22 @@ Monte Carlo test with F-fucntion
 F_CK.csr <- envelope(childcare_ck_ppp, Fest, nsim = 999)   # simulate 999 CSR patterns; compute F(r) envelopes
 
 ```
+
 ```{r}
 plot(F_CK.csr)
 
 ```
 
-
-
 ::: callout-note
 ### Reading the plot:
 
-- **F(r) above CSR** → space tends to be **closer** to facilities than CSR (suggests clustering).
-- **F(r) below CSR** → **larger gaps** than expected (suggests inhibition).
+-   **F(r) above CSR** → space tends to be **closer** to facilities than CSR (suggests clustering).
+-   **F(r) below CSR** → **larger gaps** than expected (suggests inhibition).
 :::
 
 ***5.7.3 Tampines planning area***
 
-****5.7.3.1 Computing F-function estimation****
+\*\*\*\*5.7.3.1 Computing F-function estimation\*\*\*\*
 
 ```{r}
 F_tm = Fest(childcare_tm_ppp, correction = "best")
@@ -796,6 +797,7 @@ F_tm.csr <- envelope(childcare_tm_ppp, Fest, correction = "all", nsim = 999)
 plot(F_tm.csr)
 
 ```
+
 ## 5.8 Analysing Spatial Point Process Using K-Function
 
 ### 5.8.1 Choa Chu Kang planning area
@@ -809,6 +811,7 @@ K_ck <- Kest(childcare_ck_ppp, correction = "Ripley")
 plot(K_ck, . -r ~ r, ylab= "K(d)-r", xlab = "d(m)")
 
 ```
+
 #### 5.8.1.2 Performing Complete Spatial Randomness Test
 
 To confirm the observed spatial patterns above, a hypothesis test will be conducted. The hypothesis and test are as follows:
@@ -830,11 +833,12 @@ plot(K_tm.csr, . - r ~ r,                                  # plot (K_hat - r) vs
 
 
 ```
+
 ::: callout-note
 ### Reading the plot:
 
-- Under CSR, K(r) = πr² and L(r) − r = 0.
-- **Curve above CSR** → clustering; **below** → inhibition; **inside envelopes** → not significantly different from CSR.
+-   Under CSR, K(r) = πr² and L(r) − r = 0.
+-   **Curve above CSR** → clustering; **below** → inhibition; **inside envelopes** → not significantly different from CSR.
 :::
 
 ### 5.8.2 Tampines planning area
@@ -848,6 +852,7 @@ plot(K_tm, . -r ~ r,
      xlim=c(0,1000))
 
 ```
+
 #### 5.8.2.2 Performing Complete Spatial Randomness Test
 
 To confirm the observed spatial patterns above, a hypothesis test will be conducted. The hypothesis and test are as follows:
@@ -864,17 +869,18 @@ The code chunk below is used to perform the hypothesis testing.
 K_tm.csr <- envelope(childcare_tm_ppp, Kest, nsim = 99, rank = 1, glocal=TRUE)
 
 ```
+
 ```{r}
 plot(K_tm.csr, . - r ~ r, 
      xlab="d", ylab="K(d)-r", xlim=c(0,500))
 
 ```
+
 ## 5.9 Analysing Spatial Point Process Using L-Function
 
 ### 5.9.1 Choa Chu Kang planning area
 
 #### 5.9.1.1 Computing L Fucntion estimation
-
 
 ```{r}
 L_ck <- Lest(childcare_ck_ppp, correction = "Ripley")      # estimate L(r) using Ripley edge correction
@@ -882,6 +888,7 @@ plot(L_ck, . - r ~ r,                                      # plot (L_hat - r) vs
      ylab = "L(d)-r", xlab = "d(m)")                       # match axis labels exactly as shown
 
 ```
+
 #### 5.9.1.2 Performing Complete Spatial Randomness Test
 
 To confirm the observed spatial patterns above, a hypothesis test will be conducted. The hypothesis and test are as follows:
@@ -894,7 +901,6 @@ The null hypothesis will be rejected if p-value if smaller than alpha value of 0
 
 The code chunk below is used to perform the hypothesis testing.
 
-
 ```{r}
 L_ck.csr <- envelope(childcare_ck_ppp, Lest,               # generate L-function CSR envelopes for CK
                      nsim = 99,                            # 99 simulations (as per screenshot)
@@ -904,6 +910,7 @@ plot(L_ck.csr, . - r ~ r,                                  # plot (L_hat - r) vs
      xlab = "d", ylab = "L(d)-r")                          # axis labels exactly as in the slide
 
 ```
+
 ### 5.9.2 Tampines planning area
 
 #### 5.9.2.1 Computing L-function estimation
