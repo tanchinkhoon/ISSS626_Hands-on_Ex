@@ -646,10 +646,10 @@ plot(density(childcare_jw_ppp_km,              # KDE for Jurong West
 
 **First-order** asks "where are points denser?"; **second-order** asks "how do points interact with each other across distance?"
 
-We'll use four classical functions: 
-- G(r) --- nearest-neighbour distribution (from each event to its **nearest** event). 
-- F(r) --- empty-space distribution (from random locations to **nearest** event). 
-- K(r) --- accumulates neighbours within radius r; higher than CSR suggests clustering. 
+We'll use four classical functions:\n 
+- G(r) --- nearest-neighbour distribution (from each event to its **nearest** event). \n 
+- F(r) --- empty-space distribution (from random locations to **nearest** event). \n
+- K(r) --- accumulates neighbours within radius r; higher than CSR suggests clustering. \n 
 - L(r) = √(K(r)/π) --- variance-stabilised K; plot L(r) − r to read deviations easily.
 
 For each function your Prof shows **estimation** and a **Monte Carlo CSR test with envelopes**.
