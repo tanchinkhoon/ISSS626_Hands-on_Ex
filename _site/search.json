@@ -236,5 +236,40 @@
     "title": "ISSS626",
     "section": "Objectives of my hands-on work",
     "text": "Objectives of my hands-on work\n\nDemonstrate step-by-step workflows for geospatial tasks that a beginner can follow.\nUse clear, descriptive names and relative file paths so the website renders correctly on Netlify.\nProvide reproducible results with the same structure for every assignment."
+  },
+  {
+    "objectID": "Hands-on_Ex03/Hand-on_Ex03.html",
+    "href": "Hands-on_Ex03/Hand-on_Ex03.html",
+    "title": "Hands-on_Ex03",
+    "section": "",
+    "text": "A spatio-temporal point process is a random collection of events identified by both time and location, such as disease cases, species sightings, or natural disasters. With the rise of geographically and temporally indexed data, analyzing these patterns has become increasingly important across many fields. In the past decade, several R methods and packages have been developed to support such analyses. This hands-on exercise demonstrates how these tools can be combined in a guided way, using forest fire events in Kepulauan Bangka Belitung, Indonesia (from 1 January to 31 December 2023) as a real-world case study to illustrate the procedures and interpretations.\n\n\n\n\n\nThe specific questions we would like to answer are:\n\nAre the locations of forest fire in Kepulauan Bangka Belitung spatial and spatio-temporally independent?\nIf the answer is NO, where and when the observed forest fire locations tend to cluster?\n\n\n\n\n\nKnow what files you’ll use and where they come from.\n\nforestfires.csv: point events (each row = a fire). Has longitude, latitude, and date/time fields from MODIS.\nKepulauan_Bangka_Belitung shapefile: the study region polygon (administrative boundary). We’ll read only the Kepulauan Bangka Belitung subset for 2023 analyses.\n\n\n\n\nLoad all libraries used in this hands-on exercise.\n\npacman::p_load(sf,           # read, write, and transform spatial vector data\n               terra, \n               spatstat, \n               sparr, \n               tmap, \n               tidyverse\n               )\n\n\nThe downloaded binary packages are in\n    /var/folders/v7/c691m79514zcgscg0qg8nf940000gn/T//Rtmpzo5P7i/downloaded_packages\n\n\n\nsparr installed\n\n\nWarning: package 'sparr' was built under R version 4.4.1\n\n\nWarning in pacman::p_load(sf, terra, spatstat, sparr, tmap, tidyverse): Failed to install/load:\nsparr"
+  },
+  {
+    "objectID": "Hands-on_Ex03/Hand-on_Ex03.html#overview",
+    "href": "Hands-on_Ex03/Hand-on_Ex03.html#overview",
+    "title": "Hands-on_Ex03",
+    "section": "",
+    "text": "A spatio-temporal point process is a random collection of events identified by both time and location, such as disease cases, species sightings, or natural disasters. With the rise of geographically and temporally indexed data, analyzing these patterns has become increasingly important across many fields. In the past decade, several R methods and packages have been developed to support such analyses. This hands-on exercise demonstrates how these tools can be combined in a guided way, using forest fire events in Kepulauan Bangka Belitung, Indonesia (from 1 January to 31 December 2023) as a real-world case study to illustrate the procedures and interpretations."
+  },
+  {
+    "objectID": "Hands-on_Ex03/Hand-on_Ex03.html#learning-outcome",
+    "href": "Hands-on_Ex03/Hand-on_Ex03.html#learning-outcome",
+    "title": "Hands-on_Ex03",
+    "section": "",
+    "text": "The specific questions we would like to answer are:\n\nAre the locations of forest fire in Kepulauan Bangka Belitung spatial and spatio-temporally independent?\nIf the answer is NO, where and when the observed forest fire locations tend to cluster?"
+  },
+  {
+    "objectID": "Hands-on_Ex03/Hand-on_Ex03.html#the-data",
+    "href": "Hands-on_Ex03/Hand-on_Ex03.html#the-data",
+    "title": "Hands-on_Ex03",
+    "section": "",
+    "text": "Know what files you’ll use and where they come from.\n\nforestfires.csv: point events (each row = a fire). Has longitude, latitude, and date/time fields from MODIS.\nKepulauan_Bangka_Belitung shapefile: the study region polygon (administrative boundary). We’ll read only the Kepulauan Bangka Belitung subset for 2023 analyses."
+  },
+  {
+    "objectID": "Hands-on_Ex03/Hand-on_Ex03.html#installing-and-loading-the-r-packages",
+    "href": "Hands-on_Ex03/Hand-on_Ex03.html#installing-and-loading-the-r-packages",
+    "title": "Hands-on_Ex03",
+    "section": "",
+    "text": "Load all libraries used in this hands-on exercise.\n\npacman::p_load(sf,           # read, write, and transform spatial vector data\n               terra, \n               spatstat, \n               sparr, \n               tmap, \n               tidyverse\n               )\n\n\nThe downloaded binary packages are in\n    /var/folders/v7/c691m79514zcgscg0qg8nf940000gn/T//Rtmpzo5P7i/downloaded_packages\n\n\n\nsparr installed\n\n\nWarning: package 'sparr' was built under R version 4.4.1\n\n\nWarning in pacman::p_load(sf, terra, spatstat, sparr, tmap, tidyverse): Failed to install/load:\nsparr"
   }
 ]
