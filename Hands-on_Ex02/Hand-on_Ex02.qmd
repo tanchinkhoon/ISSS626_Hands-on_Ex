@@ -285,7 +285,7 @@ ce_MC
 -   **Business communication:** Confirms earlier finding with stronger robustness. Clustering is not due to chance --- it is systematic. Policymakers should expand childcare access in low-density areas to reduce inequality in service availability.
 :::
 
-# 4.7 Kernel Density Estimation (KDE) Method
+## 4.7 Kernel Density Estimation (KDE) Method
 
 **Goal:** Turn points into a smooth surface to reveal hotspots. Bandwidth controls smoothness; kernel controls the spread shape.
 
