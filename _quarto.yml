@@ -9,7 +9,7 @@ website:
       - text: "Hands-on Exercise"
         menu:
           - text: "Hands-on Exercise 3"
-            href: Hands-on_Ex03/hand-on_ex03
+            href: Hands-on_Ex03/Hand-on_ex03
           - text: "Hands-on Exercise 2"
             href: Hands-on_Ex02/Hand-on_ex02
           - text: "Hands-on Exercise 1"
@@ -27,7 +27,7 @@ format:
     toc-title: "On this page"
     toc-location: right      # left | right
     toc-depth: 3             # include ### headings and above
-    number-sections: true    # 1, 1.1, 1.2 numbering
+    number-sections: false    # 1, 1.1, 1.2 numbering
     page-navigation: true    # Previous / Next links at bottom
     smooth-scroll: true      # nice scrolling when clicking TOC
     css: styles.css
