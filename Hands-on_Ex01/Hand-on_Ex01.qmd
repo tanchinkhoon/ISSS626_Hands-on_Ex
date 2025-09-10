@@ -1,7 +1,7 @@
 ---
 title: "Hands-on_Ex01"
 author: "TAN Chin Khoon"
-date: "`r Sys.Date()`"
+date: "28 August 2025"
 ---
 
 # 1 Geospatial Data Science with R
