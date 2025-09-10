@@ -5,7 +5,7 @@ date: "5 September 2025"
 toc: true
 toc-location: right
 toc-depth: 3
-number-sections: true
+number-sections: false
 ---
 
 # 4. 1st Order Spatial Point Patterns Analysis Methods
