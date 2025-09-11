@@ -35,12 +35,12 @@ Know what files you'll use and where they come from.
 Load all libraries used in this hands-on exercise.
 
 ```{r}
-pacman::p_load(sf,           # read, write, and transform spatial vector data
-               terra, 
-               spatstat, 
-               sparr, 
-               tmap, 
-               tidyverse
+pacman::p_load(sf,        # read, write, and transform spatial vector data
+               terra,      
+               spatstat,  # used for performing Spatial Point Patterns Analysis such as kcross, Lcross, etc
+               sparr,     # spatio-temporal kernel density estimation (STKDE)
+               tmap,      # cartographic visualisation for quick maps
+               tidyverse  # readr (CSV), dplyr (mutate/select), ggplot, etc.
                )
 
 ```
@@ -55,9 +55,9 @@ First. read the Kepulauan Bangka Belitung boundary, clean geometry, and set proj
 # Read the shapefile from the data folder -----------------------------------------------------
 kbb_sf <- st_read(dsn = "data/rds/BATAS_DESA_DESEMBER_2019_DUKCAPIL_BANGKA_BELITUNG",    # folder containing the shapefile
                   layer = "BATAS_DESA_DESEMBER_2019_DUKCAPIL_BANGKA_BELITUNG") %>%       # shapefile base name (no .shp)
-  st_union() %>%                            # dissolve internal boundaries into one polygon
-  st_zm(drop = TRUE, what = "ZM") %>%       # drop Z/M dimensions if present (keeps 2D)
-  st_transform(crs = 32748)                 # reproject to EPSG:32748 (UTM Zone 48S in meters)
+  st_union() %>%                       # dissolve internal boundaries into one polygon
+  st_zm(drop = TRUE, what = "ZM") %>%  # drop Z/M dimensions if present (keeps 2D)
+  st_transform(crs = 32748)            # reproject to EPSG:32748 (UTM Zone 48S in meters)
 
 ```
 
@@ -117,15 +117,15 @@ tm_shape(kbb_sf) +                                                  # add study 
   tm_shape(fire_sf) +                                               # add fire points
   tm_symbols(size = 0.5, col = "red") +                            # small red dots
   tm_credits(
-    "Forest Fire Points in 2023 (Kep. Bangka Belitung)",
+    "Forest Fire Points in 2023 (Kepulauan Bangka Belitung)",
     position = c("center", "top"),    # center horizontally, top vertically
     size = 1.2,                       # enlarge title text
     fontface = 2                      # bold
   ) +
   tm_layout(
     frame = TRUE,
-    # outer.margins = c(0.1, 0.05, 0.1, 0.05)  # top, right, bottom, left (gives space for title)
-    inner.margins = 0.05                          # uncomment to maximize map area even more
+    # outer.margins = c(0.1, 0.05, 0.1, 0.05) # top, right, bottom, left (gives space for title)
+    inner.margins = 0.05                      # uncomment to maximize map area even more
   )
 
 
