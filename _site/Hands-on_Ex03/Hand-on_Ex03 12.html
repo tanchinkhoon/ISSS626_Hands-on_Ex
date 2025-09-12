@@ -201,7 +201,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#computing-spatio-temporal-kde-1" id="toc-computing-spatio-temporal-kde-1" class="nav-link" data-scroll-target="#computing-spatio-temporal-kde-1">6.10.1 Computing spatio-temporal KDE</a></li>
   <li><a href="#plotting-the-output-spatio-temporal-kde" id="toc-plotting-the-output-spatio-temporal-kde" class="nav-link" data-scroll-target="#plotting-the-output-spatio-temporal-kde">6.10.2 Plotting the output spatio-temporal KDE</a></li>
   </ul></li>
-  <li><a href="#discussion-of-results-answer-to-the-research-question" id="toc-discussion-of-results-answer-to-the-research-question" class="nav-link" data-scroll-target="#discussion-of-results-answer-to-the-research-question">6.11 Discussion of Results (Answer to the Research Question)</a></li>
   </ul></li>
   </ul>
 </nav>
@@ -253,7 +252,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li>Are the locations of forest fire in Kepulauan Bangka Belitung spatial and spatio-temporally independent?</li>
 <li>If the answer is NO, where and when the observed forest fire locations tend to cluster?</li>
 </ul>
-<p>A detailed discussion of the results, together with explicit insights and implications, is provided in Section <a href="#discussion-of-results-answer-to-the-research-question">6.11 Discussion of Results (Answer to the Research Question)</a>.</p>
 </section>
 </section>
 <section id="the-data" class="level2">
@@ -3491,18 +3489,9 @@ Evaluation
 <p><img src="Hand-on_Ex03_files/figure-html/unnamed-chunk-23-351.png" class="img-fluid" width="672"></p>
 </div>
 </div>
-</section>
-</section>
-<section id="discussion-of-results-answer-to-the-research-question" class="level2">
-<h2 class="anchored" data-anchor-id="discussion-of-results-answer-to-the-research-question">6.11 Discussion of Results (Answer to the Research Question)</h2>
-<p>The spatio-temporal kernel density estimation (STKDE) provides clear evidence that the locations of forest fires in Kepulauan Bangka Belitung are <strong>not spatially or spatio-temporally independent</strong>. If the events were independent, the density surfaces would be flat and homogeneous across space and time. Instead, the STKDE outputs reveal distinct peaks, rejecting the null hypothesis of independence.</p>
-<p>The bootstrap-based bandwidth selection process identified an optimal smoothing window of <strong>h ≈ 44.7 km (spatial)</strong> and <strong>λ ≈ 19.4 days (temporal)</strong>. These parameters indicate that fire events tend to cluster within a radius of ~45 km and persist across approximately three-week periods. The density range produced, from very low background values (~1.2e-39) to sharp peaks (~6.4e-10), confirms substantial clustering intensity.</p>
-<p>The spatial clustering is most pronounced in <strong>southern and central Bangka</strong> and in <strong>eastern Belitung</strong>, where the STKDE consistently highlights hotspots of higher fire intensity. These locations repeatedly emerge in the density surfaces, showing that fire events are concentrated in specific sub-regions rather than being uniformly distributed.</p>
-<p>Temporally, clustering is most evident during the <strong>July–October period</strong>, corresponding to the dry season. The monthly KDE plots demonstrate that fire intensity builds steadily in July, peaks in September, and declines toward the year’s end. This seasonality shows that fire occurrence is not equally likely throughout the year but is instead conditioned by climatic and land-surface factors linked to the dry months.</p>
-<p>The implications of these findings are important for both science and policy. Spatial dependence means that fire risk is <strong>localized</strong>, and mitigation resources should be concentrated in the fire-prone regions identified by the STKDE. Temporal dependence means that efforts should be <strong>time-targeted</strong>, with enhanced monitoring and preventive measures deployed during the critical dry-season window. This combination of spatial and temporal clustering suggests that forest fires in Bangka Belitung are shaped by systematic environmental drivers, not by random chance.</p>
-<p>In summary, the STKDE results demonstrate that forest fire events are <strong>spatially and spatio-temporally dependent</strong>. They cluster within ~45 km regions and persist across ~3-week intervals, with the highest concentrations observed in southern/central Bangka and eastern Belitung during the July–October dry season.</p>
 
 
+</section>
 </section>
 </section>
 
