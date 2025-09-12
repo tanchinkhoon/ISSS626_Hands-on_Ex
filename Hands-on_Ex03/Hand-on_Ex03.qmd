@@ -111,11 +111,11 @@ Plot one map with all 2023 fires over the study region
 fire_sf <- sf::st_intersection(fire_sf, kbb_sf)
 
 # Build a quick overall point map with tmap 
-tmap_mode("plot")                                                   # use static plotting mode
-tm_shape(kbb_sf) +                                                  # add study area polygon layer
-  tm_polygons(col = "grey85", border.col = "grey40") +              # light fill, subtle border
-  tm_shape(fire_sf) +                                               # add fire points
-  tm_symbols(size = 0.5, col = "red") +                            # small red dots
+tmap_mode("plot")                                         # use static plotting mode
+tm_shape(kbb_sf) +                                        # add study area polygon layer
+  tm_polygons(col = "grey85", border.col = "grey40") +    # light fill, subtle border
+  tm_shape(fire_sf) +                                     # add fire points
+  tm_symbols(size = 0.5, col = "red") +                   # small red dots
   tm_credits(
     "Forest Fire Points in 2023 (Kepulauan Bangka Belitung)",
     position = c("center", "top"),    # center horizontally, top vertically
@@ -211,12 +211,12 @@ Subsequently, we will estimate spatio-temporal kernel density over space (meters
 ```{r}
 # Compute STKDE using sparr::spattemp.density 
 st_kde <- sparr::spattemp.density(fire_month_owin)  # uses default bandwidths; time is Month_num (1..12)
-summary(st_kde)                              # see chosen bandwidths h (space) and lambda (time), bounds, range
+summary(st_kde)                                     # see chosen bandwidths h (space) and lambda (time), bounds, range
 
 ```
 ### 6.8.5 Plotting the spatio-temporal KDE object
 
-Thereafter, we will reproduce month-specific density maps like the professor’s July–December example.
+Thereafter, we will reproduce month-specific density maps for July–December example.
 
 ```{r, fig.width=14, fig.height=9}
 # Plot a subset of months (e.g., 7..12) with a fixed legend range for comparability 
@@ -289,10 +289,10 @@ BOOT.spattemp(fire_yday_owin)   # prints many trial (h, lambda) and the final pa
 We will re-run STKDE using the recommended bandwidths.
 
 ```{r}
-# Refit STKDE using the professor's recommended bandwidths 
+# Refit STKDE using the bootstrap MISE recommended bandwidths 
 kde_yday <- spattemp.density(
   fire_yday_owin,     # the DayofYear ppp constrained by the study window
-  h      = 9000,      # spatial bandwidth in meters (per professor's improved selection)
+  h      = 45000,     # spatial bandwidth in meters (per improved selection)
   lambda = 19         # temporal bandwidth in days-of-year (per improved selection)
 )
 summary(kde_yday)     # verify the bandwidths and evaluation grid
@@ -309,5 +309,17 @@ plot(kde_yday)   # shows the density surface with color bar; higher values = hig
 
 ```
 
+## 6.11 Discussion of Results (Answer to the Research Question)
 
+The spatio-temporal kernel density estimation (STKDE) provides clear evidence that the locations of forest fires in Kepulauan Bangka Belitung are **not spatially or spatio-temporally independent**. If the events were independent, the density surfaces would be flat and homogeneous across space and time. Instead, the STKDE outputs reveal distinct peaks, rejecting the null hypothesis of independence.
+
+The bootstrap-based bandwidth selection process identified an optimal smoothing window of **h ≈ 44.7 km (spatial)** and **λ ≈ 19.4 days (temporal)**. These parameters indicate that fire events tend to cluster within a radius of ~45 km and persist across approximately three-week periods. The density range produced, from very low background values (~1.2e-39) to sharp peaks (~6.4e-10), confirms substantial clustering intensity.
+
+The spatial clustering is most pronounced in **southern and central Bangka** and in **eastern Belitung**, where the STKDE consistently highlights hotspots of higher fire intensity. These locations repeatedly emerge in the density surfaces, showing that fire events are concentrated in specific sub-regions rather than being uniformly distributed.
+
+Temporally, clustering is most evident during the **July–October period**, corresponding to the dry season. The monthly KDE plots demonstrate that fire intensity builds steadily in July, peaks in September, and declines toward the year’s end. This seasonality shows that fire occurrence is not equally likely throughout the year but is instead conditioned by climatic and land-surface factors linked to the dry months.
+
+The implications of these findings are important for both science and policy. Spatial dependence means that fire risk is **localized**, and mitigation resources should be concentrated in the fire-prone regions identified by the STKDE. Temporal dependence means that efforts should be **time-targeted**, with enhanced monitoring and preventive measures deployed during the critical dry-season window. This combination of spatial and temporal clustering suggests that forest fires in Bangka Belitung are shaped by systematic environmental drivers, not by random chance.
+
+In summary, the STKDE results demonstrate that forest fire events are **spatially and spatio-temporally dependent**. They cluster within ~45 km regions and persist across ~3-week intervals, with the highest concentrations observed in southern/central Bangka and eastern Belitung during the July–October dry season.
 
