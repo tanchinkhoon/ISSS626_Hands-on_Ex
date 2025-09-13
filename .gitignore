@@ -12,4 +12,5 @@ _quarto/
 
 # Ignore big data in every exercise, but allow placeholder files
 Hands-on_Ex*/Data/**
+In-Class_Ex*/Data/**
 /.quarto/

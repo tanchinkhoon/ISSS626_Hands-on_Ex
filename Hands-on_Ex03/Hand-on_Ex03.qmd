@@ -330,3 +330,12 @@ Temporally, clustering is most evident during the **July--October period**, corr
 The implications of these findings are important for both science and policy. Spatial dependence means that fire risk is **localized**, and mitigation resources should be concentrated in the fire-prone regions identified by the STKDE. Temporal dependence means that efforts should be **time-targeted**, with enhanced monitoring and preventive measures deployed during the critical dry-season window. This combination of spatial and temporal clustering suggests that forest fires in Bangka Belitung are shaped by systematic environmental drivers, not by random chance.
 
 In summary, the STKDE results demonstrate that forest fire events are **spatially and spatio-temporally dependent**. They cluster within \~45 km regions and persist across \~3-week intervals, with the highest concentrations observed in southern/central Bangka and eastern Belitung during the July--October dry season.
+
+
+```{r}
+# Look at attribute names and sample values
+names(kbb_sf)
+unique(kbb_sf$KABUPATEN)   # or the correct column name
+
+
+```
