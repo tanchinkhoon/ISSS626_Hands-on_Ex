@@ -1,6 +1,6 @@
 ---
 title: "In-class Exercise 3: Interactive K-function"
-author: "Dr. Kam Tin Seong"
+author: "TAN Chin Khoon"
 date: "September 12, 2025"
 date-modified: "last-modified"
 execute: 
@@ -18,11 +18,11 @@ pacman::p_load(sf, terra, spatstat,
 
 ```{r}
 #| echo: false
-mpsz_cl <- read_rds("data/rds/mpsz_cl.rds")
+mpsz_cl <- read_rds("data/mpsz_cl.rds")
 ```
 
 ```{r}
-childcare_sf <- read_rds("data/rds/childcare_sf.rds") 
+childcare_sf <- read_rds("data/childcare_sf.rds") 
 
 ```
 

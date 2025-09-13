@@ -17,7 +17,7 @@ website:
       - text: "In-Class Exercise"
         menu:
           - text: "In-Class Exercise 3"
-            href: In-Class_Ex03/In-Class_Ex03a
+            href: In-Class_Ex03/in-class_Ex03a
     right:
       - text: "Home"
         href: index.qmd
