@@ -14,6 +14,10 @@ website:
             href: Hands-on_Ex02/Hand-on_Ex02
           - text: "Hands-on Exercise 1"
             href: Hands-on_Ex01/Hand-on_Ex01.qmd
+      - text: "In-Class Exercise"
+        menu:
+          - text: "In-Class Exercise 3"
+            href: In-Class_Ex03/In-Class_Ex03a
     right:
       - text: "Home"
         href: index.qmd
