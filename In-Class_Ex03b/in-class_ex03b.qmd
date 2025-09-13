@@ -65,7 +65,7 @@ biz_56111 <- acra_data %>%
 
 ```
 
-## Geocoding
+## Geocoding (It took 32 seconds to process the chunk of codes)
 
 ```{r}
 postcodes <- unique(biz_56111$postal_code)
