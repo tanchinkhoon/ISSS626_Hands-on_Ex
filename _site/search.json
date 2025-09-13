@@ -219,9 +219,9 @@
   {
     "objectID": "index.html",
     "href": "index.html",
-    "title": "ISSS626",
+    "title": "ISSS626 Coursework",
     "section": "",
-    "text": "Welcome to Geospatial Analytics and Application (ISSS626). This website collects my course work and hands-on exercises. Use the top navigation bar to open each page."
+    "text": "Welcome to Geospatial Analytics and Application (ISSS626). This website collects my submission of coursework. Use the top navigation bar to open each page."
   },
   {
     "objectID": "index.html#quick-links",
@@ -233,7 +233,7 @@
   {
     "objectID": "index.html#objectives-of-my-hands-on-work",
     "href": "index.html#objectives-of-my-hands-on-work",
-    "title": "ISSS626",
+    "title": "ISSS626 Coursework",
     "section": "Objectives of my hands-on work",
     "text": "Objectives of my hands-on work\n\nDemonstrate step-by-step workflows for geospatial tasks that a beginner can follow.\nUse clear, descriptive names and relative file paths so the website renders correctly on Netlify.\nProvide reproducible results with the same structure for every assignment."
   },
@@ -324,14 +324,14 @@
   {
     "objectID": "In-Class_Ex03/in-class_Ex03a.html",
     "href": "In-Class_Ex03/in-class_Ex03a.html",
-    "title": "In-class Exercise 3: Interactive K-function",
+    "title": "In-class Exercise 3a: Interactive K-function",
     "section": "",
     "text": "pacman::p_load(sf, terra, spatstat, \n               tmap, rvest, tidyverse,\n               ggthemes, plotly)\nchildcare_sf &lt;- read_rds(\"data/childcare_sf.rds\")\nchildcare_ppp &lt;- as.ppp(childcare_sf) %&gt;%\n  rjitter(retry = TRUE,\n          nsim = 1,\n          drop = TRUE)\npg &lt;- mpsz_cl %&gt;%\n  filter(PLN_AREA_N == \"PUNGGOL\")\ntm &lt;- mpsz_cl %&gt;%\n  filter(PLN_AREA_N == \"TAMPINES\")\nck &lt;- mpsz_cl %&gt;%\n  filter(PLN_AREA_N == \"CHOA CHU KANG\")\njw &lt;- mpsz_cl %&gt;%\n  filter(PLN_AREA_N == \"JURONG WEST\")\npg_owin = as.owin(pg)\ntm_owin = as.owin(tm)\nck_owin = as.owin(ck)\njw_owin = as.owin(jw)\nchildcare_pg_ppp = childcare_ppp[pg_owin]\nchildcare_tm_ppp = childcare_ppp[tm_owin]\nchildcare_ck_ppp = childcare_ppp[ck_owin]\nchildcare_jw_ppp = childcare_ppp[jw_owin]"
   },
   {
     "objectID": "In-Class_Ex03/in-class_Ex03a.html#building-an-interative-plot-with-ggplotly",
     "href": "In-Class_Ex03/in-class_Ex03a.html#building-an-interative-plot-with-ggplotly",
-    "title": "In-class Exercise 3: Interactive K-function",
+    "title": "In-class Exercise 3a: Interactive K-function",
     "section": "Building an interative plot with ggplotly",
     "text": "Building an interative plot with ggplotly\nThe previous code chunks uses plot() to visualise the envelopes of the second-order summary statistics (such as L-function). The output is a static plot, therefore it can be difficult to make accurate guesstimates of the statistics and the corresponding distance, r.\nThe below code chunk converts the output (which is in a list form) into a dataframe, which can be used to generate a similar plot using appropriate aesthetic mappings from ggplot package. Finally, ggplotly() is used to convert the ggplot into an interactive plotly visualisation.\nThe codes were referenced from a R-blogger article. Further modifications were made to enhance the user experience by customizing the tooltips for greater clarity and intuition.\n\ntitle &lt;- \"Pairwise Distance: L function\"\n\nLcsr_df &lt;- as.data.frame(L_tm.csr)\n\ncolour=c(\"#0D657D\",\"#ee770d\",\"#D3D3D3\")\ncsr_plot &lt;- ggplot(Lcsr_df, aes(r, obs-r))+\n  # plot observed value\n  geom_line(colour=c(\"#4d4d4d\"))+\n  geom_line(aes(r,theo-r), colour=\"red\", linetype = \"dashed\")+\n  # plot simulation envelopes\n  geom_ribbon(aes(ymin=lo-r,ymax=hi-r),alpha=0.1, colour=c(\"#91bfdb\")) +\n  xlab(\"Distance r (m)\") +\n  ylab(\"L(r)-r\") +\n  geom_rug(data=Lcsr_df[Lcsr_df$obs &gt; Lcsr_df$hi,], sides=\"b\", colour=colour[1])  +\n  geom_rug(data=Lcsr_df[Lcsr_df$obs &lt; Lcsr_df$lo,], sides=\"b\", colour=colour[2]) +\n  geom_rug(data=Lcsr_df[Lcsr_df$obs &gt;= Lcsr_df$lo & Lcsr_df$obs &lt;= Lcsr_df$hi,], sides=\"b\", color=colour[3]) +\n  theme_tufte()+\n  ggtitle(title)\n\ntext1&lt;-\"Significant clustering\"\ntext2&lt;-\"Significant segregation\"\ntext3&lt;-\"Not significant clustering/segregation\"\n\n# the below conditional statement is required to ensure that the labels (text1/2/3) are assigned to the correct traces\nif (nrow(Lcsr_df[Lcsr_df$obs &gt; Lcsr_df$hi,])==0){ \n  if (nrow(Lcsr_df[Lcsr_df$obs &lt; Lcsr_df$lo,])==0){ \n    ggplotly(csr_plot, dynamicTicks=T) %&gt;%\n      style(text = text3, traces = 4) %&gt;%\n      rangeslider() \n  }else if (nrow(Lcsr_df[Lcsr_df$obs &gt;= Lcsr_df$lo & Lcsr_df$obs &lt;= Lcsr_df$hi,])==0){ \n    ggplotly(csr_plot, dynamicTicks=T) %&gt;%\n      style(text = text2, traces = 4) %&gt;%\n      rangeslider() \n  }else {\n    ggplotly(csr_plot, dynamicTicks=T) %&gt;%\n      style(text = text2, traces = 4) %&gt;%\n      style(text = text3, traces = 5) %&gt;%\n      rangeslider() \n  }\n} else if (nrow(Lcsr_df[Lcsr_df$obs &lt; Lcsr_df$lo,])==0){\n  if (nrow(Lcsr_df[Lcsr_df$obs &gt;= Lcsr_df$lo & Lcsr_df$obs &lt;= Lcsr_df$hi,])==0){\n    ggplotly(csr_plot, dynamicTicks=T) %&gt;%\n      style(text = text1, traces = 4) %&gt;%\n      rangeslider() \n  } else{\n    ggplotly(csr_plot, dynamicTicks=T) %&gt;%\n      style(text = text1, traces = 4) %&gt;%\n      style(text = text3, traces = 5) %&gt;%\n      rangeslider()\n  }\n} else{\n  ggplotly(csr_plot, dynamicTicks=T) %&gt;%\n    style(text = text1, traces = 4) %&gt;%\n    style(text = text2, traces = 5) %&gt;%\n    style(text = text3, traces = 6) %&gt;%\n    rangeslider()\n  }\n\n\n\n\n\n\n\n\n\n\n\nNote\n\n\n\nThe main features of the above visualisation:\n\nThe observed and theoretical values of L(r)-r (including the upper and lower curves of the simulated envelope) can be found in the tooltip upon hovering the cursor over the geometry layers.\nThe range slider below the plot enables users to pan and zoom in to a specific range of distance.\nThe colored bands at the bottom of the line graph gives a clearer indication of significant or insignificant spatial segregation/ clustering at distance r. Dark green bands indicate significant clustering, orange indicate significant segregation, while grey indicates insignificant clustering/segregation.\nTooltips were added to provide color legend information."
   },
@@ -443,7 +443,7 @@
   {
     "objectID": "index.html#quick-links-recent-submissions",
     "href": "index.html#quick-links-recent-submissions",
-    "title": "ISSS626",
+    "title": "ISSS626 Coursework",
     "section": "Quick links recent submissions",
     "text": "Quick links recent submissions\n(Refer to the drop-down menus above for complete list of assignment submissions)\n\n👉 In-Class Exercise 3b: Open the assignment\n👉 In-Class Exercise 3a: Open the assignment\n👉 Hand-on Exercise 3: Open the assignment\n👉 Hand-on Exercise 2: Open the assignment\n👉 Hand-on Exercise 1: Open the assignment"
   }

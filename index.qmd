@@ -1,9 +1,9 @@
 
 ---
-title: ISSS626
+title: ISSS626 Coursework
 ---
 
-Welcome to **Geospatial Analytics and Application (ISSS626)**. This website collects my course work and hands-on exercises. Use the top navigation bar to open each page.
+Welcome to **Geospatial Analytics and Application (ISSS626)**. This website collects my submission of coursework. Use the top navigation bar to open each page.
 
 ::: callout-note
 ### How to use this site
