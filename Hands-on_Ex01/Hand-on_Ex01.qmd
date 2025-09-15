@@ -23,6 +23,8 @@ pacman::p_load(
 # "mpsz" is the variable that stores the subzone polygons.
 mpsz = st_read(dsn = "data/geospatial/MasterPlan2014SubzoneBoundaryWebSHP",  # dsn = file path to the geospatial folder. 
                   layer = "MP14_SUBZONE_WEB_PL")                             # layer = which dataset (layer) to load; here the subzone boundary of Singapore.
+
+head(mpsz)
 ```
 
 ```{r}

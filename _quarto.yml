@@ -36,6 +36,7 @@ format:
     number-sections: false   # 1, 1.1, 1.2 numbering
     page-navigation: true    # Previous / Next links at bottom
     smooth-scroll: true      # nice scrolling when clicking TOC
+    date-modified: "last-modified"
     css: styles.css
     
 

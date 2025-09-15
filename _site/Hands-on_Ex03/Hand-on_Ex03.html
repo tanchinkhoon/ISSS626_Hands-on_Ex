@@ -138,12 +138,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </li>
   <li class="nav-item dropdown ">
     <a class="nav-link dropdown-toggle" href="#" id="nav-menu-in-class-exercise" role="button" data-bs-toggle="dropdown" aria-expanded="false" rel="" target="">
- <span class="menu-text">In-Class Exercise</span>
+ <span class="menu-text">In-class Exercise</span>
     </a>
     <ul class="dropdown-menu" aria-labelledby="nav-menu-in-class-exercise">    
         <li>
-    <a class="dropdown-item" href="../In-Class_Ex03/In-Class_Ex03a" rel="" target="">
- <span class="dropdown-text">In-Class Exercise 3</span></a>
+    <a class="dropdown-item" href="../In-Class_Ex03b/in-class_Ex03b" rel="" target="">
+ <span class="dropdown-text">In-class Exercise 3b</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../In-Class_Ex03/in-class_Ex03a" rel="" target="">
+ <span class="dropdown-text">In-class Exercise 3a</span></a>
   </li>  
     </ul>
   </li>
@@ -243,6 +247,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     </div>
   </div>
   
+    <div>
+    <div class="quarto-title-meta-heading">Modified</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date-modified">September 14, 2025</p>
+    </div>
+  </div>
     
   </div>
   
@@ -3512,17 +3522,6 @@ Evaluation
 <p>Temporally, clustering is most evident during the <strong>July–October period</strong>, corresponding to the dry season. The monthly KDE plots demonstrate that fire intensity builds steadily in July, peaks in September, and declines toward the year’s end. This seasonality shows that fire occurrence is not equally likely throughout the year but is instead conditioned by climatic and land-surface factors linked to the dry months.</p>
 <p>The implications of these findings are important for both science and policy. Spatial dependence means that fire risk is <strong>localized</strong>, and mitigation resources should be concentrated in the fire-prone regions identified by the STKDE. Temporal dependence means that efforts should be <strong>time-targeted</strong>, with enhanced monitoring and preventive measures deployed during the critical dry-season window. This combination of spatial and temporal clustering suggests that forest fires in Bangka Belitung are shaped by systematic environmental drivers, not by random chance.</p>
 <p>In summary, the STKDE results demonstrate that forest fire events are <strong>spatially and spatio-temporally dependent</strong>. They cluster within ~45 km regions and persist across ~3-week intervals, with the highest concentrations observed in southern/central Bangka and eastern Belitung during the July–October dry season.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb54"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Look at attribute names and sample values</span></span>
-<span id="cb54-2"><a href="#cb54-2" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(kbb_sf)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>NULL</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb56"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a><span class="fu">unique</span>(kbb_sf<span class="sc">$</span>KABUPATEN)   <span class="co"># or the correct column name</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>NULL</code></pre>
-</div>
-</div>
 
 
 </section>

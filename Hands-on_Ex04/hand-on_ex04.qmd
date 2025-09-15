@@ -1,0 +1,68 @@
+---
+title: "Hands-on_Ex04"
+author: "TAN Chin Khoon"
+date: "19 September 2025"
+---
+
+```{r}
+pacman::p_load(sf, spdep, tmap, tidyverse, knitr)
+
+```
+
+```{r}
+hunan <- st_read(dsn = "/Users/cktan/Desktop/SMU/01_Geospatial Analytics (ISSS626)/Hands-on_Ex/Hands-on_Ex04/data/geospatial", 
+                 layer = "Hunan")
+
+
+```
+
+
+```{r}
+hunan2012 <- read_csv("data/aspatial/Hunan_2012.csv")
+
+
+```
+
+
+```{r}
+
+
+
+```
+
+
+```{r}
+
+
+
+```
+
+
+```{r}
+
+
+
+```
+
+
+```{r}
+
+
+
+```
+
+
+```{r}
+
+
+
+```
+
+
+```{r}
+
+
+
+```
+
+
