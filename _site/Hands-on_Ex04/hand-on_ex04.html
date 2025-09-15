@@ -2299,12 +2299,21 @@ W 88 7744 88 30.90265 357.5308</code></pre>
 <h3 class="anchored" data-anchor-id="spatial-window-sum-include-self-binary-sum">8.9.4 Spatial window sum (include self + binary sum)</h3>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb98"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb98-1"><a href="#cb98-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Start from neighbour list that includes self</span></span>
-<span id="cb98-2"><a href="#cb98-2" aria-hidden="true" tabindex="-1"></a>wm_qs <span class="ot">&lt;-</span> spdep<span class="sc">::</span><span class="fu">include.self</span>(wm_q)                                              <span class="co"># ensure self is included</span></span>
-<span id="cb98-3"><a href="#cb98-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb98-4"><a href="#cb98-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Create binary weights for the self-included list (all ones)</span></span>
-<span id="cb98-5"><a href="#cb98-5" aria-hidden="true" tabindex="-1"></a>b_weights_qs  <span class="ot">&lt;-</span> <span class="fu">lapply</span>(wm_qs, <span class="cf">function</span>(x) <span class="dv">0</span> <span class="sc">*</span> x <span class="sc">+</span> <span class="dv">1</span>)                            <span class="co"># vector of 1s for each neighbour including self</span></span>
-<span id="cb98-6"><a href="#cb98-6" aria-hidden="true" tabindex="-1"></a>b_weights2_qs <span class="ot">&lt;-</span> spdep<span class="sc">::</span><span class="fu">nb2listw</span>(wm_qs, <span class="at">glist =</span> b_weights_qs, <span class="at">style =</span> <span class="st">"B"</span>)       <span class="co"># store as raw (binary) weights</span></span>
-<span id="cb98-7"><a href="#cb98-7" aria-hidden="true" tabindex="-1"></a>b_weights2_qs                                                                     <span class="co"># confirm characteristics</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb98-2"><a href="#cb98-2" aria-hidden="true" tabindex="-1"></a>wm_qs <span class="ot">&lt;-</span> spdep<span class="sc">::</span><span class="fu">include.self</span>(wm_q)                                          <span class="co"># ensure self is included</span></span>
+<span id="cb98-3"><a href="#cb98-3" aria-hidden="true" tabindex="-1"></a>wm_qs</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Neighbour list object:
+Number of regions: 88 
+Number of nonzero links: 536 
+Percentage nonzero weights: 6.921488 
+Average number of links: 6.090909 </code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb100"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb100-1"><a href="#cb100-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create binary weights for the self-included list (all ones)</span></span>
+<span id="cb100-2"><a href="#cb100-2" aria-hidden="true" tabindex="-1"></a>b_weights_qs  <span class="ot">&lt;-</span> <span class="fu">lapply</span>(wm_qs, <span class="cf">function</span>(x) <span class="dv">0</span> <span class="sc">*</span> x <span class="sc">+</span> <span class="dv">1</span>)                       <span class="co"># vector of 1s for each neighbour including self</span></span>
+<span id="cb100-3"><a href="#cb100-3" aria-hidden="true" tabindex="-1"></a>b_weights2_qs <span class="ot">&lt;-</span> spdep<span class="sc">::</span><span class="fu">nb2listw</span>(wm_qs, <span class="at">glist =</span> b_weights_qs, <span class="at">style =</span> <span class="st">"B"</span>)  <span class="co"># store as raw (binary) weights</span></span>
+<span id="cb100-4"><a href="#cb100-4" aria-hidden="true" tabindex="-1"></a>b_weights2_qs                                                               <span class="co"># confirm characteristics</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Characteristics of weights list object:
 Neighbour list object:
@@ -2318,11 +2327,614 @@ Weights constants summary:
    n   nn  S0   S1    S2
 B 88 7744 536 1072 14160</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb100"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb100-1"><a href="#cb100-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Compute window SUM lag (self + neighbours summed)</span></span>
-<span id="cb100-2"><a href="#cb100-2" aria-hidden="true" tabindex="-1"></a>w_sum_gdppc <span class="ot">&lt;-</span> <span class="fu">list</span>(hunan<span class="sc">$</span>NAME_3, spdep<span class="sc">::</span><span class="fu">lag.listw</span>(b_weights2_qs, hunan<span class="sc">$</span>GDPPC))  <span class="co"># list of names + sums</span></span>
-<span id="cb100-3"><a href="#cb100-3" aria-hidden="true" tabindex="-1"></a>w_sum_gdppc.res <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(w_sum_gdppc)                                     <span class="co"># to data.frame</span></span>
-<span id="cb100-4"><a href="#cb100-4" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(w_sum_gdppc.res) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"NAME_3"</span>, <span class="st">"w_sum GDPPC"</span>)                           <span class="co"># rename to match slide</span></span>
-<span id="cb100-5"><a href="#cb100-5" aria-hidden="true" tabindex="-1"></a>hunan <span class="ot">&lt;-</span> dplyr<span class="sc">::</span><span class="fu">left_join</span>(hunan, w_sum_gdppc.res, <span class="at">by =</span> <span class="st">"NAME_3"</span>)                  <span class="co"># attach to sf</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb102"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb102-1"><a href="#cb102-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Compute window SUM lag (self + neighbours summed)</span></span>
+<span id="cb102-2"><a href="#cb102-2" aria-hidden="true" tabindex="-1"></a>w_sum_gdppc <span class="ot">&lt;-</span> <span class="fu">list</span>(hunan<span class="sc">$</span>NAME_3, spdep<span class="sc">::</span><span class="fu">lag.listw</span>(b_weights2_qs, hunan<span class="sc">$</span>GDPPC))  <span class="co"># list of names + sums</span></span>
+<span id="cb102-3"><a href="#cb102-3" aria-hidden="true" tabindex="-1"></a>w_sum_gdppc</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[[1]]
+ [1] "Anxiang"       "Hanshou"       "Jinshi"        "Li"           
+ [5] "Linli"         "Shimen"        "Liuyang"       "Ningxiang"    
+ [9] "Wangcheng"     "Anren"         "Guidong"       "Jiahe"        
+[13] "Linwu"         "Rucheng"       "Yizhang"       "Yongxing"     
+[17] "Zixing"        "Changning"     "Hengdong"      "Hengnan"      
+[21] "Hengshan"      "Leiyang"       "Qidong"        "Chenxi"       
+[25] "Zhongfang"     "Huitong"       "Jingzhou"      "Mayang"       
+[29] "Tongdao"       "Xinhuang"      "Xupu"          "Yuanling"     
+[33] "Zhijiang"      "Lengshuijiang" "Shuangfeng"    "Xinhua"       
+[37] "Chengbu"       "Dongan"        "Dongkou"       "Longhui"      
+[41] "Shaodong"      "Suining"       "Wugang"        "Xinning"      
+[45] "Xinshao"       "Shaoshan"      "Xiangxiang"    "Baojing"      
+[49] "Fenghuang"     "Guzhang"       "Huayuan"       "Jishou"       
+[53] "Longshan"      "Luxi"          "Yongshun"      "Anhua"        
+[57] "Nan"           "Yuanjiang"     "Jianghua"      "Lanshan"      
+[61] "Ningyuan"      "Shuangpai"     "Xintian"       "Huarong"      
+[65] "Linxiang"      "Miluo"         "Pingjiang"     "Xiangyin"     
+[69] "Cili"          "Chaling"       "Liling"        "Yanling"      
+[73] "You"           "Zhuzhou"       "Sangzhi"       "Yueyang"      
+[77] "Qiyang"        "Taojiang"      "Shaoyang"      "Lianyuan"     
+[81] "Hongjiang"     "Hengyang"      "Guiyang"       "Changsha"     
+[85] "Taoyuan"       "Xiangtan"      "Dao"           "Jiangyong"    
+
+[[2]]
+ [1] 147903 134605 131165 135423 134635 133381 238106 297281 344573 268982
+[11] 106510 136141 126832 103303 151645 196097 207589 143926 178242 175235
+[21] 138765 155699 160150 117145 113730  89002  63532 112988  59330  35930
+[31] 154439 145795 112587 107515 162322 145517  61826  79925  82589  83352
+[41] 119897 116749  81510  63530 151986 174193 210294  97361  96472 108936
+[51]  79819 108871  48531 128935  84305 188958 171869 148402  83813 104663
+[61] 155742  73336 112705  78084  58257 279414 237883 219273  83354  90124
+[71] 168462 165714 165668 311663 126892 229971 165876 271045 117731 256646
+[81] 126603 127467 295688 336838 267729 431516  85667  51028</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb104"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb104-1"><a href="#cb104-1" aria-hidden="true" tabindex="-1"></a>w_sum_gdppc.res <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(w_sum_gdppc)                                    <span class="co"># to data.frame</span></span>
+<span id="cb104-2"><a href="#cb104-2" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(w_sum_gdppc.res) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"NAME_3"</span>, <span class="st">"w_sum GDPPC"</span>)                          <span class="co"># rename to match slide</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb105"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb105-1"><a href="#cb105-1" aria-hidden="true" tabindex="-1"></a>hunan <span class="ot">&lt;-</span> dplyr<span class="sc">::</span><span class="fu">left_join</span>(hunan, w_sum_gdppc.res, <span class="at">by =</span> <span class="st">"NAME_3"</span>)                 <span class="co"># attach to sf</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb106"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb106-1"><a href="#cb106-1" aria-hidden="true" tabindex="-1"></a>hunan <span class="sc">%&gt;%</span></span>
+<span id="cb106-2"><a href="#cb106-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="st">"County"</span>, <span class="st">"lag_sum GDPPC"</span>, <span class="st">"w_sum GDPPC"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb106-3"><a href="#cb106-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<table class="table table-sm table-striped small">
+<colgroup>
+<col style="width: 19%">
+<col style="width: 19%">
+<col style="width: 16%">
+<col style="width: 43%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">County</th>
+<th style="text-align: right;">lag_sum GDPPC</th>
+<th style="text-align: right;">w_sum GDPPC</th>
+<th style="text-align: left;">geometry</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Anxiang</td>
+<td style="text-align: right;">124236</td>
+<td style="text-align: right;">147903</td>
+<td style="text-align: left;">POLYGON ((112.0625 29.75523…</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Hanshou</td>
+<td style="text-align: right;">113624</td>
+<td style="text-align: right;">134605</td>
+<td style="text-align: left;">POLYGON ((112.2288 29.11684…</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Jinshi</td>
+<td style="text-align: right;">96573</td>
+<td style="text-align: right;">131165</td>
+<td style="text-align: left;">POLYGON ((111.8927 29.6013,…</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Li</td>
+<td style="text-align: right;">110950</td>
+<td style="text-align: right;">135423</td>
+<td style="text-align: left;">POLYGON ((111.3731 29.94649…</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Linli</td>
+<td style="text-align: right;">109081</td>
+<td style="text-align: right;">134635</td>
+<td style="text-align: left;">POLYGON ((111.6324 29.76288…</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Shimen</td>
+<td style="text-align: right;">106244</td>
+<td style="text-align: right;">133381</td>
+<td style="text-align: left;">POLYGON ((110.8825 30.11675…</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Liuyang</td>
+<td style="text-align: right;">174988</td>
+<td style="text-align: right;">238106</td>
+<td style="text-align: left;">POLYGON ((113.9905 28.5682,…</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Ningxiang</td>
+<td style="text-align: right;">235079</td>
+<td style="text-align: right;">297281</td>
+<td style="text-align: left;">POLYGON ((112.7181 28.38299…</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Wangcheng</td>
+<td style="text-align: right;">273907</td>
+<td style="text-align: right;">344573</td>
+<td style="text-align: left;">POLYGON ((112.7914 28.52688…</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Anren</td>
+<td style="text-align: right;">256221</td>
+<td style="text-align: right;">268982</td>
+<td style="text-align: left;">POLYGON ((113.1757 26.82734…</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Guidong</td>
+<td style="text-align: right;">98013</td>
+<td style="text-align: right;">106510</td>
+<td style="text-align: left;">POLYGON ((114.1799 26.20117…</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Jiahe</td>
+<td style="text-align: right;">104050</td>
+<td style="text-align: right;">136141</td>
+<td style="text-align: left;">POLYGON ((112.4425 25.74358…</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Linwu</td>
+<td style="text-align: right;">102846</td>
+<td style="text-align: right;">126832</td>
+<td style="text-align: left;">POLYGON ((112.5914 25.55143…</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Rucheng</td>
+<td style="text-align: right;">92017</td>
+<td style="text-align: right;">103303</td>
+<td style="text-align: left;">POLYGON ((113.6759 25.87578…</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Yizhang</td>
+<td style="text-align: right;">133831</td>
+<td style="text-align: right;">151645</td>
+<td style="text-align: left;">POLYGON ((113.2621 25.68394…</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Yongxing</td>
+<td style="text-align: right;">158446</td>
+<td style="text-align: right;">196097</td>
+<td style="text-align: left;">POLYGON ((113.3169 26.41843…</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Zixing</td>
+<td style="text-align: right;">141883</td>
+<td style="text-align: right;">207589</td>
+<td style="text-align: left;">POLYGON ((113.7311 26.16259…</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Changning</td>
+<td style="text-align: right;">119508</td>
+<td style="text-align: right;">143926</td>
+<td style="text-align: left;">POLYGON ((112.6144 26.60198…</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Hengdong</td>
+<td style="text-align: right;">150757</td>
+<td style="text-align: right;">178242</td>
+<td style="text-align: left;">POLYGON ((113.1056 27.21007…</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Hengnan</td>
+<td style="text-align: right;">153324</td>
+<td style="text-align: right;">175235</td>
+<td style="text-align: left;">POLYGON ((112.7599 26.98149…</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Hengshan</td>
+<td style="text-align: right;">113593</td>
+<td style="text-align: right;">138765</td>
+<td style="text-align: left;">POLYGON ((112.607 27.4689, …</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Leiyang</td>
+<td style="text-align: right;">129594</td>
+<td style="text-align: right;">155699</td>
+<td style="text-align: left;">POLYGON ((112.9996 26.69276…</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Qidong</td>
+<td style="text-align: right;">142149</td>
+<td style="text-align: right;">160150</td>
+<td style="text-align: left;">POLYGON ((111.7818 27.0383,…</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Chenxi</td>
+<td style="text-align: right;">100119</td>
+<td style="text-align: right;">117145</td>
+<td style="text-align: left;">POLYGON ((110.2624 28.21778…</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Zhongfang</td>
+<td style="text-align: right;">82884</td>
+<td style="text-align: right;">113730</td>
+<td style="text-align: left;">POLYGON ((109.9431 27.72858…</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Huitong</td>
+<td style="text-align: right;">74668</td>
+<td style="text-align: right;">89002</td>
+<td style="text-align: left;">POLYGON ((109.9419 27.10512…</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Jingzhou</td>
+<td style="text-align: right;">43184</td>
+<td style="text-align: right;">63532</td>
+<td style="text-align: left;">POLYGON ((109.8186 26.75842…</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Mayang</td>
+<td style="text-align: right;">99244</td>
+<td style="text-align: right;">112988</td>
+<td style="text-align: left;">POLYGON ((109.795 27.98008,…</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Tongdao</td>
+<td style="text-align: right;">46549</td>
+<td style="text-align: right;">59330</td>
+<td style="text-align: left;">POLYGON ((109.9294 26.46561…</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Xinhuang</td>
+<td style="text-align: right;">20518</td>
+<td style="text-align: right;">35930</td>
+<td style="text-align: left;">POLYGON ((109.227 27.43733,…</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Xupu</td>
+<td style="text-align: right;">140576</td>
+<td style="text-align: right;">154439</td>
+<td style="text-align: left;">POLYGON ((110.7189 28.30485…</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Yuanling</td>
+<td style="text-align: right;">121601</td>
+<td style="text-align: right;">145795</td>
+<td style="text-align: left;">POLYGON ((110.9652 28.99895…</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Zhijiang</td>
+<td style="text-align: right;">92069</td>
+<td style="text-align: right;">112587</td>
+<td style="text-align: left;">POLYGON ((109.8818 27.60661…</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Lengshuijiang</td>
+<td style="text-align: right;">43258</td>
+<td style="text-align: right;">107515</td>
+<td style="text-align: left;">POLYGON ((111.5307 27.81472…</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Shuangfeng</td>
+<td style="text-align: right;">144567</td>
+<td style="text-align: right;">162322</td>
+<td style="text-align: left;">POLYGON ((112.263 27.70421,…</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Xinhua</td>
+<td style="text-align: right;">132119</td>
+<td style="text-align: right;">145517</td>
+<td style="text-align: left;">POLYGON ((111.3345 28.19642…</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Chengbu</td>
+<td style="text-align: right;">51694</td>
+<td style="text-align: right;">61826</td>
+<td style="text-align: left;">POLYGON ((110.4455 26.69317…</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Dongan</td>
+<td style="text-align: right;">59024</td>
+<td style="text-align: right;">79925</td>
+<td style="text-align: left;">POLYGON ((111.4531 26.86812…</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Dongkou</td>
+<td style="text-align: right;">69349</td>
+<td style="text-align: right;">82589</td>
+<td style="text-align: left;">POLYGON ((110.6622 27.37305…</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Longhui</td>
+<td style="text-align: right;">73780</td>
+<td style="text-align: right;">83352</td>
+<td style="text-align: left;">POLYGON ((110.985 27.65983,…</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Shaodong</td>
+<td style="text-align: right;">94651</td>
+<td style="text-align: right;">119897</td>
+<td style="text-align: left;">POLYGON ((111.9054 27.40254…</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Suining</td>
+<td style="text-align: right;">100680</td>
+<td style="text-align: right;">116749</td>
+<td style="text-align: left;">POLYGON ((110.389 27.10006,…</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Wugang</td>
+<td style="text-align: right;">69398</td>
+<td style="text-align: right;">81510</td>
+<td style="text-align: left;">POLYGON ((110.9878 27.03345…</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Xinning</td>
+<td style="text-align: right;">52798</td>
+<td style="text-align: right;">63530</td>
+<td style="text-align: left;">POLYGON ((111.0736 26.84627…</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Xinshao</td>
+<td style="text-align: right;">140472</td>
+<td style="text-align: right;">151986</td>
+<td style="text-align: left;">POLYGON ((111.6013 27.58275…</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Shaoshan</td>
+<td style="text-align: right;">118623</td>
+<td style="text-align: right;">174193</td>
+<td style="text-align: left;">POLYGON ((112.5391 27.97742…</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Xiangxiang</td>
+<td style="text-align: right;">180933</td>
+<td style="text-align: right;">210294</td>
+<td style="text-align: left;">POLYGON ((112.4549 28.05783…</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Baojing</td>
+<td style="text-align: right;">82798</td>
+<td style="text-align: right;">97361</td>
+<td style="text-align: left;">POLYGON ((109.7015 28.82844…</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Fenghuang</td>
+<td style="text-align: right;">83090</td>
+<td style="text-align: right;">96472</td>
+<td style="text-align: left;">POLYGON ((109.5239 28.19206…</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Guzhang</td>
+<td style="text-align: right;">97356</td>
+<td style="text-align: right;">108936</td>
+<td style="text-align: left;">POLYGON ((109.8968 28.74034…</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Huayuan</td>
+<td style="text-align: right;">59482</td>
+<td style="text-align: right;">79819</td>
+<td style="text-align: left;">POLYGON ((109.5647 28.61712…</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Jishou</td>
+<td style="text-align: right;">77334</td>
+<td style="text-align: right;">108871</td>
+<td style="text-align: left;">POLYGON ((109.8375 28.4696,…</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Longshan</td>
+<td style="text-align: right;">38777</td>
+<td style="text-align: right;">48531</td>
+<td style="text-align: left;">POLYGON ((109.6337 29.62521…</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Luxi</td>
+<td style="text-align: right;">111463</td>
+<td style="text-align: right;">128935</td>
+<td style="text-align: left;">POLYGON ((110.1067 28.41835…</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Yongshun</td>
+<td style="text-align: right;">74715</td>
+<td style="text-align: right;">84305</td>
+<td style="text-align: left;">POLYGON ((110.0003 29.29499…</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Anhua</td>
+<td style="text-align: right;">174391</td>
+<td style="text-align: right;">188958</td>
+<td style="text-align: left;">POLYGON ((111.6034 28.63716…</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Nan</td>
+<td style="text-align: right;">150558</td>
+<td style="text-align: right;">171869</td>
+<td style="text-align: left;">POLYGON ((112.3232 29.46074…</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Yuanjiang</td>
+<td style="text-align: right;">122144</td>
+<td style="text-align: right;">148402</td>
+<td style="text-align: left;">POLYGON ((112.4391 29.1791,…</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Jianghua</td>
+<td style="text-align: right;">68012</td>
+<td style="text-align: right;">83813</td>
+<td style="text-align: left;">POLYGON ((111.6461 25.29661…</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Lanshan</td>
+<td style="text-align: right;">84575</td>
+<td style="text-align: right;">104663</td>
+<td style="text-align: left;">POLYGON ((112.2286 25.61123…</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Ningyuan</td>
+<td style="text-align: right;">143045</td>
+<td style="text-align: right;">155742</td>
+<td style="text-align: left;">POLYGON ((112.0715 26.09892…</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Shuangpai</td>
+<td style="text-align: right;">51394</td>
+<td style="text-align: right;">73336</td>
+<td style="text-align: left;">POLYGON ((111.8864 26.11957…</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Xintian</td>
+<td style="text-align: right;">98279</td>
+<td style="text-align: right;">112705</td>
+<td style="text-align: left;">POLYGON ((112.2578 26.0796,…</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Huarong</td>
+<td style="text-align: right;">47671</td>
+<td style="text-align: right;">78084</td>
+<td style="text-align: left;">POLYGON ((112.9242 29.69134…</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Linxiang</td>
+<td style="text-align: right;">26360</td>
+<td style="text-align: right;">58257</td>
+<td style="text-align: left;">POLYGON ((113.5502 29.67418…</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Miluo</td>
+<td style="text-align: right;">236917</td>
+<td style="text-align: right;">279414</td>
+<td style="text-align: left;">POLYGON ((112.9902 29.02139…</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Pingjiang</td>
+<td style="text-align: right;">220631</td>
+<td style="text-align: right;">237883</td>
+<td style="text-align: left;">POLYGON ((113.8436 29.06152…</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Xiangyin</td>
+<td style="text-align: right;">185290</td>
+<td style="text-align: right;">219273</td>
+<td style="text-align: left;">POLYGON ((112.9173 28.98264…</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Cili</td>
+<td style="text-align: right;">64640</td>
+<td style="text-align: right;">83354</td>
+<td style="text-align: left;">POLYGON ((110.8822 29.69017…</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Chaling</td>
+<td style="text-align: right;">70046</td>
+<td style="text-align: right;">90124</td>
+<td style="text-align: left;">POLYGON ((113.7666 27.10573…</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Liling</td>
+<td style="text-align: right;">126971</td>
+<td style="text-align: right;">168462</td>
+<td style="text-align: left;">POLYGON ((113.5673 27.94346…</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Yanling</td>
+<td style="text-align: right;">144693</td>
+<td style="text-align: right;">165714</td>
+<td style="text-align: left;">POLYGON ((113.9292 26.6154,…</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">You</td>
+<td style="text-align: right;">129404</td>
+<td style="text-align: right;">165668</td>
+<td style="text-align: left;">POLYGON ((113.5879 27.41324…</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Zhuzhou</td>
+<td style="text-align: right;">284074</td>
+<td style="text-align: right;">311663</td>
+<td style="text-align: left;">POLYGON ((113.2493 28.02411…</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Sangzhi</td>
+<td style="text-align: right;">112268</td>
+<td style="text-align: right;">126892</td>
+<td style="text-align: left;">POLYGON ((110.556 29.40543,…</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Yueyang</td>
+<td style="text-align: right;">203611</td>
+<td style="text-align: right;">229971</td>
+<td style="text-align: left;">POLYGON ((113.343 29.61064,…</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Qiyang</td>
+<td style="text-align: right;">145238</td>
+<td style="text-align: right;">165876</td>
+<td style="text-align: left;">POLYGON ((111.5563 26.81318…</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Taojiang</td>
+<td style="text-align: right;">251536</td>
+<td style="text-align: right;">271045</td>
+<td style="text-align: left;">POLYGON ((112.0508 28.67265…</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Shaoyang</td>
+<td style="text-align: right;">108078</td>
+<td style="text-align: right;">117731</td>
+<td style="text-align: left;">POLYGON ((111.5013 27.30207…</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Lianyuan</td>
+<td style="text-align: right;">238300</td>
+<td style="text-align: right;">256646</td>
+<td style="text-align: left;">POLYGON ((111.6789 28.02946…</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Hongjiang</td>
+<td style="text-align: right;">108870</td>
+<td style="text-align: right;">126603</td>
+<td style="text-align: left;">POLYGON ((110.1441 27.47513…</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Hengyang</td>
+<td style="text-align: right;">108085</td>
+<td style="text-align: right;">127467</td>
+<td style="text-align: left;">POLYGON ((112.7144 26.98613…</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Guiyang</td>
+<td style="text-align: right;">262835</td>
+<td style="text-align: right;">295688</td>
+<td style="text-align: left;">POLYGON ((113.0811 26.04963…</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Changsha</td>
+<td style="text-align: right;">248182</td>
+<td style="text-align: right;">336838</td>
+<td style="text-align: left;">POLYGON ((112.9421 28.03722…</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Taoyuan</td>
+<td style="text-align: right;">244850</td>
+<td style="text-align: right;">267729</td>
+<td style="text-align: left;">POLYGON ((112.0612 29.32855…</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Xiangtan</td>
+<td style="text-align: right;">404456</td>
+<td style="text-align: right;">431516</td>
+<td style="text-align: left;">POLYGON ((113.0426 27.8942,…</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Dao</td>
+<td style="text-align: right;">67608</td>
+<td style="text-align: right;">85667</td>
+<td style="text-align: left;">POLYGON ((111.498 25.81679,…</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Jiangyong</td>
+<td style="text-align: right;">33860</td>
+<td style="text-align: right;">51028</td>
+<td style="text-align: left;">POLYGON ((111.3659 25.39472…</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb107"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb107-1"><a href="#cb107-1" aria-hidden="true" tabindex="-1"></a>w_sum_gdppc <span class="ot">&lt;-</span> <span class="fu">qtm</span>(hunan, <span class="st">"w_sum GDPPC"</span>)</span>
+<span id="cb107-2"><a href="#cb107-2" aria-hidden="true" tabindex="-1"></a><span class="fu">tmap_arrange</span>(lag_sum_gdppc, w_sum_gdppc, <span class="at">asp=</span><span class="dv">1</span>, <span class="at">ncol=</span><span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="hand-on_ex04_files/figure-html/unnamed-chunk-59-1.png" class="img-fluid" width="672"></p>
+</div>
 </div>
 
 
