@@ -214,6 +214,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#spatial-lag-with-row-standardised-weights-average-of-neighbours" id="toc-spatial-lag-with-row-standardised-weights-average-of-neighbours" class="nav-link" data-scroll-target="#spatial-lag-with-row-standardised-weights-average-of-neighbours">8.9.1 Spatial lag with row-standardised weights (average of neighbours)</a></li>
   <li><a href="#question" id="toc-question" class="nav-link" data-scroll-target="#question">Question:</a></li>
   <li><a href="#spatial-lag-as-a-sum-of-neighboring-values-binary-weights" id="toc-spatial-lag-as-a-sum-of-neighboring-values-binary-weights" class="nav-link" data-scroll-target="#spatial-lag-as-a-sum-of-neighboring-values-binary-weights">8.9.2 Spatial lag as a sum of neighboring values (binary weights)</a></li>
+  <li><a href="#question-1" id="toc-question-1" class="nav-link" data-scroll-target="#question-1">Question:</a></li>
   <li><a href="#spatial-window-average" id="toc-spatial-window-average" class="nav-link" data-scroll-target="#spatial-window-average">8.9.3 Spatial window average</a></li>
   <li><a href="#spatial-window-sum-include-self-binary-sum" id="toc-spatial-window-sum-include-self-binary-sum" class="nav-link" data-scroll-target="#spatial-window-sum-include-self-binary-sum">8.9.4 Spatial window sum (include self + binary sum)</a></li>
   </ul></li>
@@ -263,8 +264,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h1>8 Spatial Weights and Applications</h1>
 <section id="overview" class="level2">
 <h2 class="anchored" data-anchor-id="overview">8.1 Overview</h2>
-<p>In this hands-on exercise, you will learn how to compute spatial weights using R.</p>
-<p>By the end to this hands-on exercise, you will be able to: - import geospatial data using appropriate function(s) of <strong>sf</strong> package, - import csv file using appropriate function of <strong>readr</strong> package, - perform relational join using appropriate join function of <strong>dplyr</strong> package, - compute spatial weights using appropriate functions of <strong>spdep</strong> package, and calculate spatially lagged variables using appropriate functions of <strong>spdep</strong> package.</p>
+<p>In this hands-on exercise, we will learn how to compute spatial weights using R.</p>
+<p>By the end to this hands-on exercise, we will be able to: - import geospatial data using appropriate function(s) of <strong>sf</strong> package, - import csv file using appropriate function of <strong>readr</strong> package, - perform relational join using appropriate join function of <strong>dplyr</strong> package, - compute spatial weights using appropriate functions of <strong>spdep</strong> package, and calculate spatially lagged variables using appropriate functions of <strong>spdep</strong> package.</p>
 </section>
 <section id="the-data" class="level2">
 <h2 class="anchored" data-anchor-id="the-data">8.2 The Data</h2>
@@ -295,7 +296,7 @@ Bounding box:  xmin: 108.7831 ymin: 24.6342 xmax: 114.2544 ymax: 30.12812
 Geodetic CRS:  WGS 84</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Inspect the basic structure to confirm geometry + fields</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(hunan)                                                    <span class="co"># shows feature count, geometry type, CRS, attributes</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(hunan)    <span class="co"># shows feature count, geometry type, CRS, attributes</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Simple feature collection with 88 features and 7 fields
 Geometry type: POLYGON
@@ -344,7 +345,7 @@ dbl (27): avg_wage, deposite, FAI, Gov_Rev, Gov_Exp, GDP, GDPPC, GIO, Loan, ...
 ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Peek at columns so we know what to join</span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>dplyr<span class="sc">::</span><span class="fu">glimpse</span>(hunan2012)                                             <span class="co"># confirms column names such as County, GDPPC, etc.</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>dplyr<span class="sc">::</span><span class="fu">glimpse</span>(hunan2012)   <span class="co"># confirms column names such as County, GDPPC, etc.</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Rows: 88
 Columns: 29
@@ -390,7 +391,7 @@ $ ROREmp      &lt;dbl&gt; 0.8929619, 0.8782065, 0.8041262, 0.7460163, 0.9052651,
 <pre><code>Joining with `by = join_by(County)`</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Inspect and verify that GDPPC is now present alongside geometry</span></span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(hunan)                                       <span class="co"># should list fields incl. County, GDPPC, geometry</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(hunan)   <span class="co"># should list fields incl. County, GDPPC, geometry</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Simple feature collection with 6 features and 6 fields
 Geometry type: POLYGON
@@ -436,13 +437,13 @@ Geodetic CRS:  WGS 84
 </section>
 <section id="contiguity-spatial-weights-queen-and-rook" class="level2">
 <h2 class="anchored" data-anchor-id="contiguity-spatial-weights-queen-and-rook">8.5 Contiguity Spatial Weights (Queen and Rook)</h2>
-<p>In this section, you will learn how to use <code>poly2nb()</code> of <strong>spdep</strong> package to compute contiguity weight matrices for the study area. This function builds a neighbours list based on regions with contiguous boundaries. If you look at the documentation you will see that you can pass a “queen” argument that takes TRUE or FALSE as options. If you do not specify this argument the default is set to TRUE, that is, if you don’t specify queen = FALSE this function will return a list of first order neighbours using the Queen criteria.</p>
+<p>In this section, we will learn how to use <code>poly2nb()</code> of <strong>spdep</strong> package to compute contiguity weight matrices for the study area. This function builds a neighbours list based on regions with contiguous boundaries. If we look at the documentation, we will see that we can pass a “queen” argument that takes TRUE or FALSE as options. If we do not specify this argument the default is set to TRUE, that is, if we don’t specify queen = FALSE this function will return a list of first order neighbours using the Queen criteria.</p>
 <section id="computing-queen-contiguity-based-neighbours" class="level3">
 <h3 class="anchored" data-anchor-id="computing-queen-contiguity-based-neighbours">8.5.1 Computing (QUEEN) contiguity based neighbours</h3>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Build a neighbours list where polygons touching at edges OR corners are neighbours</span></span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>wm_q <span class="ot">&lt;-</span> spdep<span class="sc">::</span><span class="fu">poly2nb</span>(hunan, <span class="at">queen =</span> <span class="cn">TRUE</span>)    <span class="co"># queen = TRUE includes corner touches</span></span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(wm_q)                                  <span class="co"># prints number of regions, links, and link distribution</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(wm_q)   <span class="co"># prints number of regions, links, and link distribution</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Neighbour list object:
 Number of regions: 88 
@@ -501,7 +502,7 @@ Link number distribution:
 <blockquote class="blockquote">
 <p>The printed output above shows that the GDPPC of the five nearest neighbours based on Queen’s method are 20981, 34592, 24473, 21311 and 22879 respectively.</p>
 </blockquote>
-<p>You can display the complete weight matrix by using str().</p>
+<p>We can display the complete weight matrix by using str().</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co"># View the full list structure (long print, but matches slide)</span></span>
 <span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(wm_q)   <span class="co"># shows, for each region, the integer IDs of its neighbours</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -606,7 +607,7 @@ Link number distribution:
   ..$ comp.id: int [1:88] 1 1 1 1 1 1 1 1 1 1 ...</code></pre>
 </div>
 </div>
-<p>Be warned: The output might cut across several pages. Save the trees if you are going to print out the report.</p>
+<p>Be warned: The output might cut across several pages. Save the trees if we are going to print out the report.</p>
 </section>
 <section id="creating-rook-contiguity-based-neighbours" class="level3">
 <h3 class="anchored" data-anchor-id="creating-rook-contiguity-based-neighbours">8.5.2 Creating (ROOK) contiguity based neighbours</h3>
@@ -694,7 +695,7 @@ Link number distribution:
 </section>
 <section id="distance-based-neighbours" class="level2">
 <h2 class="anchored" data-anchor-id="distance-based-neighbours">8.6 Distance-based Neighbours</h2>
-<p>In this section, you will learn how to derive distance-based weight matrices by using <code>dnearneigh()</code> of spdep package.</p>
+<p>In this section, we will learn how to derive distance-based weight matrices by using <code>dnearneigh()</code> of spdep package.</p>
 <p>The function identifies neighbours of region points by Euclidean distance with a distance band with lower d1= and upper d2= bounds controlled by the bounds= argument. If unprojected coordinates are used and either specified in the coordinates object x or with x as a two column matrix and longlat=TRUE, great circle distances in <strong>km</strong> will be calculated assuming the WGS84 reference ellipsoid.</p>
 <section id="determine-a-cut-off-distance-from-1-nn-distances" class="level3">
 <h3 class="anchored" data-anchor-id="determine-a-cut-off-distance-from-1-nn-distances">8.6.1 Determine a cut-off distance (from 1-NN distances)</h3>
@@ -1129,7 +1130,7 @@ Non-symmetric neighbours list</code></pre>
 </section>
 <section id="weights-based-on-inverse-distance-idw-on-queen-neighbours" class="level2">
 <h2 class="anchored" data-anchor-id="weights-based-on-inverse-distance-idw-on-queen-neighbours">8.7 Weights Based on Inverse Distance (IDW on Queen neighbours)</h2>
-<p>In this section, you will learn how to derive a spatial weight matrix based on Inversed Distance method.</p>
+<p>In this section, we will learn how to derive a spatial weight matrix based on Inversed Distance method.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb58"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Compute distances ONLY for pairs that are QUEEN neighbours (wm_q) to avoid all-pairs blow-up</span></span>
 <span id="cb58-2"><a href="#cb58-2" aria-hidden="true" tabindex="-1"></a>dist_q <span class="ot">&lt;-</span> spdep<span class="sc">::</span><span class="fu">nbdists</span>(wm_q, coords, <span class="at">longlat =</span> <span class="cn">TRUE</span>)  <span class="co"># a list: element i contains distances to i's neighbours</span></span>
@@ -1475,7 +1476,7 @@ B 88 7744 8.786867 0.3776535 3.8137</code></pre>
 </section>
 <section id="applications-of-the-spatial-weight-matrix" class="level2">
 <h2 class="anchored" data-anchor-id="applications-of-the-spatial-weight-matrix">8.9 Applications of the Spatial Weight Matrix</h2>
-<p>In this section, you will learn how to create four different spatial lagged variables, they are: - spatial lag with row-standardized weights, - spatial lag as a sum of neighbouring values, - spatial window average, and - spatial window sum.</p>
+<p>In this section, we will learn how to create four different spatial lagged variables, they are: - spatial lag with row-standardized weights, - spatial lag as a sum of neighbouring values, - spatial window average, and - spatial window sum.</p>
 <section id="spatial-lag-with-row-standardised-weights-average-of-neighbours" class="level3">
 <h3 class="anchored" data-anchor-id="spatial-lag-with-row-standardised-weights-average-of-neighbours">8.9.1 Spatial lag with row-standardised weights (average of neighbours)</h3>
 <div class="cell">
@@ -1624,20 +1625,12 @@ B 88 7744 448 896 10224</code></pre>
 [81] 108870 108085 262835 248182 244850 404456  67608  33860</code></pre>
 </div>
 </div>
-<div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-title-container flex-fill">
-Question:
-</div>
-</div>
-<div class="callout-body-container callout-body">
+</section>
+<section id="question-1" class="level3 callout:note">
+<h3 class="anchored" data-anchor-id="question-1">Question:</h3>
 <p><strong>Can you understand the meaning of Spatial lag as a sum of neighboring values now?</strong><br>
-<em>==lag_sum GDPPC== is the <strong>total GDPPC of neighbours</strong>, so counties with <strong>many neighbours</strong> (or neighbours with large GDPPC) stand out more than in the averaged lag.</em></p>
-</div>
-</div>
+==lag_sum GDPPC== is the <strong>total GDPPC of neighbours</strong>, so counties with <strong>many neighbours</strong> (or neighbours with large GDPPC) stand out more than in the averaged lag.</p>
+</section>
 <p>Next, we will append the lag_sum GDPPC field into hunan sf data frame by using the code chunk below.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb84"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb84-1"><a href="#cb84-1" aria-hidden="true" tabindex="-1"></a>hunan <span class="ot">&lt;-</span> dplyr<span class="sc">::</span><span class="fu">left_join</span>(hunan, lag.res, <span class="at">by =</span> <span class="st">"NAME_3"</span>)   </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -1651,7 +1644,6 @@ Question:
 <p><img src="hand-on_ex04_files/figure-html/unnamed-chunk-44-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
-</section>
 <section id="spatial-window-average" class="level3">
 <h3 class="anchored" data-anchor-id="spatial-window-average">8.9.3 Spatial window average</h3>
 <p>The spatial window average uses row-standardized weights and includes the diagonal element. To do this in R, we need to go back to the neighbors structure and add the diagonal element before assigning weights.</p>
@@ -2291,7 +2283,7 @@ W 88 7744 88 30.90265 357.5308</code></pre>
 </div>
 </div>
 <blockquote class="blockquote">
-<p><strong>Window average</strong> dampens extremes because each county’s own value is blended with its neighbours’. Border counties with few neighbours change more when you include “self”.</p>
+<p><strong>Window average</strong> dampens extremes because each county’s own value is blended with its neighbours’. Border counties with few neighbours change more when we include “self”.</p>
 </blockquote>
 <p>Note: For more effective comparison, it is advicible to use the core tmap mapping functions.</p>
 </section>

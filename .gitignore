@@ -15,3 +15,5 @@ Hands-on_Ex*/Data/**
 In-class_Ex*/Data/**
 Take-home_Ex*/Data/**
 /.quarto/
+
+**/*.quarto_ipynb

@@ -8,9 +8,9 @@ date: "19 September 2025"
 
 ## 8.1 Overview
 
-In this hands-on exercise, you will learn how to compute spatial weights using R.
+In this hands-on exercise, we will learn how to compute spatial weights using R.
 
-By the end to this hands-on exercise, you will be able to:
+By the end to this hands-on exercise, we will be able to:
 - import geospatial data using appropriate function(s) of **sf** package,
 - import csv file using appropriate function of **readr** package,
 - perform relational join using appropriate join function of **dplyr** package,
@@ -39,7 +39,7 @@ pacman::p_load(sf, spdep, tmap, tidyverse, knitr)
 hunan <- sf::st_read(dsn = "data/geospatial", layer = "Hunan")  # dsn = folder, layer = shapefile basename
 
 # Inspect the basic structure to confirm geometry + fields
-print(hunan)                                                    # shows feature count, geometry type, CRS, attributes
+print(hunan)    # shows feature count, geometry type, CRS, attributes
 
 ```
 ### 8.3.2 Import CSV into R
@@ -49,7 +49,7 @@ print(hunan)                                                    # shows feature 
 hunan2012 <- readr::read_csv("data/aspatial/Hunan_2012.csv")   # creates a regular tibble/data.frame
 
 # Peek at columns so we know what to join
-dplyr::glimpse(hunan2012)                                             # confirms column names such as County, GDPPC, etc.
+dplyr::glimpse(hunan2012)   # confirms column names such as County, GDPPC, etc.
 
 ```
 
@@ -61,7 +61,7 @@ hunan <- dplyr::left_join(hunan, hunan2012) %>%   # merge attributes into polygo
   dplyr::select(1:4, 7, 15)                       # reproduce Prof’s column subset (indices from slides)
 
 # Inspect and verify that GDPPC is now present alongside geometry
-head(hunan)                                       # should list fields incl. County, GDPPC, geometry
+head(hunan)   # should list fields incl. County, GDPPC, geometry
 
 
 
@@ -87,14 +87,14 @@ tmap::tmap_arrange(basemap, gdppc_map, asp = 1, ncol = 2) # arrange 2 maps in on
 
 ## 8.5 Contiguity Spatial Weights (Queen and Rook)
 
-In this section, you will learn how to use `poly2nb()` of **spdep** package to compute contiguity weight matrices for the study area. This function builds a neighbours list based on regions with contiguous boundaries. If you look at the documentation you will see that you can pass a “queen” argument that takes TRUE or FALSE as options. If you do not specify this argument the default is set to TRUE, that is, if you don’t specify queen = FALSE this function will return a list of first order neighbours using the Queen criteria.
+In this section, we will learn how to use `poly2nb()` of **spdep** package to compute contiguity weight matrices for the study area. This function builds a neighbours list based on regions with contiguous boundaries. If we look at the documentation, we will see that we can pass a “queen” argument that takes TRUE or FALSE as options. If we do not specify this argument the default is set to TRUE, that is, if we don’t specify queen = FALSE this function will return a list of first order neighbours using the Queen criteria.
 
 ### 8.5.1 Computing (QUEEN) contiguity based neighbours
 
 ```{r}
 # Build a neighbours list where polygons touching at edges OR corners are neighbours
 wm_q <- spdep::poly2nb(hunan, queen = TRUE)    # queen = TRUE includes corner touches
-summary(wm_q)                                  # prints number of regions, links, and link distribution
+summary(wm_q)   # prints number of regions, links, and link distribution
 
 ```
 
@@ -136,14 +136,14 @@ nb1_gdppc                           # print to compare with slide values
 
 > The printed output above shows that the GDPPC of the five nearest neighbours based on Queen’s method are 20981, 34592, 24473, 21311 and 22879 respectively.
 
-You can display the complete weight matrix by using str().
+We can display the complete weight matrix by using str().
 
 ```{r}
 # View the full list structure (long print, but matches slide)
 str(wm_q)   # shows, for each region, the integer IDs of its neighbours
 
 ```
-Be warned: The output might cut across several pages. Save the trees if you are going to print out the report.
+Be warned: The output might cut across several pages. Save the trees if we are going to print out the report.
 
 ### 8.5.2 Creating (ROOK) contiguity based neighbours
 
@@ -197,7 +197,7 @@ par(mfrow = c(1, 1))                                                   # reset l
 ```
 
 ## 8.6 Distance-based Neighbours
-In this section, you will learn how to derive distance-based weight matrices by using `dnearneigh()` of spdep package.
+In this section, we will learn how to derive distance-based weight matrices by using `dnearneigh()` of spdep package.
 
 The function identifies neighbours of region points by Euclidean distance with a distance band with lower d1= and upper d2= bounds controlled by the bounds= argument. If unprojected coordinates are used and either specified in the coordinates object x or with x as a two column matrix and longlat=TRUE, great circle distances in **km** will be calculated assuming the WGS84 reference ellipsoid.
 
@@ -311,7 +311,7 @@ plot(knn6, coords, pch = 19, cex = 0.6, add = TRUE, col = "red")
 ```
 ## 8.7 Weights Based on Inverse Distance (IDW on Queen neighbours)
 
-In this section, you will learn how to derive a spatial weight matrix based on Inversed Distance method.
+In this section, we will learn how to derive a spatial weight matrix based on Inversed Distance method.
 
 ```{r}
 # Compute distances ONLY for pairs that are QUEEN neighbours (wm_q) to avoid all-pairs blow-up
@@ -355,7 +355,7 @@ summary(unlist(rswm_ids$weights))   # min/median/mean/... like the slide
 
 ## 8.9 Applications of the Spatial Weight Matrix
 
-In this section, you will learn how to create four different spatial lagged variables, they are:
+In this section, we will learn how to create four different spatial lagged variables, they are:
 - spatial lag with row-standardized weights,
 - spatial lag as a sum of neighbouring values,
 - spatial window average, and
@@ -440,12 +440,10 @@ lag_sum
 
 ```
 
-::: callout-note
+:::callout:note
 ### Question:
-
 **Can you understand the meaning of Spatial lag as a sum of neighboring values now?**  
-*==lag_sum GDPPC== is the **total GDPPC of neighbours**, so counties with **many neighbours** (or neighbours with large GDPPC) stand out more than in the averaged lag.*
-
+==lag_sum GDPPC== is the **total GDPPC of neighbours**, so counties with **many neighbours** (or neighbours with large GDPPC) stand out more than in the averaged lag.
 :::
 
 Next, we will append the lag_sum GDPPC field into hunan sf data frame by using the code chunk below.
@@ -537,7 +535,7 @@ w_avg_gdppc <- tmap::qtm(hunan, "lag_window_avg GDPPC")
 tmap::tmap_arrange(lag_gdppc_m, w_avg_gdppc, asp = 1, ncol = 2)
 
 ```
-> **Window average** dampens extremes because each county’s own value is blended with its neighbours’. Border counties with few neighbours change more when you include “self”.
+> **Window average** dampens extremes because each county’s own value is blended with its neighbours’. Border counties with few neighbours change more when we include “self”.
 
 Note: For more effective comparison, it is advicible to use the core tmap mapping functions.
 

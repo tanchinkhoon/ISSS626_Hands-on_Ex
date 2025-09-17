@@ -27,6 +27,12 @@ website:
         href: index.qmd
       - text: "About"
         href: about.qmd
+      - icon: linkedin
+        href: https://www.linkedin.com/in/tanchinkhoon/ 
+        aria-label: Linkedin
+      - icon: github
+        href: https://github.com/tanchinkhoon/ISSS626_Hands-on_Ex
+        aria-label: Github
 
 format:
   html:
@@ -38,7 +44,6 @@ format:
     number-sections: false   # 1, 1.1, 1.2 numbering
     page-navigation: true    # Previous / Next links at bottom
     smooth-scroll: true      # nice scrolling when clicking TOC
-    date-modified: "last-modified"
     css: styles.css
     
 
