@@ -44,7 +44,7 @@ mpsz14_shp <- st_read(dsn = "data/MasterPlan2014SubzoneBoundaryWebSHP",
 
 ```{r}
 # This code chunk imports kml file
-# mpsz14_kml <- st_read("data/MasterPlan2014SubzoneBoundaryKML.kml")
+mpsz14_kml <- st_read("data/MasterPlan2014SubzoneBoundaryKML.kml")
 
 ```
 
@@ -84,8 +84,8 @@ preschool_geojson <- st_read("data/PreSchoolsLocation.geojson")
 
 ```{r}
 # To import shapefile
-# mpsz19_shp <- st_read(dsn = "data/",
-#                 layer = "MPSZ-2019")
+mpsz19_shp <- st_read(dsn = "data/",
+                layer = "MPSZ-2019")
 
 ```
 

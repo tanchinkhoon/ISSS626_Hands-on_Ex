@@ -88,7 +88,7 @@ Next read the CSV, make it spatial, reproject to meters, and build helpful time 
 ```{r}
 fire_sf <- read_csv("data/rds/modis_2023_Indonesia.csv")    %>%  # load the event table
   st_as_sf(coords = c("longitude", "latitude"), crs = 4326) %>%  # turn lon/lat cols into points (WGS84)
-  st_transform(crs = 32748)                                      # project to meters to match the study area
+  st_transform(crs = 32748)   # project to meters to match the study area
 
 ```
 
@@ -173,15 +173,15 @@ Next, we need to convert to a spatstat **ppp** (planar point pattern) object.
 ```{r}
 # Convert sf points to ppp (planar point pattern) 
 fire_month_ppp <- as.ppp(fire_month)   # create ppp with coordinates and 'Month_num' as the mark
-fire_month_ppp                         # print basic info to confirm number of points/window box
+fire_month_ppp   # print basic info to confirm number of points/window box
 
 
 ```
 
 ```{r}
 # Sanity checks on the ppp 
-summary(fire_month_ppp)                 # detailed summary (intensity, mark stats, window box)
-any(duplicated(fire_month_ppp))         # TRUE if any exact duplicate point events; expect FALSE per notes
+summary(fire_month_ppp)   # detailed summary (intensity, mark stats, window box)
+any(duplicated(fire_month_ppp)) # TRUE if any exact duplicate point events; expect FALSE per notes
 
 ```
 
@@ -198,14 +198,14 @@ Next, we need to clip/assign the point pattern to the **study window**.
 ```{r}
 # Attach/clip the ppp to our study-area window 
 fire_month_owin <- fire_month_ppp[kbb_owin]  # ensure points are analysed within the polygon boundary
-summary(fire_month_owin)                     # verify marks, counts, window area
+summary(fire_month_owin)   # verify marks, counts, window area
 
 
 ```
 
 ```{r, fig.width=20, fig.height=10}
 # Visual check that points and window align
-plot(fire_month_owin)                        # base plot; circles show mark values (here: months 1..12)
+plot(fire_month_owin)   # base plot; circles show mark values (here: months 1..12)
 
 ```
 
@@ -256,7 +256,7 @@ fire_yday_ppp <- fire_sf %>%
 ```{r}
 # Attach the owin (study window) to the DayofYear ppp 
 fire_yday_owin <- fire_yday_ppp[kbb_owin] # ensure points are constrained to study polygon
-summary(fire_yday_owin)                   # confirm counts, mark summary, window stats
+summary(fire_yday_owin)    # confirm counts, mark summary, window stats
 
 ```
 
@@ -285,7 +285,7 @@ plot(kde_yday)     # continuous surface over the region with legend
 
 ```{r}
 # For reproducibility of the bootstrap selection 
-set.seed(1234)                  # fixed seed so results are repeatable in class
+set.seed(1234)    # fixed seed so results are repeatable in class
 
 # Run bootstrap bandwidth selection (may take some time) 
 BOOT.spattemp(fire_yday_owin)   # prints many trial (h, lambda) and the final pair at bottom
