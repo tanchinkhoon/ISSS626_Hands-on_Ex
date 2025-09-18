@@ -3,6 +3,7 @@ title: "In-class Exercise 3b: Working with Open Government Data"
 author: "TAN Chin Khoon"
 date: "September 13, 2025"
 date-modified: "last-modified"
+number-sections: true
 execute: 
   eval: true
   echo: true
@@ -17,14 +18,14 @@ By the end of this hands-on exercise, you will be able to:
 - Converting the geocoded transaction data into sf point feature data.frame, and
 - Wrangling the sf point features to avoid overlapping point features.
 
-## Loading the R package
+# Loading the R package
 
 ```{r}
 pacman::p_load(tidyverse, sf, tmap, httr)
 
 ```
 
-## Importing ACRA data
+# Importing ACRA data
 
 ```{r}
 folder_path <- "/Users/cktan/Desktop/SMU/01_Geospatial Analytics (ISSS626)/Hands-on_Ex/Take-home_Ex01/data/aspatial"
@@ -37,7 +38,7 @@ acra_data <- file_list %>%
 
 ```
 
-## Saving ACRA data
+# Saving ACRA data
 
 ```{r}
 write_rds(acra_data,
@@ -45,7 +46,7 @@ write_rds(acra_data,
 
 ```
 
-## Tidying ACRA data
+# Tidying ACRA data
 
 ```{r}
 biz_56111 <- acra_data %>%
@@ -65,7 +66,7 @@ biz_56111 <- acra_data %>%
 
 ```
 
-## Geocoding (It took 32 seconds to process the chunk of codes)
+# Geocoding (It took 32 seconds to process the chunk of codes)
 
 ```{r}
 postcodes <- unique(biz_56111$postal_code)
@@ -97,7 +98,7 @@ for (pc in postcodes) {
 
 ```
 
-## Tidying the geocoded data
+# Tidying the geocoded data
 
 ```{r}
 found <- found %>%
@@ -105,7 +106,7 @@ found <- found %>%
 
 ```
 
-## Appending the location information
+# Appending the location information
 
 ```{r}
 biz_56111 = biz_56111 %>%
@@ -114,14 +115,14 @@ biz_56111 = biz_56111 %>%
 
 ```
 
-## Saving the data
+# Saving the data
 
 ```{r}
 write_rds(biz_56111, "/Users/cktan/Desktop/SMU/01_Geospatial Analytics (ISSS626)/Hands-on_Ex/Take-home_Ex01/data/rds/biz_56111.rds")
 
 ```
 
-## Converting into SF data frame
+# Converting into SF data frame
 
 ```{r}
 biz_56111_sf <- st_as_sf(biz_56111, 
@@ -130,7 +131,7 @@ biz_56111_sf <- st_as_sf(biz_56111,
 
 ```
 
-## Visualising the distribution
+# Visualising the distribution
 
 ```{r}
 ggplot(data = biz_56111,
