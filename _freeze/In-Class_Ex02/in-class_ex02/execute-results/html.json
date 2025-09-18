@@ -1,0 +1,15 @@
+{
+  "hash": "07cce54367ef6730ad77463a52ef3532",
+  "result": {
+    "engine": "knitr",
+    "markdown": "---\ntitle: \"In-class Exercise 2: Spatial Point Patterns Analysis - Spatstat methods\"\nauthor: \"TAN Chin Khoon\"\ndate: \"September 13, 2025\"\nnumber-sections: true\nexecute: \n  eval: true\n  echo: true\n  warning: false\n  freeze: true\n---\n\n# Issue 1: Installing maptools\n\nmaptools is retired and binary is removed from CRAN. However, we can download from [Posit Public Package Manager](https://packagemanager.posit.co/client/#/repos/cran/setup?snapshot=2023-10-13&distribution=windows&r_environment=ide) snapshots by using the code chunk below.\n\n\n::: {.cell}\n\n```{.r .cell-code}\ninstall.packages(\"maptools\", \n                 repos = \"https://packagemanager.posit.co/cran/2023-10-13\")\n```\n\n::: {.cell-output .cell-output-stdout}\n\n```\n\nThe downloaded binary packages are in\n\t/var/folders/v7/c691m79514zcgscg0qg8nf940000gn/T//RtmpwoE6c8/downloaded_packages\n```\n\n\n:::\n:::\n\n\nAfter the installation is completed, it is important to edit the code chunk as shown below in order to avoid maptools being download and install repetitively every time the Quarto document been rendered.\n\n![](Screenshot 2025-09-18 at 9.25.53 PM.png){width=\"316\"}\n\n# Issue 2: Creating coastal outline\n\nIn sf package, there are two functions allow us to combine multiple simple features into one simple features. They are st_combine() and st_union().\n\n- st_combine() returns a single, combined geometry, with no resolved boundaries; returned geometries may well be invalid.\n\n- If y is missing, st_union(x) returns a single geometry with resolved boundaries, else the geometries for all unioned pairs of x[i] and y[j].\n\n## Working with st_union()\nThe code chunk below, `st_union()` is used to derive the coastal outline sf tibble data.frame.\n\n\n::: {.cell}\n\n```{.r .cell-code}\n# sg_sf <- mpsz_sf %>%\n#   st_union()\n```\n:::\n",
+    "supporting": [],
+    "filters": [
+      "rmarkdown/pagebreak.lua"
+    ],
+    "includes": {},
+    "engineDependencies": {},
+    "preserve": {},
+    "postProcess": true
+  }
+}
