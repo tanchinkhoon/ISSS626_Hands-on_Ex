@@ -19,11 +19,15 @@ website:
       - text: "In-class Exercise"
         menu:
           - text: "In-class Exercise 4"
-            href: In-class_ex04/in-class_ex04 
+            href: In-Class_Ex04/in-class_ex04 
           - text: "In-class Exercise 3b"
             href: In-Class_Ex03b/in-class_Ex03b        
           - text: "In-class Exercise 3a"
             href: In-Class_Ex03/in-class_Ex03a
+      - text: "Take-home Exercise"
+        menu:
+          - text: "Take-home Exercise 1"
+            href: Take-home_Ex01/take-home_ex01 
     right:
       - text: "Home"
         href: index.qmd
