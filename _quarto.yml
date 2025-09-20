@@ -19,7 +19,7 @@ website:
       - text: "In-class Exercise"
         menu:
           - text: "In-class Exercise 4"
-            href: In-Class_Ex04/in-class_ex4 
+            href: In-class_ex04/in-class_ex04 
           - text: "In-class Exercise 3b"
             href: In-Class_Ex03b/in-class_Ex03b        
           - text: "In-class Exercise 3a"
