@@ -159,12 +159,27 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     </a>
     <ul class="dropdown-menu" aria-labelledby="nav-menu-in-class-exercise">    
         <li>
+    <a class="dropdown-item" href="../In-Class_Ex04/in-class_ex04">
+ <span class="dropdown-text">In-class Exercise 4</span></a>
+  </li>  
+        <li>
     <a class="dropdown-item" href="../In-Class_Ex03b/in-class_Ex03b">
  <span class="dropdown-text">In-class Exercise 3b</span></a>
   </li>  
         <li>
     <a class="dropdown-item" href="../In-Class_Ex03/in-class_Ex03a">
  <span class="dropdown-text">In-class Exercise 3a</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-take-home-exercise" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Take-home Exercise</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-take-home-exercise">    
+        <li>
+    <a class="dropdown-item" href="../Take-home_Ex01/take-home_ex01">
+ <span class="dropdown-text">Take-home Exercise 1</span></a>
   </li>  
     </ul>
   </li>
@@ -272,7 +287,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <div>
     <div class="quarto-title-meta-heading">Modified</div>
     <div class="quarto-title-meta-contents">
-      <p class="date-modified">September 19, 2025</p>
+      <p class="date-modified">September 20, 2025</p>
     </div>
   </div>
     
@@ -456,7 +471,7 @@ Geodetic CRS:  WGS 84
 <span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  tmap<span class="sc">::</span><span class="fu">tm_polygons</span>() <span class="sc">+</span>                                   <span class="co"># draw filled polygons</span></span>
 <span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>  tmap<span class="sc">::</span><span class="fu">tm_text</span>(<span class="st">"NAME_3"</span>, <span class="at">size =</span> <span class="fl">0.5</span>)                     <span class="co"># label polygons with county names (field matches slides)</span></span>
 <span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Choropleth of GDPPC (per Professor’s quick plotting approach)</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Choropleth of GDPPC </span></span>
 <span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>gdppc_map <span class="ot">&lt;-</span> tmap<span class="sc">::</span><span class="fu">qtm</span>(hunan, <span class="st">"GDPPC"</span>) <span class="sc">+</span>                  <span class="co"># quick thematic map of GDPPC</span></span>
 <span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>  tmap<span class="sc">::</span><span class="fu">tm_layout</span>(<span class="at">legend.position =</span> <span class="fu">c</span>(<span class="st">"left"</span>, <span class="st">"bottom"</span>))  <span class="co"># put legend bottom-left to match the slides</span></span>
 <span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a></span>
@@ -639,8 +654,8 @@ Link number distribution:
  - attr(*, "snap")= num 9e-08
  - attr(*, "sym")= logi TRUE
  - attr(*, "ncomp")=List of 2
-  ..$ nc     : int 1
-  ..$ comp.id: int [1:88] 1 1 1 1 1 1 1 1 1 1 ...</code></pre>
+  ..$ nc     : num 1
+  ..$ comp.id: num [1:88] 1 1 1 1 1 1 1 1 1 1 ...</code></pre>
 </div>
 </div>
 <p>Be warned: The output might cut across several pages. Save the trees if we are going to print out the report.</p>
@@ -900,8 +915,8 @@ Average number of links: 3.681818 </code></pre>
  - attr(*, "nbtype")= chr "distance"
  - attr(*, "sym")= logi TRUE
  - attr(*, "ncomp")=List of 2
-  ..$ nc     : int 1
-  ..$ comp.id: int [1:88] 1 1 1 1 1 1 1 1 1 1 ...</code></pre>
+  ..$ nc     : num 1
+  ..$ comp.id: num [1:88] 1 1 1 1 1 1 1 1 1 1 ...</code></pre>
 </div>
 </div>
 <p>Another way to display the structure of the weight matrix is to combine <code>table()</code> and <code>card()</code> of <strong>spdep</strong>.</p>
@@ -1166,8 +1181,8 @@ Non-symmetric neighbours list</code></pre>
  - attr(*, "knn-k")= num 6
  - attr(*, "class")= chr "nb"
  - attr(*, "ncomp")=List of 2
-  ..$ nc     : int 1
-  ..$ comp.id: int [1:88] 1 1 1 1 1 1 1 1 1 1 ...</code></pre>
+  ..$ nc     : num 1
+  ..$ comp.id: num [1:88] 1 1 1 1 1 1 1 1 1 1 ...</code></pre>
 </div>
 </div>
 <section id="plotting-distance-based-neighbours" class="level4">
