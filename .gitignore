@@ -4,6 +4,7 @@
 .RData
 .Ruserdata
 .DS_Store
+.tmp
 
 # Quarto caches (keep output _site/)
 _quarto/
@@ -17,3 +18,4 @@ Take-home_Ex*/Data/**
 /.quarto/
 
 **/*.quarto_ipynb
+*.tmp

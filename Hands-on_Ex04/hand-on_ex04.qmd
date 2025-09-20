@@ -73,7 +73,7 @@ basemap <- tmap::tm_shape(hunan) +                        # tell tmap what to dr
   tmap::tm_polygons() +                                   # draw filled polygons
   tmap::tm_text("NAME_3", size = 0.5)                     # label polygons with county names (field matches slides)
 
-# Choropleth of GDPPC (per Professor’s quick plotting approach)
+# Choropleth of GDPPC 
 gdppc_map <- tmap::qtm(hunan, "GDPPC") +                  # quick thematic map of GDPPC
   tmap::tm_layout(legend.position = c("left", "bottom"))  # put legend bottom-left to match the slides
 
