@@ -1,0 +1,1531 @@
+---
+title: "Take-home Ex01: Geospatial Analytics for Public Good"
+author: "TAN Chin Khoon"
+date: "September 24, 2025"
+date-modified: "last-modified"
+number-sections: true
+execute: 
+  eval: true
+  echo: true
+  warning: false
+  freeze: true
+---
+
+![](Experience-Singapore_food-and-drink_-Featured-photo_Singapore.jpg)
+
+## Introduction
+
+Restaurants are a sensitive barometer of urban vitality: they arise where pedestrian flows, accessibility, and complementary land uses intersect, and they seed further activity via agglomeration effects. This study interrogates the **first-order** (intensity) and **second-order** (interaction) properties of **new restaurant registrations** in Singapore between 1 Jan 2025 and 30 Jun 2025. Following the exact workflow taught in **In-Class Exercise and the Hands-on series**, we (i) **tidy** ACRA registrations, (ii) **geocode** 6-digit postcodes using **OneMap’s**, (iii) project to **SVY21 (EPSG:3414)** for distance-true analysis, (iv) estimate **kernel density** (fixed and adaptive bandwidths) to reveal where intensity concentrates, and (v) evaluate **Ripley’s L/K with CSR envelopes** to determine statistically significant clustering scales. Results are interpreted for **planning and management** (town-centre provisioning, licensing cadence, last-mile logistics, and transit-oriented support).
+
+## The Data
+
+To analyse the Food & Beverage (F&B) industry in Singapore, this exercise integrates four key data sources. The **Singapore Standard Industrial Classification (SSIC)** provides the authoritative framework to define and filter economic activities (e.g., Restaurants and Cafés). **ACRA business registry extracts** supply establishment-level records with SSIC codes and addresses. **URA Master Plan boundaries** offer official geospatial polygons (planning areas and subzones) to aggregate and visualise spatial distributions. Finally, **OneMap APIs** provide authoritative coordinates and geocoding services to standardise addresses and link firms to spatial units. Together, these datasets allow us to identify, locate, and analyse F&B businesses consistently across Singapore’s geography, ensuring both statistical reliability and spatial accuracy.
+
+```{r}
+#| echo: false
+#| eval: true
+
+library(knitr)
+
+data_sources <- data.frame(
+  Dataset_Name = c(
+    "SSIC 2020 – Report & Detailed Definitions",
+    "ACRA Information on Corporate Entities",
+    "URA Master Plan 2019 – Subzone Boundary (No Sea)",
+    "OneMap (SLA) – Search & Reverse Geocode / Thematic Layers"
+  ),
+  Description = c(
+    "Prior edition still widely used; contains 5-digit codes (e.g., 56111 Restaurants, 56112 Cafés).",
+    "Open data extract of registered entities, including SSIC codes and addresses for firm-level analysis.",
+    "Official subzone polygons for aggregation and spatial analysis (choropleths).",
+    "Authoritative API to geocode/standardise addresses, fetch POIs, and retrieve thematic layers."
+  ),
+  Format = c(
+    "Excel / PDF",
+    "CSV",
+    "GeoJSON / KML",
+    "REST / JSON API"
+  ),
+  Source = c(
+    "[SingStat (DOS)](https://www.singstat.gov.sg/standards/standards-and-classifications/ssic)",
+    "[data.gov.sg (ACRA)](https://data.gov.sg/dataset/acra-information-on-corporate-entities)",
+    "[data.gov.sg (URA)](https://data.gov.sg/dataset/master-plan-2019-subzone-boundary-no-sea)",
+    "[OneMap (SLA)](https://www.onemap.gov.sg/docs/)"
+  )
+)
+
+kable(data_sources, caption = "Table 1: Data Sources for F&B Industry Analysis in Singapore", escape = FALSE)
+
+```
+
+## Research Quetions
+
+Aligned with given exercise objectives (“identify where/when new firms appear; detect clustering; discuss implications”), our questions translate the class’s statistical toolkit into targeted, decision-relevant tests for restaurants. We intentionally separate first-order (where intensity is high) from second-order (how points interact relative to CSR), and we include a minimal spatio-temporal view (monthly facets) exactly as demonstrated in class.
+
+**RQ1 — Where/When:** Where do new restaurants (SSIC 56111) concentrate spatially within January 2025 – Jun 2025, and how do these concentrations evolve month-to-month?
+
+**RQ2 — First-order intensity (Core):** What is the intensity structure of new restaurants and which locales exhibit persistent high density after smoothing?
+
+**RQ3 — Second-order clustering scales:** At which distance bands (e.g., 0–1000 m) do restaurants exhibit significant clustering or dispersion relative to CSR?
+
+**RQ4 — Planning/Management Implications:** How should statistically validated hotspots and clustering scales inform town-centre planning, licensing cadence, amenity siting, and last-mile/logistics near identified corridors and nodes?
+
+## Setup the environment
+
+Defines the initial environment settings to ensure consistent execution of the R script.
+
+### Load/install packages
+
+Checks and installs required R packages (via pacman), then loads libraries for data wrangling, mapping, geospatial analysis, and reproducibility.
+
+```{r}
+
+if (!require(pacman)) install.packages("pacman")    # install pacman once if missing
+pacman::p_load(                                     # load (and auto-install if needed)
+  tidyverse,   # data wrangling + plotting (dplyr, tidyr, ggplot2, readr)
+  stringr,     # string helpers (e.g., str_pad, str_detect)
+  lubridate,   # date helpers (e.g., year, month, floor_date)
+  sf,          # vector geospatial (points/polygons, CRS transforms)
+  ggplot,
+  tmap,        # cartographic maps (static/interactive)
+  terra,       # raster/SpatRaster conversion for KDE images
+  rvest,
+  httr,        # HTTP client for OneMap geocoding calls
+  spatstat,    # point pattern analysis meta-package (ppp, Kest, Lest, envelope, density)
+  here         # robust relative file paths for reproducibility
+)
+
+```
+
+### Reproducibility for CSR envelopes
+
+Sets a random seed to guarantee reproducible results when generating CSR (Complete Spatial Randomness) envelopes.
+
+```{r}
+
+set.seed(626)  # reproducibility for CSR envelopes
+
+```
+
+## Import & tidy ACRA (Restaurants only)
+
+In this section, we import the Accounting and Corporate Regulatory Authority (ACRA) corporate entities data, which is organised into multiple CSV files. The objective is to compile, clean, and filter these records to isolate restaurants and cafés coded under SSIC 56111. This step is fundamental because it converts raw administrative files into a consistent and analysis-ready dataset, with standardised variable names, parsed dates, and validated postal codes. The outcome is a tidy dataset that preserves the essential business attributes required for downstream geocoding, spatial conversion, and statistical analysis.
+
+### Importing ACRA data
+
+```{r}
+
+# folder_path points to the directory containing the ACRA CSV files.
+folder_path <- "/Users/cktan/Desktop/SMU/01_Geospatial Analytics (ISSS626)/Hands-on_Ex/Take-home_Ex01/data/aspatial"
+
+# list.files() collects all ACRA files that match the naming pattern and returns their full paths.
+file_list <- list.files(path = folder_path, 
+                        pattern = "^ACRA*.*\\.csv$", 
+                        full.names = TRUE)
+
+# map_dfr() reads each CSV file and stacks them into one tibble (row binding).
+acra_data <- file_list %>%
+  map_dfr(read_csv)
+
+```
+
+### Saving ACRA data for reproducibility
+
+```{r}
+
+# Save the raw imported data as an RDS file to avoid repeated imports in future runs.
+write_rds(acra_data,
+          "/Users/cktan/Desktop/SMU/01_Geospatial Analytics (ISSS626)/Hands-on_Ex/Take-home_Ex01/data/rds/acra_data.rds")
+
+```
+
+### Tidying ACRA data (restaurants only, SSIC 56111)
+
+```{r}
+
+biz_56111 <- acra_data %>%
+  select(1:24) %>%                                    # Select only the first 24 columns (ignore extra metadata columns).
+  filter(primary_ssic_code == 56111) %>%              # Keep only businesses coded as restaurants and cafés (SSIC 56111).
+  rename(date = registration_incorporation_date) %>%  # Rename registration date field to a shorter label 'date'.
+  
+  # Convert registration date to Date class, extract Year and Month (numeric and abbreviated).
+  mutate(date = as.Date(date),
+         YEAR = year(date),
+         MONTH_NUM = month(date),
+         MONTH_ABBR = month(date, 
+                            label = TRUE, 
+                            abbr = TRUE)) %>% 
+  
+  # Standardise postal code to six digits with leading zeros.
+  mutate(
+    postal_code = str_pad(postal_code, 
+    width = 6, side = "left", pad = "0")) %>%
+           filter(YEAR == 2025)    
+
+```
+
+### Saving tidy restaurant data
+
+```{r}
+
+# Save the tidy restaurant dataset for subsequent steps such as geocoding and EDA.
+write_rds(biz_56111, 
+          "/Users/cktan/Desktop/SMU/01_Geospatial Analytics (ISSS626)/Hands-on_Ex/Take-home_Ex01/data/rds/restaurants_56111_tidy.rds")
+
+```
+
+## Exploratory Data Analysis (EDA) of Restaurants
+
+Before any spatial conversion or modelling, it is essential to perform Exploratory Data Analysis (EDA) to understand the characteristics of the cleaned dataset. EDA helps confirm that the data aligns with the research window (January 2025 – Jun 2025) and that restaurants are being correctly filtered. It also allows us to observe temporal dynamics such as monthly registration counts and possible seasonal patterns. Through simple summaries, tables, and visualisations, we can validate the dataset’s integrity and gain initial insights into how new restaurants are distributed over time. This diagnostic step ensures confidence in the subsequent geocoding and spatial analyses.
+
+### Inspect data structure
+
+```{r}
+
+# glimpse() provides an overview of column names, data types, and a sample of values.
+glimpse(biz_56111)
+
+# Display the first five rows to manually confirm tidied field names and values.
+head(biz_56111, 5)
+
+```
+
+### Count restaurants by year
+
+```{r}
+
+# Summarise how many restaurants were registered in each year within the study period.
+biz_56111 %>% 
+  count(YEAR, name = "n_restaurants")
+
+```
+The dataset shows that in 2025 alone, there were 677 new restaurant registrations recorded within the study period (Jan – Jun 2025). This indicates a strong level of activity in the food and beverage (F&B) sector, even though the year is only halfway complete.
+
+### Monthly registration counts (bar chart)
+
+```{r}
+
+# 1) Aggregate once: counts per month (make sure months are ordered nicely)
+month_levels <- c("Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec")
+df_month <- biz_56111 %>%
+  count(MONTH_ABBR, name = "registrations") %>%
+  mutate(MONTH_ABBR = factor(MONTH_ABBR, levels = month_levels)) %>%
+  arrange(MONTH_ABBR)
+
+y_max <- max(df_month$registrations) * 1.10  # headroom for labels
+
+# 2) Plot: bars + count labels + centered title + trend line
+p_month_bar <- ggplot(df_month, aes(x = MONTH_ABBR, y = registrations, group = 1)) +
+  geom_col(fill = "steelblue") +
+  geom_text(aes(label = registrations), vjust = -0.5, size = 3.5) +  # labels on bars
+  geom_line(color = "red", linewidth = 1) +                          # trend line
+  geom_point(color = "red") +                                        # trend points (optional)
+  labs(
+    title = "New Restaurants by Month (Jan 2025 – Jun 2025)",
+    x = "Month", y = "Registrations"
+  ) +
+  theme_minimal() +
+  theme(plot.title = element_text(hjust = 0.5)) +                    # center title
+  expand_limits(y = y_max)                                           # keep labels above bars
+
+p_month_bar
+
+```
+
+Between Jan 2024 and Jul 2025, new restaurant registrations ranged from a high of 110 in March 2024 to a low of 79 in July 2025, with most months maintaining 90–105 openings, reflecting both seasonal dynamics and the resilience of the F&B sector. From a geospatial perspective, however, this chart is limited as it only shows overall counts by month without accounting for where the restaurants are located, how they cluster across planning areas or subzones, or whether growth is concentrated in certain regions. Without spatial context, we cannot assess neighborhood-level competition, urban planning implications, or the uneven distribution of opportunities across Singapore.
+
+## Geospatial data wrangling
+
+This section converts six-digit postal codes from the cleaned ACRA table into planar coordinates suitable for spatial analysis. Following the in-class pattern, we query the OneMap common/elastic/search endpoint for each unique postcode, store results, and left-join them back to the restaurant records by matching postal_code to OneMap’s POSTAL. We deliberately retain OneMap’s original column names (e.g., POSTAL, X, Y, LONGITUDE, LATITUDE) to mirror the professor’s demonstration. After joining, we save an RDS copy for reproducibility and create an sf object directly in SVY21 (EPSG:3414) using coords = c("X","Y"), which is required for distance-true kernel density estimation and Ripley’s K/L.
+
+### Geocoding loop (query OneMap and collect results)
+
+We prepare a vector of unique postcodes to minimise API calls, then iterate through them. For each postcode, we pass the exact parameters used in class (searchVal, returnGeom, getAddrDetails, pageNum) to the OneMap endpoint. Successful responses are converted to a data frame and appended to ```found```; postcodes with no match go into ```not_found```. 
+
+```{r}
+ 
+# --- Geocoding (It took XX seconds to process this chunk) ---------------------------
+
+# Create a unique vector of six-digit postcodes to avoid redundant API requests.
+postcodes <- unique(biz_56111$postal_code)
+
+# OneMap elastic search endpoint 
+url <- "https://onemap.gov.sg/api/common/elastic/search"
+
+# Initialise an empty data.frame to accumulate matched results from OneMap.
+found <- data.frame()
+
+# Initialise an empty data.frame to record postcodes with no matches.
+not_found <- data.frame(postcode = character())
+
+# Iterate over each unique postcode.
+for (pc in postcodes) {
+  query <- list(
+    searchVal    = pc,   # The postcode we are querying for.
+    returnGeom   = "Y",  # Request coordinates in the response.
+    getAddrDetails = "Y",# Request address details in the response.
+    pageNum      = "1"   # First page of results (sufficient for exact postcodes).
+  )
+
+  # Submit an HTTP GET request to OneMap with the query parameters.
+  res  <- httr::GET(url, query = query)
+  
+  # Parse the HTTP response content as a list (OneMap returns JSON).
+  json <- httr::content(res)
+  
+  # If OneMap reports at least one match for this postcode...
+  if (json$found != 0) {
+    
+    # Convert the 'results' array to a data.frame, preserving original OneMap field names.
+    df <- as.data.frame(json$results, stringsAsFactors = FALSE)
+    
+    # Keep the input postcode as a traceability column (useful for QA).
+    df$input_postcode <- pc
+
+    # Append the current result to the cumulative 'found' table.
+    found <- dplyr::bind_rows(found, df)
+
+    # If there is no match for this postcode...
+  } else {
+    
+    # Record the postcode in 'not_found' for later inspection.
+    not_found <- dplyr::bind_rows(not_found, data.frame(postcode = pc))
+
+  }
+}
+
+```
+
+### Tidy the geocoded table
+
+To keep the workflow identical to the professor’s, we do not rename OneMap fields and simply keep the first 10 columns, which include ```POSTAL```, ```X```, ```Y```, ```LONGITUDE```, ```LATITUDE```, and key address attributes. This makes the subsequent ```left_join()``` straightforward and visually matches the in-class console output.
+
+```{r}
+
+# --- Tidying the geocoded data -----------------------------------------------------
+
+found <- found %>%
+  dplyr::select(1:10)
+# Keep the first ten columns from OneMap exactly as shown in class.
+# (These include POSTAL, X, Y, LONGITUDE, LATITUDE, etc.)
+
+```
+
+### Append coordinates to restaurants (join by postal code)
+
+We attach the geocoded coordinates to the restaurant records using a left join from ```biz_56111``` to ```found```, matching ```postal_code``` (our cleaned field) with OneMap’s ```POSTAL```. This preserves all restaurant rows and adds coordinate columns where available.
+
+```{r}
+
+# --- Appending the location information --------------------------------------------
+
+biz_56111 <- biz_56111 %>%
+  dplyr::left_join(found, by = c('postal_code' = 'POSTAL'))
+# Left-join OneMap coordinates back to the restaurant table.
+# The join is on 'postal_code' (ours) = 'POSTAL' (OneMap).
+
+```
+
+```{r}
+
+# --- Convert geocoded restaurants into sf object -----------------------------------
+
+biz_56111_sf <- sf::st_as_sf(
+  biz_56111,
+  coords = c("X", "Y"),    # the coordinate columns from OneMap geocoding
+  crs    = 3414            # Singapore SVY21 / EPSG:3414
+)
+
+# Quick check: print the first rows
+head(biz_56111_sf)
+
+```
+
+### Save a reproducible copy (RDS) for downstream steps
+
+Saving after the join ensures the same input is used for EDA and spatial analyses without re-calling the API. The absolute path mirrors your screenshot and professor’s style. If you maintain a different project root, adjust the path accordingly.
+
+```{r}
+
+# --- Saving the data ----------------------------------------------------------------
+
+readr::write_rds(
+  biz_56111,
+  "/Users/cktan/Desktop/SMU/01_Geospatial Analytics (ISSS626)/Hands-on_Ex/Take-home_Ex01/data/rds/biz_56111_geocoded.rds"
+)
+# Persist the geocoded, joined table so later chunks can read it directly if needed.
+
+```
+
+### Convert to sf (SVY21) using OneMap’s ```X``` and ```Y``` fields
+
+OneMap’s ```X```/```Y``` are already in SVY21 meters, so we can convert directly to an sf point object with ```crs = 3414```. This mirrors your class code (st_as_sf(..., coords = c("X","Y"), crs = 3414)) and produces an object that can be passed into as.ppp() and mapped with tmap. From here, you can proceed to QA maps, KDE, and Ripley’s K/L with CSR envelopes.
+
+## Boundary preparation (parse MP19 KML ```Description```) + Quality Assurance (QA) Map
+
+Many URA MP19 KML files appear to contain only two visible fields (Name, Description). However, the actual attributes—such as SUBZONE_N and PLN_AREA_N—are embedded within an HTML table inside the Description column. To handle this, we define a helper function that parses the HTML and extracts specific fields by label (e.g., SUBZONE_N). Using this function, we generate clean columns for each feature, remove offshore polygons (e.g., SOUTHERN GROUP, WESTERN ISLANDS), and create a QA map to verify that restaurant points fall correctly within the refined subzone boundaries. This ensures that subsequent spatial analyses (KDE and L/K functions) are accurate and reliable.
+
+### Read MP19 KML and project to SVY21
+
+We read the “MasterPlan2019SubzoneBoundaryNoSeaKML.kml”, drop Z/M, and project to SVY21 (EPSG:3414). At this point the table likely has only Name and Description; we do not filter yet because those fields are still inside the HTML.
+
+```{r}
+
+# --- Read MP19 Subzones (No Sea) KML and project to SVY21 --------------------------
+
+# read the KML layer (likely Name + Description fields)
+mpsz_raw <- sf::st_read("data/geospatial/MasterPlan2019SubzoneBoundaryNoSeaKML.kml", quiet = TRUE) %>%   
+  sf::st_zm(drop = TRUE, what = "ZM") %>%   # drop Z/M to keep 2D geometry only
+  sf::st_transform(crs = 3414)              # project to SVY21 meters so distance/area are metric
+
+```
+
+### Helper to extract one field from the KML ```Description``` HTML
+
+We will parse the HTML table inside ```Description``` and return the value from the table row where the ```<th>``` (header) equals a requested field label (e.g., “SUBZONE_N”). We wrap this into a function ```extract_kml_field(html_text, field_name)``` and make sure it fails safely (returns ```NA_character_``` if the label cannot be found).
+
+```{r}
+
+# --- Helper: pull a single attribute from the KML 'Description' HTML ---------------
+
+extract_kml_field <- function(html_text, field_name) {
+  # If the cell is empty or NA, return NA to avoid errors later
+  if (is.na(html_text) || html_text == "") return(NA_character_)
+  
+  # Parse the HTML string into a document
+  page <- rvest::read_html(html_text)
+  
+  # Grab all table rows <tr> (the KML Description usually contains one table)
+  rows <- rvest::html_elements(page, "tr")
+  
+  # Keep the row whose header cell <th> equals the requested field label,
+  # then take the text of the <td> cell in that same row
+  value <- rows %>%
+    purrr::keep(~ rvest::html_text2(rvest::html_element(.x, "th")) == field_name) %>%
+    rvest::html_element("td") %>%
+    rvest::html_text2()
+  
+  # If nothing matched, return NA; otherwise return the extracted value
+  if (length(value) == 0) NA_character_ else value
+}
+
+```
+
+### Materialise attributes from ```Description```, tidy columns, and filter
+
+We now map the helper over each feature’s Description to create real columns: REGION_N, PLN_AREA_N, SUBZONE_N, SUBZONE_C (names mirror the professor’s). Then we drop the original Name / Description, put geometry last (nice console print), and filter out Southern Group and Western Islands by the newly-created columns—exactly the step that previously failed because those columns didn’t exist.
+
+```{r}
+
+# --- Parse Description to real columns, then tidy and filter -----------------------
+
+mpsz <- mpsz_raw %>%
+  dplyr::mutate(
+    REGION_N   = purrr::map_chr(Description, extract_kml_field, "REGION_N"),   # parse region name
+    PLN_AREA_N = purrr::map_chr(Description, extract_kml_field, "PLN_AREA_N"), # parse planning area name
+    SUBZONE_N  = purrr::map_chr(Description, extract_kml_field, "SUBZONE_N"),  # parse subzone name
+    SUBZONE_C  = purrr::map_chr(Description, extract_kml_field, "SUBZONE_C")   # parse subzone code
+  ) %>%
+  dplyr::select(-Name, -Description) %>%                                        # remove raw Name/Description
+  dplyr::relocate(geometry, .after = dplyr::last_col())                         # move geometry to the last column
+
+# Print a few rows so you can see the new columns are present
+mpsz %>% dplyr::slice_head(n = 3)
+
+# Filter out offshore groups using the newly created columns
+mpsz_clean <- mpsz %>%
+  dplyr::filter(SUBZONE_N != "SOUTHERN GROUP",
+                PLN_AREA_N != "WESTERN ISLANDS",
+                SUBZONE_N != "NORTH-EASTERN ISLANDS"
+                )
+
+```
+
+### QA Map (tmap v4): restaurants over cleaned MP19 subzones
+
+We build a QA map to confirm geocoded restaurants lie within the cleaned subzones. Because you’re on tmap v4, we use fill, col, fill_alpha, and tm_title(), and we explicitly print the map object so it renders in Quarto. 
+
+```{r}
+# --- Ensure both layers share the same CRS (SVY21) ----------------------------------
+
+if (sf::st_crs(biz_56111_sf) != sf::st_crs(mpsz_clean)) {
+  biz_56111_sf <- sf::st_transform(biz_56111_sf, sf::st_crs(mpsz_clean))  # align CRS if needed
+}
+
+# --- Draw the QA map using tmap v4 syntax ------------------------------------------
+
+tmap::tmap_mode("plot")   # static mode (consistent in reports)
+
+qa_map <- 
+  tmap::tm_shape(mpsz_clean) +
+  tmap::tm_polygons(
+    fill = "grey95",     # polygon fill (v4)
+    col  = "grey50"      # polygon outline color (v4)
+  ) +
+  tmap::tm_shape(biz_56111_sf) +
+  tmap::tm_dots(
+    size       = 0.15,   # dot size
+    fill       = "red",  # dot fill color
+    fill_alpha = 0.7     # dot transparency (v4)
+  ) +
+  tmap::tm_title("QA Map: Geocoded Restaurants over MP19 Subzones (SVY21)")
+
+qa_map                  # IMPORTANT: print the map so Quarto renders it
+
+# --- Save a high-resolution PNG for the write-up ------------------------------------
+
+tmap::tmap_save(
+  tm       = qa_map,
+  filename = here::here("outputs/figs/qa_map_restaurants.png"),
+  width    = 2000, height = 1500, dpi = 170
+)
+
+```
+
+
+
+```{r}
+# --- QA Map (tmap v4): restaurants over MP19 planning areas with labels -----
+
+# # 0) Ensure both layers share the same CRS (SVY21)
+if (sf::st_crs(biz_56111_sf) != sf::st_crs(mpsz_clean)) {
+  biz_56111_sf <- sf::st_transform(biz_56111_sf, sf::st_crs(mpsz_clean))  # align CRS if needed
+}
+
+# 1) Dissolve subzones -> Planning Areas (by PLN_AREA_N)
+#    (keeps one polygon per planning area; fixes invalids just in case)
+mp19_pa <-
+  mpsz_clean |>
+  dplyr::group_by(PLN_AREA_N) |>
+  dplyr::summarise(.groups = "drop") |>
+  sf::st_make_valid()
+
+# # 2) (Optional) remove offshore planning areas for clarity
+# mp19_pa <-
+#   mp19_pa |>
+#   dplyr::filter(!PLN_AREA_N %in% c("SOUTHERN GROUP", "WESTERN ISLANDS"))
+
+# 3) Draw the QA map with labels
+tmap::tmap_mode("plot")  # static mode (consistent in reports)
+
+qa_map_pa <-
+  tmap::tm_shape(mp19_pa) +
+    tmap::tm_polygons(
+      fill = "grey95",     # polygon fill (v4)
+      col  = "grey50",     # polygon outline color (v4)
+      lwd  = 0.6
+    ) +
+    tmap::tm_text(
+      "PLN_AREA_N",
+      size = 0.5,          # label size
+      col  = "grey20",
+      shadow = TRUE,
+      auto.placement = TRUE
+    ) +
+  tmap::tm_shape(biz_56111_sf) +
+    tmap::tm_dots(
+      size      = 0.15,    # dot size
+      fill      = "red",   # dot color
+      fill_alpha= 0.7      # dot transparency (v4)
+    ) +
+  tmap::tm_title("QA Map: Geocoded Restaurants over MP19 Planning Areas (SVY21)")
+
+qa_map_pa   # IMPORTANT: print the map so Quarto renders it
+
+```
+
+
+```{r}
+tmap::tmap_mode("view")
+
+qa_map_pa_int <-
+  tm_basemap("CartoDB.Positron") +
+  tm_shape(mp19_pa, name = "Planning Areas") +
+    tm_polygons(fill = "grey80", col = "grey50", lwd = 0.6, alpha = 0.3) +
+  tm_shape(mp19_pa, name = "PA Labels") +
+    tm_text("PLN_AREA_N", size = 1, col = "black",
+            bg.color = "white", bg.alpha = 0.6, auto.placement = TRUE) +
+  tm_shape(biz_56111_sf, name = "Restaurants") +
+    tm_dots()
+
+qa_map_pa_int
+
+```
+
+
+## First-Order Analysis: Kernel Density Estimation (KDE)
+
+First-order analysis describes intensity (expected number of events per unit area). KDE smooths the restaurant points into a continuous surface, revealing hotspots beyond raw scatterplots. In this section, we convert the restaurants into a spatstat point pattern constrained by the MP19 “No Sea” window, then compute KDE with (i) an automatic bandwidth from bw.diggle(), (ii) a fixed 600 m bandwidth, and (iii) an adaptive estimator. Because density() returns a spatstat image without an explicit CRS, we convert to terra::SpatRaster, assign SVY21 (EPSG:3414), mask to MP19, and map with tmap v4.
+
+### Small helper (avoids repeating the CRS fix)
+
+`density()` returns a spatstat im object (no CRS). This helper converts im → SpatRaster, assigns the SVY21 CRS, and masks to the MP19 boundary in one call. We’ll reuse it for all KDE variants.
+
+```{r}
+
+# --- Helper: im -> SpatRaster, set CRS to SVY21, mask to MP19 ----------------------
+
+set_crs_and_mask <- function(im_obj, boundary_sf) {
+  r <- terra::rast(im_obj)                           # convert spatstat 'im' to terra SpatRaster
+  terra::crs(r) <- "EPSG:3414"                       # assign SVY21 / EPSG:3414 so layers align
+  r <- terra::mask(r, terra::vect(boundary_sf))      # clip/mask to the MP19 boundary
+  return(r)                                          # return cleaned raster ready for mapping
+}
+
+```
+
+### Build the point pattern (ppp) and observation window
+
+KDE requires a planar point pattern and a valid window defining the spatial domain for edge correction. We convert the cleaned MP19 subzones to a spatstat window, transform the geocoded restaurants to ppp, then clip points to the window to avoid artefacts outside Singapore. Units remain meters because we are using SVY21 (EPSG:3414).
+
+```{r}
+
+# --- Create the spatstat observation window (owin) from MP19 polygons --------------
+
+sg_owin <- as.owin(mpsz_clean)          # convert MP19 (SVY21) polygons to 'owin'
+
+# --- Convert sf restaurants to a planar point pattern (ppp) and clip to window -----
+
+resto_ppp_raw <- as.ppp(biz_56111_sf)   # make ppp from sf POINT geometry
+resto_ppp     <- resto_ppp_raw[sg_owin] # keep only points inside Singapore window
+
+# --- Quick diagnostic to confirm point count, window units, etc. --------------------
+
+summary(resto_ppp)    # should report meters (SVY21) and npoints
+
+
+```
+
+### KDE with automatic bandwidth (Diggle)
+
+We estimate the smoothing bandwidth using Diggle’s cross-validation. This provides a principled $\sigma$ tuned to the current point density. We then compute the KDE, convert the result to a SpatRaster, mask it to the MP19 boundary for clean cartography, and render with tmap v4.
+
+```{r}
+
+# --- Select bandwidth automatically (Diggle) ---------------------------------------
+
+bw_auto_m <- bw.diggle(resto_ppp)  # automatic bandwidth in METERS (SVY21)
+bw_auto_m                          # print value for reporting
+
+# --- KDE with the generic 'density()' (dispatches to density.ppp for 'ppp') --------
+
+kde_auto_im <- density(
+  resto_ppp,                       # input point pattern
+  sigma  = bw_auto_m,              # automatic sigma (m)
+  edge   = TRUE,                   # edge correction at the boundary
+  kernel = "gaussian"              # Gaussian kernel (as in class)
+)
+
+# --- im -> SpatRaster + set CRS + mask to MP19 (CRS fix baked in) ------------------
+
+kde_auto_r <- set_crs_and_mask(kde_auto_im, mpsz_clean)  # ready-to-map raster (SVY21, clipped)
+
+# --- Map with tmap v4 and export ----------------------------------------------------
+
+tmap::tmap_mode("plot")            # static mode for reports
+
+map_kde_auto <-
+  tmap::tm_shape(kde_auto_r) +
+  tmap::tm_raster(style = "cont", palette = "YlOrRd", alpha = 0.85) +
+  tmap::tm_shape(mpsz_clean) + tmap::tm_borders(col = "grey40") +
+  tmap::tm_title(paste0("KDE — Automatic bandwidth (σ ≈ ", round(bw_auto_m, 0), " m)"))
+
+map_kde_auto                       # print to render
+
+tmap::tmap_save(
+  tm       = map_kde_auto,
+  filename = here::here("outputs/figs/09_kde_auto_restaurants.png"),
+  width    = 2000, height = 1500, dpi = 170
+)
+
+```
+
+### KDE with fixed bandwidth ($\sigma$ = 600 m) 
+
+Next, we compute KDE using a fixed bandwidth of 600 m. This value approximates a neighbourhood scale suitable for restaurants (captures local clustering while retaining contrast). Keeping a fixed $\sigma$ facilitates comparisons across areas and time. We repeat the same rasterisation, masking, and mapping steps for a like-for-like output.
+
+```{r}
+
+# --- KDE with a fixed bandwidth of 600 meters --------------------------------------
+
+kde_fixed_im <- density(
+  resto_ppp,                                          # ppp object
+  sigma  = 600,                                       # fixed sigma (m)
+  edge   = TRUE,                                      # edge correction
+  kernel = "gaussian"                                 # Gaussian kernel
+)
+
+# --- im -> SpatRaster + set CRS + mask to MP19 (CRS fix baked in) ------------------
+
+kde_fixed_r <- set_crs_and_mask(kde_fixed_im, mpsz_clean)
+
+# --- Map and export ----------------------------------------------------------------
+
+map_kde_fixed <-
+  tmap::tm_shape(kde_fixed_r) +
+  tmap::tm_raster(style = "cont", palette = "YlGnBu", alpha = 0.85) +
+  tmap::tm_shape(mpsz_clean) + tmap::tm_borders(col = "grey40") +
+  tmap::tm_title("KDE — Fixed bandwidth (σ = 600 m)")
+
+map_kde_fixed
+
+tmap::tmap_save(
+  tm       = map_kde_fixed,
+  filename = here::here("outputs/figs/10_kde_fixed600_restaurants.png"),
+  width    = 2000, height = 1500, dpi = 170
+)
+
+```
+
+### Adaptive kernel density
+
+Where points are sparse, a fixed $\sigma$ can produce noisy surfaces; where points are dense, it can oversmooth peaks. The adaptive estimator changes the bandwidth locally, using smaller kernels in dense regions and larger kernels in sparse regions. This is particularly useful for city-wide restaurant patterns with strong central peaks and weaker peripheral activity. We compute the adaptive surface and visualise it consistently.
+
+```{r}
+
+# --- Adaptive KDE (bandwidth varies by local density) -------------------------------
+
+kde_adapt_im <- adaptive.density(
+  resto_ppp,                                          # ppp object
+  method = "kernel"                                   # kernel-based adaptive smoother
+  # optional: add 'f' to tune sensitivity (prof's default is acceptable)
+)
+
+# --- im -> SpatRaster + set CRS + mask to MP19 (CRS fix baked in) ------------------
+
+kde_adapt_r <- set_crs_and_mask(kde_adapt_im, mpsz_clean)
+
+# --- Map and export ----------------------------------------------------------------
+
+map_kde_adapt <-
+  tmap::tm_shape(kde_adapt_r) +
+  tmap::tm_raster(style = "cont", palette = "PuRd", alpha = 0.85) +
+  tmap::tm_shape(mpsz_clean) + tmap::tm_borders(col = "grey40") +
+  tmap::tm_title("KDE — Adaptive bandwidth")
+
+map_kde_adapt
+
+tmap::tmap_save(
+  tm       = map_kde_adapt,
+  filename = here::here("outputs/figs/11_kde_adaptive_restaurants.png"),
+  width    = 2000, height = 1500, dpi = 170
+)
+
+
+```
+
+### What to report (for your captions)
+
+For each KDE figure, report: (1) bandwidth used (auto σ, fixed 600 m, adaptive), (2) the strongest hotspots (e.g., Orchard, CBD, Bugis, Tampines, Jurong — confirm from your map), and (3) any secondary corridors (e.g., along major MRT interchanges). Emphasise that KDE shows first-order intensity (where restaurants are expected to occur), which is distinct from second-order interaction (tested next with Ripley’s L/K).
+
+```{r}
+
+
+
+```
+
+
+
+```{r}
+
+
+
+```
+
+
+
+```{r}
+
+
+
+```
+
+
+
+```{r}
+
+
+
+```
+
+
+
+```{r}
+
+
+
+```
+
+
+
+```{r}
+
+
+
+```
+
+
+
+
+```{r}
+
+
+
+```
+
+
+
+
+```{r}
+
+
+
+```
+
+
+
+
+```{r}
+
+
+
+```
+
+
+
+
+```{r}
+
+
+
+```
+
+
+
+
+```{r}
+
+
+
+```
+
+
+
+
+```{r}
+
+
+
+```
+
+
+
+
+```{r}
+
+
+
+```
+
+
+
+
+```{r}
+
+
+
+```
+
+
+
+```{r}
+
+
+
+```
+
+
+
+```{r}
+
+
+
+```
+
+
+
+```{r}
+
+
+
+```
+
+
+
+
+```{r}
+
+
+
+```
+
+
+
+```{r}
+
+
+
+```
+
+
+
+
+```{r}
+
+
+
+```
+
+
+
+
+```{r}
+
+
+
+```
+
+
+
+```{r}
+
+
+
+```
+
+
+
+```{r}
+
+
+
+```
+
+
+
+```{r}
+
+
+
+```
+
+
+
+
+```{r}
+
+
+
+```
+
+
+
+
+```{r}
+
+
+
+```
+
+
+
+
+```{r}
+
+
+
+```
+
+
+
+
+```{r}
+
+
+
+```
+
+
+
+
+```{r}
+
+
+
+```
+
+
+
+
+```{r}
+
+
+
+```
+
+
+
+```{r}
+
+
+
+```
+
+
+
+
+```{r}
+
+
+
+```
+
+
+
+```{r}
+
+
+
+```
+
+
+
+
+```{r}
+
+
+
+```
+
+
+
+
+```{r}
+
+
+
+```
+
+
+
+
+```{r}
+
+
+
+```
+
+
+
+
+```{r}
+
+
+
+```
+
+
+
+```{r}
+
+
+
+```
+
+
+
+
+```{r}
+
+
+
+```
+
+
+
+
+```{r}
+
+
+
+```
+
+
+
+
+
+```{r}
+
+
+
+```
+
+
+
+
+```{r}
+
+
+
+```
+
+
+
+
+```{r}
+
+
+
+```
+
+
+
+
+```{r}
+
+
+
+```
+
+
+
+
+```{r}
+
+
+
+```
+
+
+
+
+```{r}
+
+
+
+```
+
+
+
+```{r}
+
+
+
+```
+
+
+
+
+
+```{r}
+
+
+
+```
+
+
+
+
+```{r}
+
+
+
+```
+
+
+
+
+```{r}
+
+
+
+```
+
+
+
+
+
+```{r}
+
+
+
+```
+
+
+
+
+```{r}
+
+
+
+```
+
+
+
+```{r}
+
+
+
+```
+
+
+
+
+```{r}
+
+
+
+```
+
+
+
+```{r}
+
+
+
+```
+
+
+
+```{r}
+
+
+
+```
+
+
+
+```{r}
+
+
+
+```
+
+
+
+```{r}
+
+
+
+```
+
+
+
+```{r}
+
+
+
+```
+
+
+
+```{r}
+
+
+
+```
+
+
+
+```{r}
+
+
+
+```
+
+
+
+```{r}
+
+
+
+```
+
+
+
+```{r}
+
+
+
+```
+
+
+
+```{r}
+
+
+
+```
+
+
+
+```{r}
+
+
+
+```
+
+
+
+```{r}
+
+
+
+```
+
+
+
+```{r}
+
+
+
+```
+
+
+
+```{r}
+
+
+
+```
+
+
+
+```{r}
+
+
+
+```
+
+
+
+```{r}
+
+
+
+```
+
+
+
+```{r}
+
+
+
+```
+
+
+
+```{r}
+
+
+
+```
+
+
+
+```{r}
+
+
+
+```
+
+
+
+```{r}
+
+
+
+```
+
+
+
+```{r}
+
+
+
+```
+
+
+
+```{r}
+
+
+
+```
+
+
+
+```{r}
+
+
+
+```
+
+
+
+
+```{r}
+
+
+
+```
+
+
+
+```{r}
+
+
+
+```
+
+
+
+```{r}
+
+
+
+```
+
+
+
+```{r}
+
+
+
+```
+
+
+
+```{r}
+
+
+
+```
+
+
+
+```{r}
+
+
+
+```
+
+
+
+```{r}
+
+
+
+```
+
+
+
+```{r}
+
+
+
+```
+
+
+
+```{r}
+
+
+
+```
+
+
+
+```{r}
+
+
+
+```
+
+
+
+```{r}
+
+
+
+```
+
+
+```{r}
+
+
+
+```
+
+
+```{r}
+
+
+
+```
+
+
+```{r}
+
+
+
+```
+
+
+
+```{r}
+
+
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
