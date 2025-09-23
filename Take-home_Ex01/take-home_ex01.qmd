@@ -15,7 +15,8 @@ execute:
 
 ## Introduction
 
-Restaurants are a sensitive barometer of urban vitality: they arise where pedestrian flows, accessibility, and complementary land uses intersect, and they seed further activity via agglomeration effects. This study interrogates the **first-order** (intensity) and **second-order** (interaction) properties of **new restaurant registrations** in Singapore between 1 Jan 2025 and 30 Jun 2025. Following the exact workflow taught in **In-Class Exercise and the Hands-on series**, we (i) **tidy** ACRA registrations, (ii) **geocode** 6-digit postcodes using **OneMap’s**, (iii) project to **SVY21 (EPSG:3414)** for distance-true analysis, (iv) estimate **kernel density** (fixed and adaptive bandwidths) to reveal where and when intensity concentrates, and (v) evaluate **Ripley’s L/K with CSR envelopes** to determine statistically significant clustering scales. Results are interpreted for **planning and management** (town-centre provisioning, licensing cadence, last-mile logistics, and transit-oriented support).
+Restaurants are a sensitive barometer of urban vitality: they emerge where pedestrian flows, accessibility, and complementary land uses intersect, and they amplify activity through agglomeration effects. This study examines the **first-order** (intensity) and **second-order** (interaction) properties of **new restaurant registrations** in Singapore between 1 January 2025 and 30 June 2025. The workflow comprises five steps: (i) **tidying** ACRA registration records, (ii) **geocoding** 6-digit postcodes via **OneMap**, (iii) projecting to **SVY21 (EPSG:3414)** to preserve distance accuracy, (iv) estimating **kernel densities** using fixed and adaptive bandwidths to reveal spatial concentrations over time, and (v) applying **Ripley’s L/K functions with CSR envelopes** to identify statistically significant clustering scales. The results are interpreted through the lens of **planning and urban management**, with implications for town-centre provisioning, licensing cadence, last-mile logistics, and transit-oriented development.
+
 
 ## The Data
 
@@ -60,7 +61,7 @@ kable(data_sources, caption = "Table 1: Data Sources for F&B Industry Analysis i
 
 ## Research Quetions
 
-Aligned with given exercise objectives (“identify where/when new firms appear; detect clustering; discuss implications”), our questions translate the class’s statistical toolkit into targeted, decision-relevant tests for restaurants. We intentionally separate first-order (where intensity is high) from second-order (how points interact relative to CSR), and we include a minimal spatio-temporal view (monthly facets) exactly as demonstrated in class.
+Aligned with the stated exercise objectives (“identify where and when new firms appear; detect clustering; discuss implications”), our research questions translate the statistical toolkit into targeted, decision-relevant tests for restaurant activity. We deliberately distinguish between first-order analysis (examining where intensity is high) and second-order analysis (evaluating how points interact relative to CSR), while also incorporating a minimal spatio-temporal perspective through monthly facets to capture temporal variation in establishment patterns.
 
 **RQ1 — Where/When:** Where do new restaurants (SSIC 56111) concentrate spatially within January 2025 – Jun 2025, and how do these concentrations evolve month-to-month?
 
@@ -78,7 +79,7 @@ Defines the initial environment settings to ensure consistent execution of the R
 
 Checks and installs required R packages (via pacman), then loads libraries for data wrangling, mapping, geospatial analysis, and reproducibility.
 
-```{r}
+```{r, warning=FALSE}
 
 if (!require(pacman)) install.packages("pacman")    # install pacman once if missing
 pacman::p_load(                                     # load (and auto-install if needed)
@@ -86,7 +87,6 @@ pacman::p_load(                                     # load (and auto-install if 
   stringr,     # string helpers (e.g., str_pad, str_detect)
   lubridate,   # date helpers (e.g., year, month, floor_date)
   sf,          # vector geospatial (points/polygons, CRS transforms)
-  ggplot,
   tmap,        # cartographic maps (static/interactive)
   terra,       # raster/SpatRaster conversion for KDE images
   rvest,
@@ -249,11 +249,11 @@ Between Jan 2021 and Jul 2025, new restaurant registrations ranged from a high o
 
 ## Geospatial data wrangling
 
-This section converts six-digit postal codes from the cleaned ACRA table into planar coordinates suitable for spatial analysis. Following the in-class pattern, we query the OneMap endpoint for each unique postcode, store results, and left-join them back to the restaurant records by matching postal_code to OneMap’s POSTAL. We deliberately retain OneMap’s original column names (e.g., POSTAL, X, Y, LONGITUDE, LATITUDE). After joining, we save an RDS copy for reproducibility and create an sf object directly in SVY21 (EPSG:3414) using coords = c("X","Y"), which is required for distance-true kernel density estimation and Ripley’s K/L.
+This section converts six-digit postal codes from the cleaned ACRA table into planar coordinates suitable for spatial analysis. We query the OneMap endpoint for each unique postcode, store results, and left-join them back to the restaurant records by matching postal_code to OneMap’s POSTAL. We deliberately retain OneMap’s original column names (e.g., POSTAL, X, Y, LONGITUDE, LATITUDE). After joining, we save an RDS copy for reproducibility and create an sf object directly in SVY21 (EPSG:3414) using coords = c("X","Y"), which is required for distance-true kernel density estimation and Ripley’s K/L.
 
 ### Geocoding loop (query OneMap and collect results)
 
-We prepare a vector of unique postcodes to minimise API calls, then iterate through them. For each postcode, we pass the exact parameters used in class (searchVal, returnGeom, getAddrDetails, pageNum) to the OneMap endpoint. Successful responses are converted to a data frame and appended to ```found```; postcodes with no match go into ```not_found```. 
+We prepare a vector of unique postcodes to minimise API calls, then iterate through them sequentially. For each postcode, the relevant parameters (```searchVal```, ```returnGeom```, ```getAddrDetails```, ```pageNum```) are submitted to the OneMap endpoint. Successful responses are converted into a data frame and appended to the found table, while unmatched postcodes are stored separately in ```not_found```. This process ensures efficient use of the API, reduces redundancy, and creates a clear separation between valid and invalid geocoded results for subsequent analysis.
 
 ```{r}
  
@@ -311,11 +311,11 @@ for (pc in postcodes) {
 
 ### Tidy the geocoded table
 
-To keep the workflow identical to the professor’s, we do not rename OneMap fields and simply keep the first 10 columns, which include ```POSTAL```, ```X```, ```Y```, ```LONGITUDE```, ```LATITUDE```, and key address attributes. This makes the subsequent ```left_join()``` straightforward and visually matches the in-class console output.
+To prepare the geocoded dataset for integration with the business records, we retain only the essential columns returned by OneMap. Specifically, the first ten fields are preserved, covering postal codes, spatial coordinates (X, Y, longitude, latitude), and key address attributes. This step removes extraneous metadata while maintaining all information required for spatial joins and mapping. By standardising the table structure, subsequent operations such as `left_join()` become more efficient and less error-prone, ensuring that the geocoded records align seamlessly with the cleaned business dataset. The result is a compact, analysis ready table that is useful for downstream spatial analysis and visualisation.
 
 ```{r}
 
-# Keep the first ten columns from OneMap exactly as shown in class.
+# Keep the first ten columns from OneMap.
 # (These include POSTAL, X, Y, LONGITUDE, LATITUDE, etc.)
 
 found <- found %>%
@@ -338,8 +338,7 @@ biz_56111 <- biz_56111 %>%
 
 ```{r}
 
-# --- Convert geocoded restaurants into sf object -----------------------------------
-
+# Convert geocoded restaurants into sf object
 biz_56111_sf <- sf::st_as_sf(
   biz_56111,
   coords = c("X", "Y"),    # the coordinate columns from OneMap geocoding
@@ -347,7 +346,6 @@ biz_56111_sf <- sf::st_as_sf(
 )
 
 # Quick check: print an overview of column names, data types, and a sample of values.
-
 glimpse(biz_56111_sf)
 
 ```
@@ -381,8 +379,6 @@ We read the “MasterPlan2019SubzoneBoundaryNoSeaKML.kml”, drop Z/M, and proje
 
 ```{r}
 
-# --- Read MP19 Subzones (No Sea) KML and project to SVY21 --------------------------
-
 # read the KML layer (likely Name + Description fields)
 mpsz_raw <- sf::st_read("data/geospatial/MasterPlan2019SubzoneBoundaryNoSeaKML.kml", quiet = TRUE) %>%   
   sf::st_zm(drop = TRUE, what = "ZM") %>%   # drop Z/M to keep 2D geometry only
@@ -395,8 +391,6 @@ mpsz_raw <- sf::st_read("data/geospatial/MasterPlan2019SubzoneBoundaryNoSeaKML.k
 We will parse the HTML table inside ```Description``` and return the value from the table row where the ```<th>``` (header) equals a requested field label (e.g., “SUBZONE_N”). We wrap this into a function ```extract_kml_field(html_text, field_name)``` and make sure it fails safely (returns ```NA_character_``` if the label cannot be found).
 
 ```{r}
-
-# --- Helper: pull a single attribute from the KML 'Description' HTML ---------------
 
 extract_kml_field <- function(html_text, field_name) {
   # If the cell is empty or NA, return NA to avoid errors later
@@ -439,7 +433,7 @@ mpsz <- mpsz_raw %>%
   dplyr::select(-Name, -Description) %>%     # remove raw Name/Description
   dplyr::relocate(geometry, .after = dplyr::last_col())   # move geometry to the last column
 
-# Print a few rows so you can see the new columns are present
+# Print a few rows so we can see the new columns are present
 mpsz %>% dplyr::slice_head(n = 3)
 
 # Filter out offshore groups using the newly created columns
@@ -510,6 +504,7 @@ Overall, the output validates the geospatial preprocessing workflow while simult
 This interactive version of the QA map is important because it allows users to zoom, pan, and explore individual planning areas in greater detail. While the static map is suitable for reporting, an interactive map provides flexibility to validate whether each restaurant point is correctly placed within its boundary, especially in dense central regions where overlaps occur. It enhances data verification, spatial accuracy checks, and stakeholder communication, making it easier to spot potential geocoding or boundary alignment errors that might not be visible in a static output.
 
 ```{r}
+
 tmap::tmap_mode("view")
 
 qa_map_pa_int <-
@@ -570,6 +565,7 @@ plot(unmark(rest_ppp_km), main = "Restaurants (ppp, km units)")  # base plot of 
 
 ```
 The polygonal boundary output confirms that the study window is irregular, consisting of 41 polygons with 26 holes and a usable land area of 669.5 km², representing only 43.6% of the bounding frame. Within this space, 677 restaurants classified under SSIC 56111 are distributed, producing an average intensity of about 1.01 points per km². This indicates that density varies substantially across the region, with likely hotspots in central subzones and sparse distribution at the periphery. The presence of rich attributes and temporal fields also enables multi-dimensional analysis beyond static spatial clustering.  
+
 The plot shows the spatial distribution of 677 restaurants across Singapore, represented as points within the polygonal boundary. The pattern indicates clear clustering in the central and southern regions, particularly around the Downtown Core and Orchard areas, reflecting the city’s commercial and entertainment hubs. In contrast, peripheral areas such as the north and far east exhibit sparser distributions, suggesting fewer restaurant establishments relative to population or land use. This visualisation confirms spatial heterogeneity in restaurant presence, highlighting distinct hotspots of activity alongside low-density regions, and provides the foundation for subsequent kernel density estimation to quantify clustering patterns.
 
 ### Bandwidth estimation (km scale)
@@ -590,7 +586,7 @@ bw_cvl   <- bw.CvL(rest_ppp_km)       # Cronie–van Lieshout selector (km)
 bw_scott <- bw.scott(rest_ppp_km)     # Scott’s rule-of-thumb (can return σ.x, σ.y)
 bw_ppl   <- bw.ppl(rest_ppp_km)       # Profile likelihood selector (km)
 
-# 3) Inspect and store the values you plan to cite in the narrative
+# 3) Inspect and store the values we plan to cite in the narrative
 bw_cvl
 bw_scott
 bw_ppl
@@ -615,7 +611,7 @@ With the point pattern rescaled to kilometres and bandwidth values estimated, we
 ```{r}
 
 # Input: 'rest_ppp_km' (restaurants point pattern, km units)
-#        'bw_diggle'   (Diggle bandwidth estimated in km, Section ??)
+#        'bw_diggle'   (Diggle bandwidth estimated in km, Section 9.2)
 
 # 1) KDE using Diggle’s automatic bandwidth (Gaussian, edge corrected)
 kde_rest_diggle <- density(
@@ -678,15 +674,13 @@ terra::crs(kde_rest_diggle_rast)
 terra::crs(kde_rest_fixed_rast)
 terra::crs(kde_rest_adapt_rast)
 
-# -------------------------------------------------------------------------------
-
 ```
 
 The output confirms that the kernel density raster layers produced earlier did not automatically carry a coordinate reference system (CRS). To ensure proper alignment with Singapore’s planning boundaries and other spatial layers, the SVY21 / Singapore Transverse Mercator (EPSG:3414) projection is explicitly assigned to each raster. This step does not resample or modify density values but simply attaches the correct spatial metadata so overlays, graticules, and scale bars behave as expected. The insight here is that assigning the CRS guarantees interoperability across maps, enabling accurate visualisation, integration with vector data, and reliable interpretation for urban planning analysis.
 
 ### Plotting KDE rasters with tmap 
 
-In this section, we will render each KDE surface as a cartographic map using the exact idiom shown earlier: `tm_shape(<SpatRaster>) + tm_raster(col.scale = tm_scale_continuous(values="viridis"), col.legend = tm_legend(...))`, then subzone borders, graticules, a north arrow, and a simple layout. The objective is to visually verify that (1) each raster carries **EPSG:3414** (set earlier) and overlays correctly with the subzones, and (2) the legend and decorations match the example. No manual class breaks are introduced; we keep a **continuous viridis** scale and a **legend box at right–bottom** with a semi-transparent white background. Three maps are produced—automatic (Diggle σ), fixed σ (0.6 km), and adaptive—so you can confirm the outputs line up with expectations and are ready for interpretation.
+In this section, we will render each KDE surface as a cartographic map using the exact idiom shown earlier: `tm_shape(<SpatRaster>) + tm_raster(col.scale = tm_scale_continuous(values="viridis"), col.legend = tm_legend(...))`, then subzone borders, graticules, a north arrow, and a simple layout. The objective is to visually verify that (1) each raster carries **EPSG:3414** (set earlier) and overlays correctly with the subzones, and (2) the legend and decorations match the example. No manual class breaks are introduced; we keep a **continuous viridis** scale and a **legend box at right–bottom** with a semi-transparent white background. Three maps are produced which are automatic (Diggle $\sigma$), fixed $\sigma$ (0.6 km), and adaptive. These enable us to confirm the outputs line up with expectations and are ready for interpretation.
 
 ```{r}
 
@@ -746,7 +740,7 @@ We will prepare four contrasted study areas so the subsequent first-order analys
 
 ```{r}
 
-# 1) Extract FOUR planning areas by name (edit names if your dataset differs) -----
+# 1) Extract FOUR planning areas by name (edit names if our dataset differs) -----
 pa_punggol   <- dplyr::filter(mpsz_clean, PLN_AREA_N == "PUNGGOL")       # Punggol polygon(s)
 pa_tampines  <- dplyr::filter(mpsz_clean, PLN_AREA_N == "TAMPINES")      # Tampines polygon(s)
 pa_orchard  <- dplyr::filter(mpsz_clean, PLN_AREA_N == "ORCHARD") # Choa Chu Kang polygon(s)
@@ -839,6 +833,8 @@ The KDE plots for Punggol, Tampines, Orchard, and Jurong West illustrate clear c
 These differences confirm that KDE is effective in capturing the spatial heterogeneity of restaurant intensity across planning areas. Orchard exemplifies centralised, high-density clustering driven by its urban function, while Tampines and Jurong West illustrate more moderate but significant suburban nodes. Punggol lags behind, with limited commercial clustering that reflects its developmental stage. Together, these outputs demonstrate how KDE surfaces can reveal meaningful variations in urban foodscapes, linking land-use intensity, urban maturity, and service accessibility to spatial patterns of F&B establishments.
 
 ### Spatio-Temporal KDE (STKDE) for Jan–Jun 2025
+
+#### 
 
 ```{r}
 
