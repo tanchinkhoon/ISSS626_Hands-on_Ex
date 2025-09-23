@@ -15,7 +15,7 @@ execute:
 
 ## Introduction
 
-Restaurants are a sensitive barometer of urban vitality: they emerge where pedestrian flows, accessibility, and complementary land uses intersect, and they amplify activity through agglomeration effects. This study examines the **first-order** (intensity) and **second-order** (interaction) properties of **new restaurant registrations** in Singapore between 1 January 2025 and 30 June 2025. The workflow comprises five steps: (i) **tidying** ACRA registration records, (ii) **geocoding** 6-digit postcodes via **OneMap**, (iii) projecting to **SVY21 (EPSG:3414)** to preserve distance accuracy, (iv) estimating **kernel densities** using fixed and adaptive bandwidths to reveal spatial concentrations over time, and (v) applying **Ripley’s L/K functions with CSR envelopes** to identify statistically significant clustering scales. The results are interpreted through the lens of **planning and urban management**, with implications for town-centre provisioning, licensing cadence, last-mile logistics, and transit-oriented development.
+Restaurants are a sensitive barometer of urban vitality: they emerge where pedestrian flows, accessibility, and complementary land uses intersect, and they amplify activity through agglomeration effects. This study examines the **first-order** (intensity) and **second-order** (interaction) properties of **new restaurant registrations** in Singapore between 1 January 2025 and 30 June 2025. The workflow comprises five steps: (i) **tidying** ACRA registration records, (ii) **geocoding** 6-digit postcodes via **OneMap**, (iii) projecting to **SVY21 (EPSG:3414)** to preserve distance accuracy, (iv) estimating **kernel densities** using fixed and adaptive bandwidths to reveal spatial concentrations over time, and (v) applying **Ripley’s L/K functions with Complete Spatial Randomness (CSR) envelopes** to identify statistically significant clustering scales. The results are interpreted through the lens of **planning and urban management**, with implications for town-centre provisioning, licensing cadence, last-mile logistics, and transit-oriented development.
 
 
 ## The Data
@@ -26,7 +26,9 @@ To analyse the Food & Beverage (F&B) industry in Singapore, this exercise integr
 #| echo: false
 #| eval: true
 
-library(knitr)
+pacman::p_load(knitr)
+
+# library(knitr)
 
 data_sources <- data.frame(
   Dataset_Name = c(
@@ -83,23 +85,25 @@ Checks and installs required R packages (via pacman), then loads libraries for d
 
 if (!require(pacman)) install.packages("pacman")    # install pacman once if missing
 pacman::p_load(                                     # load (and auto-install if needed)
-  tidyverse,   # data wrangling + plotting (dplyr, tidyr, ggplot2, readr)
-  stringr,     # string helpers (e.g., str_pad, str_detect)
-  lubridate,   # date helpers (e.g., year, month, floor_date)
-  sf,          # vector geospatial (points/polygons, CRS transforms)
-  tmap,        # cartographic maps (static/interactive)
-  terra,       # raster/SpatRaster conversion for KDE images
+  tidyverse,      # data wrangling + plotting (dplyr, tidyr, ggplot2, readr)
+  stringr,        # string helpers (e.g., str_pad, str_detect)
+  lubridate,      # date helpers (e.g., year, month, floor_date)
+  sf,             # vector geospatial (points/polygons, CRS transforms)
+  tmap,           # cartographic maps (static/interactive)
+  terra,          # raster/SpatRaster conversion for KDE images
+  sparr,
+  spatstat.geom,
   rvest,
-  httr,        # HTTP client for OneMap geocoding calls
-  spatstat,    # point pattern analysis meta-package (ppp, Kest, Lest, envelope, density)
-  here         # robust relative file paths for reproducibility
+  httr,      # HTTP client for OneMap geocoding calls
+  spatstat,  # point pattern analysis meta-package (ppp, Kest, Lest, envelope, density)
+  here       # robust relative file paths for reproducibility
 )
 
 ```
 
 ### Reproducibility for CSR envelopes
 
-Sets a random seed to guarantee reproducible results when generating CSR (Complete Spatial Randomness) envelopes.
+Sets a random seed to guarantee reproducible results when generating CSR envelopes.
 
 ```{r}
 
@@ -369,7 +373,7 @@ readr::write_rds(
 
 ```
 
-## Boundary preparation (parse MP19 KML ```Description```) + Quality Assurance (QA) Map
+## Boundary preparation (parse MP19 KML Description) + Quality Assurance (QA) Map
 
 Many URA MP19 KML files appear to contain only two visible fields (Name, Description). However, the actual attributes—such as SUBZONE_N and PLN_AREA_N—are embedded within an HTML table inside the Description column. To handle this, we define a helper function that parses the HTML and extracts specific fields by label (e.g., SUBZONE_N). Using this function, we generate clean columns for each feature, remove offshore polygons (e.g., SOUTHERN GROUP, WESTERN ISLANDS), and create a QA map to verify that restaurant points fall correctly within the refined subzone boundaries. This ensures that subsequent spatial analyses (KDE and L/K functions) are accurate and reliable.
 
@@ -386,9 +390,9 @@ mpsz_raw <- sf::st_read("data/geospatial/MasterPlan2019SubzoneBoundaryNoSeaKML.k
 
 ```
 
-### Helper to extract one field from the KML ```Description``` HTML
+### Helper to extract one field from the KML Description HTML
 
-We will parse the HTML table inside ```Description``` and return the value from the table row where the ```<th>``` (header) equals a requested field label (e.g., “SUBZONE_N”). We wrap this into a function ```extract_kml_field(html_text, field_name)``` and make sure it fails safely (returns ```NA_character_``` if the label cannot be found).
+We will parse the HTML table inside Description and return the value from the table row where the ```<th>``` (header) equals a requested field label (e.g., “SUBZONE_N”). We wrap this into a function ```extract_kml_field(html_text, field_name)``` and make sure it fails safely (returns ```NA_character_``` if the label cannot be found).
 
 ```{r}
 
@@ -415,7 +419,7 @@ extract_kml_field <- function(html_text, field_name) {
 
 ```
 
-### Materialise attributes from ```Description```, tidy columns, and filter
+### Materialise attributes from Description, tidy columns, and filter
 
 We now map the helper over each feature’s Description to create real columns: REGION_N, PLN_AREA_N, SUBZONE_N, SUBZONE_C. Then we drop the original Name / Description, put geometry last (nice console print), and filter out Southern Group and Western Islands by the newly-created columns—exactly the step that previously failed because those columns didn’t exist.
 
@@ -531,7 +535,7 @@ This section investigates the **first-order intensity** of new restaurant regist
 
 ### Prepare spatstat objects
 
-We already have clean data: restaurants_sf (points in EPSG:3414) and mpsz_cl (planning subzones in EPSG:3414). Here, we convert them into formats required for point pattern analysis: an **observation window** (owin) and a **point pattern** (ppp). We also create a kilometre-scaled version for sensitivity analysis.
+We already have clean data: restaurants_sf (points in EPSG:3414) and mpsz_cl (planning subzones in EPSG:3414). Here, we convert them into formats required for point pattern analysis: an **observation window** (owin) and a **point pattern** (ppp). We also create a kilometer-scaled version for sensitivity analysis.
 
 ```{r}
 
@@ -606,7 +610,7 @@ Taken together, these results underline the importance of bandwidth choice in ke
 
 ### KDE with alternative bandwidth strategies (all outputs in km²)
 
-With the point pattern rescaled to kilometres and bandwidth values estimated, we now generate kernel KDE of restaurant intensity. KDE provides a smooth surface of expected events per $km^2$ by centring a kernel function over each observed point. Three approaches are used to reflect different assumptions about spatial structure: Diggle’s bandwidth, a data-driven estimate derived from cross-validation; a fixed bandwidth of 0.6 km, chosen to represent a neighbourhood-scale radius consistent with urban walking distances; and an adaptive bandwidth, which adjusts the kernel size depending on local point density. The Gaussian kernel with edge correction is used throughout to ensure smoothness and reduce boundary bias. Comparing these three approaches allows us to evaluate whether clustering patterns are robust across parameterisations or sensitive to smoothing assumptions. This not only enhances methodological transparency but also provides practical insight into the scale at which clustering is most relevant for urban planning and decision-making.
+With the point pattern rescaled to kilometers and bandwidth values estimated, we now generate kernel KDE of restaurant intensity. KDE provides a smooth surface of expected events per $km^2$ by centring a kernel function over each observed point. Three approaches are used to reflect different assumptions about spatial structure: Diggle’s bandwidth, a data-driven estimate derived from cross-validation; a fixed bandwidth of 0.6 km, chosen to represent a neighbourhood-scale radius consistent with urban walking distances; and an adaptive bandwidth, which adjusts the kernel size depending on local point density. The Gaussian kernel with edge correction is used throughout to ensure smoothness and reduce boundary bias. Comparing these three approaches allows us to evaluate whether clustering patterns are robust across parameterisations or sensitive to smoothing assumptions. This not only enhances methodological transparency but also provides practical insight into the scale at which clustering is most relevant for urban planning and decision-making.
 
 ```{r}
 
@@ -832,212 +836,201 @@ The KDE plots for Punggol, Tampines, Orchard, and Jurong West illustrate clear c
 
 These differences confirm that KDE is effective in capturing the spatial heterogeneity of restaurant intensity across planning areas. Orchard exemplifies centralised, high-density clustering driven by its urban function, while Tampines and Jurong West illustrate more moderate but significant suburban nodes. Punggol lags behind, with limited commercial clustering that reflects its developmental stage. Together, these outputs demonstrate how KDE surfaces can reveal meaningful variations in urban foodscapes, linking land-use intensity, urban maturity, and service accessibility to spatial patterns of F&B establishments.
 
-### Spatio-Temporal KDE (STKDE) for Jan–Jun 2025
+### 9.9 Spatio-Temporal KDE (STKDE) for Jan–Jun 2025
 
-#### 
+In this section, we bring together the spatial and temporal dimensions of restaurant incorporations into a unified spatio-temporal analysis using Kernel Density Estimation (STKDE). The period of focus is January to June 2025, and the primary aim is to detect not only where incorporations cluster in space but also how these clusters evolve across time. The section begins with exploratory faceted maps that simply display the geographic distribution of restaurants month by month, offering a descriptive baseline. This is followed by computational STKDE at the monthly scale, where incorporation months are treated as temporal marks and used to generate a three-dimensional density surface across space (x, y) and time (t). Recognising that monthly aggregation can mask short-lived bursts of activity, the section then extends to day-level STKDE. By applying bootstrap bandwidth optimisation, the analysis achieves a careful balance between spatial and temporal smoothing, ensuring that density estimates capture meaningful patterns rather than artefacts of parameter choice. Finally, the section emphasises validation and interpretability, producing fixed-scale comparative panels that allow researchers to trace how hotspots intensify, persist, or dissipate across the study window. Overall, Section 9.9 transforms raw incorporation points into a dynamic surface that reveals the tempo and geography of restaurant entry, providing richer insight than purely spatial or purely temporal methods could offer in isolation.
+
+#### 9.9.1 Visualising geographic distribution by month
+
+Before advancing into formal spatio-temporal density estimation, the data is first explored visually to understand how restaurant incorporations are spread across Singapore from January to June 2025. Using the tmap package in static plot mode, individual incorporations are represented as dots, layered over the national planning boundary (sg_owin) to ensure geographic consistency. By applying tm_facets(by = "MONTH_ABBR"), the output generates a panel of maps, one for each month, which collectively illustrate how point distributions evolve across time. This faceted approach does not yet quantify clustering but serves as an intuitive diagnostic, highlighting months with visibly denser patterns or more dispersed incorporations. Such side-by-side visualisation is valuable for detecting preliminary trends—for example, whether activity is consistently concentrated in the central business districts or if new hotspots are emerging in suburban planning areas. As an exploratory step, these maps provide a baseline context that informs and motivates the more rigorous spatio-temporal KDE analysis developed later in the section.
+
 
 ```{r}
 
-# 0) Singapore study boundary from planning subzones (mpsz_clean)
-#    - dissolve to a single polygon
-#    - drop Z/M if present
-#    - ensure EPSG:3414 (SVY21 meters)
-study_sf <- mpsz_clean |>
-  sf::st_union() |>
-  sf::st_zm(drop = TRUE) |>
-  sf::st_transform(3414)
+tmap::tmap_mode("plot")
 
-# 1) Convert to spatstat observation window
-study_owin <- spatstat.geom::as.owin(study_sf)
+study_owin_sf <- sf::st_as_sf(sg_owin)
+sf::st_crs(study_owin_sf) <- 3414  # SVY21
 
-plot(study_owin); box()
+tm_shape(study_owin_sf) +
+  tm_polygons(col = NA, border.col = "grey70", lwd = 0.4) +
+tm_shape(biz_56111_sf) +
+  tm_dots(size = 0.08, col = "black") +
+  tm_facets(by = "MONTH_ABBR", free.coords = FALSE, drop.units = TRUE)
 
+```
 
-# --- 9.8 Spatio-temporal Data Preparation ----------------------
+#### 9.9.2 STKDE by month
 
-# Ensure restaurants sf is in SVY21 meters (matches study_owin)
-biz_56111_sf <- biz_56111_sf |>
-  sf::st_transform(3414)
+Here, the analysis moves from descriptive visualization to computational STKDE, aggregated by month. The dataset is first structured so that the month of incorporation (1–12) is explicitly treated as a time mark, ensuring compatibility with the spatstat framework. The data is then converted to a planar point pattern process (PPP) with spatial coordinates expressed in meters, and subsequently rescaled into kilometers for consistency with the rest of the study. Each restaurant’s month of incorporation is treated as a temporal event, which is clipped to the global study window to avoid edge effects. The spattemp.density() function then computes the STKDE, estimating how restaurant incorporations are distributed simultaneously across space and time. The outcome is a three-dimensional density object (x, y, t), where t represents month. This monthly STKDE provides a fine-grained temporal lens, enabling researchers to investigate whether restaurant hotspots emerge gradually, persist across multiple months, or appear suddenly, potentially linked to policy interventions or seasonal demand.
 
-# 1) Add temporal marks (numeric month from existing 'date' column)
-biz_56111_sf <- biz_56111_sf |>
-  dplyr::mutate(
-    date = lubridate::ymd(date),         # parse if not already Date
-    Month_num = lubridate::month(date)   # 1–12
-  )
+```{r}
 
-# 2) Convert to spatio-temporal ppp (space = study_owin, time mark = Month_num)
-rest_ppp_st <- spatstat.geom::as.ppp(
-  biz_56111_sf |> dplyr::select(Month_num),  # keep geometry + month mark
-  W = study_owin
+# 1) Keep ONLY the month mark (1..12) with geometry (still meters here)
+rest_month <- biz_56111_sf |>
+  dplyr::select(MONTH_NUM)
+
+# 2) Convert to ppp (meters); MONTH_NUM travels along as marks
+rest_month_ppp <- spatstat.geom::as.ppp(rest_month)
+
+# 3) Clip to the global observation window you used in §9
+rest_month_owin <- rest_month_ppp[sg_owin]
+
+# 4) Rescale to kilometers (to stay consistent with §9)
+rest_month_ppp_km <- spatstat.geom::rescale(rest_month_owin, 1000, "km")
+
+# --- CRITICAL: ensure time marks are a plain numeric vector (not a data.frame/factor)
+mks <- marks(rest_month_ppp_km)
+month_vec <- if (is.data.frame(mks)) mks$MONTH_NUM else mks
+stopifnot(is.numeric(month_vec))
+rest_month_ppp_km <- spatstat.geom::setmarks(rest_month_ppp_km, as.numeric(month_vec))
+
+# Quick sanity: months present should be inside 1..12
+range(month_vec, na.rm = TRUE)
+table(month_vec)
+
+# 5) STKDE using sparr (let it pick sensible spatial defaults; specify time grid)
+#    tres = number of distinct months we actually have; tlim bounds the months.
+uniq_months <- sort(unique(month_vec))
+nt <- length(uniq_months)
+
+st_kde_m <- sparr::spattemp.density(
+  rest_month_ppp_km,
+  sres  = 128,                      # spatial grid like the notes
+  tres  = nt,                        # number of time slices
+  tlim  = range(uniq_months, na.rm = TRUE)  # temporal span (e.g., 1..7 in your data)
 )
 
-# 3) Rescale to kilometers (consistent with earlier sections)
-rest_ppp_st_km <- spatstat.geom::rescale(rest_ppp_st, 1000, "km")
-
-# 4) Sanity check
-summary(rest_ppp_st_km)
-
+# Confirm we now have a 3D object (you should see ... x ... x nt)
+summary(st_kde_m)
 
 ```
 
+```{r}
 
+# 6) Map actual month numbers -> internal time indices that spattemp.density created
+#    st_kde_m$z$t holds the time coordinate; if NULL (very rare), build a seq of length nt.
+t_axis <- st_kde_m$z$t
+if (is.null(t_axis)) t_axis <- seq_len(nt)
+
+t_idx  <- match(uniq_months, t_axis)
+keep   <- !is.na(t_idx)
+t_idx  <- t_idx[keep]
+lab_months <- month.abb[uniq_months][keep]
+
+# 7) Plot every month with a fixed legend range (prof’s “comparable panels” habit)
+op <- par(mfcol = c(2, ceiling(length(t_idx)/2)))  # 2×? grid; adjust if you prefer 3×?
+for (i in seq_along(t_idx)) {
+  plot(
+    st_kde_m, t_idx[i],
+    override.par = FALSE,
+    fix.range    = TRUE,
+    main = paste("KDE at", lab_months[i])
+  )
+}
+par(op)
+
+```
+
+#### 9.7.3 STKDE by day-of-year (improved bandwidths via BOOT.spattemp)
+
+This section advances the STKDE analysis by refining temporal granularity to the level of individual days and improving smoothing parameters through bootstrap bandwidth selection. The day-of-year (1–366) is extracted from each incorporation date, ensuring temporal precision beyond monthly aggregation. The dataset is then processed into a PPP, rescaled to kilometers, and prepared with appropriate temporal marks. A critical step here is bandwidth optimisation: instead of relying on arbitrary or fixed values, the bootstrap method (BOOT.spattemp) identifies data-driven spatial ($h$) and temporal ($\lambda$) bandwidths that balance bias and variance. This ensures that the resulting STKDE surface captures meaningful clustering patterns without over-smoothing fine details or exaggerating noise. Once the optimised parameters are selected, the spatio-temporal density is computed, and slices across different days can be visualised. This approach provides a much more dynamic and precise picture of incorporation activity, capable of highlighting short-lived bursts of restaurant openings that monthly aggregation might obscure, offering richer insight into temporal clustering behaviour.
 
 
 ```{r}
 
+# 1) Build a temp sf with just the Day-of-Year mark (1..366), keep geometry
+rest_yday <- biz_56111_sf |>
+  dplyr::transmute(YDAY_NUM = lubridate::yday(date))
 
+# 2) Convert to ppp (meters) – the mark travels along
+rest_yday_ppp <- spatstat.geom::as.ppp(rest_yday)
 
-```
+# 3) Clip to the same global observation window used in §9
+rest_yday_owin <- rest_yday_ppp[sg_owin]
 
+# 4) Rescale to kilometers (consistent with the rest of §9)
+rest_yday_ppp_km <- spatstat.geom::rescale(rest_yday_owin, 1000, "km")
 
-sss
+# 5) SAFETY: ensure the time mark is a plain numeric vector inside the ppp
+mks <- marks(rest_yday_ppp_km)
+yday_vec <- if (is.data.frame(mks)) mks$YDAY_NUM else mks
+stopifnot(is.numeric(yday_vec))
+rest_yday_ppp_km <- spatstat.geom::setmarks(rest_yday_ppp_km, as.numeric(yday_vec))
 
-```{r}
+# Quick checks like in the notes
+range(yday_vec, na.rm = TRUE)      # should be within 1..366 subset
+length(unique(yday_vec))           # number of distinct days actually present
 
+# 6) Select bandwidths via bootstrap (professor’s method)
+set.seed(1234)  # reproducibility
+boot_bw <- sparr::BOOT.spattemp(rest_yday_ppp_km)  # let sparr choose; no extra args
 
+# --- Robust extraction: works for both list-return and numeric vector-return
+h_opt <- tryCatch(boot_bw$h.opt, error = function(e) NULL)
+lambda_opt <- tryCatch(boot_bw$lambda.opt, error = function(e) NULL)
+if (is.null(h_opt) || is.null(lambda_opt)) {
+  vals <- as.numeric(boot_bw)
+  stopifnot(length(vals) >= 2)
+  h_opt      <- vals[1]
+  lambda_opt <- vals[2]
+}
+cat("Selected h (km):", h_opt, "  lambda (days):", lambda_opt, "\n")
 
-```
+# 7) Compute the STKDE using the selected bandwidths
+kde_yday <- sparr::spattemp.density(
+  rest_yday_ppp_km,
+  h      = h_opt,
+  lambda = lambda_opt
+)
 
-
-
-
-```{r}
-
-
-
-```
-
-
-
-```{r}
-
-
-
-```
-
-
-
-
-```{r}
-
-
-
-```
-
-
-
-```{r}
-
-
-
-```
-
-
-
-
-```{r}
-
-
+# Inspect (should report the t-domain and grid)
+summary(kde_yday)
 
 ```
 
-
-
-
 ```{r}
 
-
-
-```
-
-
-
-
-```{r}
-
-
-
-```
-
-
-
-
-```{r}
-
-
-
-```
-
-
-
-```{r}
-
-
-
-```
-
-
-
-
-```{r}
-
-
-
-```
-
-
-
-
-```{r}
-
-
-
-```
-
-
-
-
-
-```{r}
-
-
-
-```
-
-
-
-
-```{r}
-
-
-
-```
-
-
-
-
-```{r}
-
-
-
-```
-
-
-
-
-```{r}
-
-
-
-```
-
-
-
-
-```{r}
-
-
+# 8a) Plot a specific day-of-year slice (like the notes). Example: t = 10
+plot(kde_yday)        # default panel (slider-like)
+plot(kde_yday, 10)    # explicitly show t = 10 (any valid index 1..nt)
+
+# 8b) Optional: evenly spaced days panel with fixed legend (robust to structure)
+# Try to get the time axis from the object; fall back to cube depth; then to data
+t_axis <- kde_yday$z$t
+if (is.null(t_axis)) {
+  nt_from_v <- tryCatch({
+    vv <- kde_yday$z$v
+    d  <- dim(vv)
+    if (length(d) >= 3) d[3] else NA_integer_
+  }, error = function(e) NA_integer_)
+  if (is.na(nt_from_v)) {
+    nt_from_v <- length(unique(yday_vec))  # last resort: how many days we fed in
+  }
+  t_axis <- seq_len(nt_from_v)
+}
+
+# Guard: if we still don’t have any time slices, stop with a clear message
+if (length(t_axis) < 1L) {
+  stop("STKDE object has zero time slices (check marks/time input and BOOT bandwidth step).")
+}
+
+# Build up to 6 evenly spaced slice indices across the available t-axis
+k <- min(6L, length(t_axis))
+t_show <- unique(round(seq(from = 1, to = length(t_axis), length.out = k)))
+t_show <- t_show[t_show >= 1 & t_show <= length(t_axis)]  # extra safety
+
+# Plot with a fixed legend range so panels are comparable
+op <- par(mfcol = c(2, ceiling(length(t_show)/2)))  # 2×3 grid when 6 slices
+for (ti in t_show) {
+  plot(
+    kde_yday, ti,
+    override.par = FALSE,
+    fix.range    = TRUE,
+    main = paste("KDE at t =", ti)
+  )
+}
+par(op)
 
 ```
 
@@ -1060,23 +1053,11 @@ sss
 
 
 
-
-
 ```{r}
 
 
 
 ```
-
-
-
-
-```{r}
-
-
-
-```
-
 
 
 
@@ -1088,6 +1069,12 @@ sss
 
 
 
+```{r}
+
+
+
+```
+
 
 
 ```{r}
@@ -1098,10 +1085,81 @@ sss
 
 
 
+```{r}
+
+
+
+```
+
+
 
 ```{r}
 
 
+
+```
+
+
+
+```{r}
+
+
+
+```
+
+
+
+```{r}
+
+
+
+```
+
+
+
+```{r}
+
+
+
+```
+
+
+
+```{r}
+
+
+
+```
+
+
+
+```{r}
+
+
+
+```
+
+
+
+```{r}
+
+
+
+```
+
+
+
+```{r}
+
+
+
+```
+
+
+#### 9.9.3 STKDE by day-of-year with improved bandwidths
+
+
+```{r}
 
 ```
 
