@@ -754,11 +754,11 @@ map_kde_adapt
 
 ### 9.7 First-order SPPA at the Planning Subzone Level
 
-This subsection prepares four contrasted study areas so the subsequent first-order analyses (intensity mapping via KDE) are meaningful and comparable across different urban contexts. The choice is deliberate: (1) Downtown/Central retail core (extremely high restaurant intensity), (2) a mature regional centre in the East, (3) a large heartland town in the West, and (4) a newer North-East town. Together they cover distinct development histories, land-use mixes, and day–night populations, which strongly influence restaurant locations. Working at the planning-area/subzone scale also reduces boundary bias for local analyses while keeping results policy-relevant (these are common planning units). In what follows, we: extract the four planning areas, convert them to owin study windows required by spatstat, clip the Singapore-wide restaurant ppp to each window (defensive check), and rescale to kilometres (single canonical unit). These km-scaled point patterns become the inputs for KDE and any other first-order statistics i,kn the next subsections.
+This section applies First Order Spatial Point Pattern Analysis (SPPA) to assess how the distribution of restaurant locations varies across Singapore’s planning subzones. Unlike kernel density estimation at the continuous surface level, the subzone-based approach aggregates point counts into administrative boundaries, enabling direct comparison of spatial intensity relative to area size and population density. This allows us to identify subzones with unusually high or low restaurant concentrations, detect clustering patterns at a policy-relevant scale, and provide insights for urban planning and commercial decision-making.
 
-### 9.7.1
+### 9.7.1 Geospatial data wrangling
 
-
+We will prepare four contrasted study areas so the subsequent first-order analyses (intensity mapping via KDE) are meaningful and comparable across different urban contexts. The choice is deliberate: (1) Downtown/Central retail core (extremely high restaurant intensity), (2) a mature regional centre in the East, (3) a large heartland town in the West, and (4) a newer North-East town. Together they cover distinct development histories, land-use mixes, and day–night populations, which strongly influence restaurant locations. Working at the planning-area/subzone scale also reduces boundary bias for local analyses while keeping results policy-relevant (these are common planning units). In what follows, we: extract the four planning areas, convert them to owin study windows required by spatstat, clip the Singapore-wide restaurant ppp to each window (defensive check), and rescale to kilometres (single canonical unit). These km-scaled point patterns become the inputs for KDE and any other first-order statistics i,kn the next subsections.
 
 ```{r}
 
@@ -811,9 +811,9 @@ summary(rest_ppp_orchard_km); summary(rest_ppp_jurongw_km)
 
 ```
 
-### 9.7.2
+### 9.7.2 Computing KDE surfaces by planning Area
 
-
+By converting discrete restaurant locations into continuous density surfaces, KDE helps identify hotspots and highlight differences in spatial intensity across planning areas. At this stage, we focus on computing KDE surfaces separately for selected planning areas of Singapore, instead of for the entire island. This allows us to explore variations in restaurant distribution within localised study areas and compare across subzones. Importantly, the KDE computation uses a consistent bandwidth estimator, ensuring results are comparable across regions. Following the same structure and coding style as earlier sections, we use Diggle’s automatic bandwidth selection method (bw.diggle) and apply the Gaussian kernel to maintain methodological consistency. All computations are carried out in kilometres, rather than metres, since this scale provides results that are interpretable and aligned with urban planning practices. This ensures KDE values represent the density of restaurants per square kilometre, a unit meaningful for evaluating clustering and intensity at the planning area level.
 
 ```{r}
 
@@ -857,6 +857,8 @@ plot(
 
 
 ```
+
+
 
 ## 9.8
 
