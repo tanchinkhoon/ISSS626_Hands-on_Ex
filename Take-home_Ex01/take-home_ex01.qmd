@@ -836,11 +836,11 @@ The KDE plots for Punggol, Tampines, Orchard, and Jurong West illustrate clear c
 
 These differences confirm that KDE is effective in capturing the spatial heterogeneity of restaurant intensity across planning areas. Orchard exemplifies centralised, high-density clustering driven by its urban function, while Tampines and Jurong West illustrate more moderate but significant suburban nodes. Punggol lags behind, with limited commercial clustering that reflects its developmental stage. Together, these outputs demonstrate how KDE surfaces can reveal meaningful variations in urban foodscapes, linking land-use intensity, urban maturity, and service accessibility to spatial patterns of F&B establishments.
 
-### 9.9 Spatio-Temporal KDE (STKDE) for Jan–Jun 2025
+### Spatio-Temporal KDE (STKDE) for Jan–Jun 2025
 
 In this section, we bring together the spatial and temporal dimensions of restaurant incorporations into a unified spatio-temporal analysis using Kernel Density Estimation (STKDE). The period of focus is January to June 2025, and the primary aim is to detect not only where incorporations cluster in space but also how these clusters evolve across time. The section begins with exploratory faceted maps that simply display the geographic distribution of restaurants month by month, offering a descriptive baseline. This is followed by computational STKDE at the monthly scale, where incorporation months are treated as temporal marks and used to generate a three-dimensional density surface across space (x, y) and time (t). Recognising that monthly aggregation can mask short-lived bursts of activity, the section then extends to day-level STKDE. By applying bootstrap bandwidth optimisation, the analysis achieves a careful balance between spatial and temporal smoothing, ensuring that density estimates capture meaningful patterns rather than artefacts of parameter choice. Finally, the section emphasises validation and interpretability, producing fixed-scale comparative panels that allow researchers to trace how hotspots intensify, persist, or dissipate across the study window. Overall, Section 9.9 transforms raw incorporation points into a dynamic surface that reveals the tempo and geography of restaurant entry, providing richer insight than purely spatial or purely temporal methods could offer in isolation.
 
-#### 9.9.1 Visualising geographic distribution by month
+#### Visualising geographic distribution by month
 
 Before advancing into formal spatio-temporal density estimation, the data is first explored visually to understand how restaurant incorporations are spread across Singapore from January to June 2025. Using the tmap package in static plot mode, individual incorporations are represented as dots, layered over the national planning boundary (sg_owin) to ensure geographic consistency. By applying tm_facets(by = "MONTH_ABBR"), the output generates a panel of maps, one for each month, which collectively illustrate how point distributions evolve across time. This faceted approach does not yet quantify clustering but serves as an intuitive diagnostic, highlighting months with visibly denser patterns or more dispersed incorporations. Such side-by-side visualisation is valuable for detecting preliminary trends—for example, whether activity is consistently concentrated in the central business districts or if new hotspots are emerging in suburban planning areas. As an exploratory step, these maps provide a baseline context that informs and motivates the more rigorous spatio-temporal KDE analysis developed later in the section.
 
@@ -860,7 +860,7 @@ tm_shape(biz_56111_sf) +
 
 ```
 
-#### 9.9.2 STKDE by month
+#### STKDE by month
 
 Here, the analysis moves from descriptive visualization to computational STKDE, aggregated by month. The dataset is first structured so that the month of incorporation (1–12) is explicitly treated as a time mark, ensuring compatibility with the spatstat framework. The data is then converted to a planar point pattern process (PPP) with spatial coordinates expressed in meters, and subsequently rescaled into kilometers for consistency with the rest of the study. Each restaurant’s month of incorporation is treated as a temporal event, which is clipped to the global study window to avoid edge effects. The spattemp.density() function then computes the STKDE, estimating how restaurant incorporations are distributed simultaneously across space and time. The outcome is a three-dimensional density object (x, y, t), where t represents month. This monthly STKDE provides a fine-grained temporal lens, enabling researchers to investigate whether restaurant hotspots emerge gradually, persist across multiple months, or appear suddenly, potentially linked to policy interventions or seasonal demand.
 
@@ -932,7 +932,7 @@ par(op)
 
 ```
 
-#### 9.7.3 STKDE by day-of-year (improved bandwidths via BOOT.spattemp)
+#### STKDE by day-of-year (improved bandwidths via BOOT.spattemp)
 
 This section advances the STKDE analysis by refining temporal granularity to the level of individual days and improving smoothing parameters through bootstrap bandwidth selection. The day-of-year (1–366) is extracted from each incorporation date, ensuring temporal precision beyond monthly aggregation. The dataset is then processed into a PPP, rescaled to kilometers, and prepared with appropriate temporal marks. A critical step here is bandwidth optimisation: instead of relying on arbitrary or fixed values, the bootstrap method (BOOT.spattemp) identifies data-driven spatial ($h$) and temporal ($\lambda$) bandwidths that balance bias and variance. This ensures that the resulting STKDE surface captures meaningful clustering patterns without over-smoothing fine details or exaggerating noise. Once the optimised parameters are selected, the spatio-temporal density is computed, and slices across different days can be visualised. This approach provides a much more dynamic and precise picture of incorporation activity, capable of highlighting short-lived bursts of restaurant openings that monthly aggregation might obscure, offering richer insight into temporal clustering behaviour.
 
@@ -1154,9 +1154,6 @@ par(op)
 
 
 ```
-
-
-#### 9.9.3 STKDE by day-of-year with improved bandwidths
 
 
 ```{r}
