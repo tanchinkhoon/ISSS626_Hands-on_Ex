@@ -942,7 +942,7 @@ par(op)
 
 ```
 
-The spatio-temporal KDE (STKDE) surfaces provide a dynamic perspective on restaurant intensity across Singapore's planning areas from January to July 2025. Unlike the static first-order SPPA, which offered a cumulative view of clustering, STKDE reveals how concentration shifts month by month.
+The STKDE surfaces provide a dynamic perspective on restaurant intensity across Singapore's planning areas from January to July 2025. Unlike the static first-order SPPA, which offered a cumulative view of clustering, STKDE reveals how concentration shifts month by month.
 
 In the early months, February and March exhibit diffuse patterns with low overall intensity, indicating that restaurant registrations were spread broadly across several planning areas rather than concentrated in one location. April marks a sharp surge in activity, with central planning areas registering the highest intensity, exceeding 0.02 restaurants/km². This confirms the first-order result that central regions are the primary clusters but clarifies that the peak was temporally concentrated in April. Activity then disperses in May and June, with moderate levels appearing in eastern and western planning areas such as Tampines and Jurong West, suggesting a decentralization of openings. By July, the overall intensity weakens further, reflecting fewer new registrations across the island and confirming that April's central spike was an anomaly rather than a sustained trend.
 
