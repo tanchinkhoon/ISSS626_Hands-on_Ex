@@ -1047,11 +1047,13 @@ par(op)
 ```
 
 
-The SSTKDE by day-of-year refines the island-wide analysis by tracking how restaurant clustering changes on a daily basis rather than relying on monthly or static snapshots. The model evaluates intensities across a 3D lattice (128 × 128 × 212), producing values that range from $5.3 x 10^-48$  to $1.25 x 10^-8$ restaurants per $km^2$ per day. The lower bound corresponds to background zero activity, while the upper bound marks the maximum hotspot intensity observed on peak days.
+The SSTKDE by day-of-year refines the island-wide analysis by tracking how restaurant clustering changes on a daily basis rather than relying on monthly or static snapshots. The model evaluates intensities across a 3D lattice (128 × 128 × 212), producing values that range from $5.3 \times 10^-(48)$  to $1.25 \times 10^-8$ restaurants per $km^2$ per day. The lower bound corresponds to background zero activity, while the upper bound marks the maximum hotspot intensity observed on peak days.
 
 When compared with first-order SPPA at the planning area level, which showed Orchard as the clear hotspot and weaker but noticeable activity in Jurong West, Tampines, and Punggol, the STKDE reveals that these clusters are highly time-dependent. Orchard’s concentration does not persist uniformly across the study period; instead, it appears in sharp bursts of activity that quickly dissipate. Jurong West and Tampines show only modest clustering spread over time, while Punggol remains marginal with scattered, intermittent signals. This temporal fluctuation is invisible in static SPPA maps, which aggregate activity and risk overstating long-term persistence.
 
 Importantly, these outputs are not counts of restaurants but model-derived intensities. The kernel estimator smooths each restaurant registration across space and time according to the selected bandwidths. As a result, the maps report expected density in restaurants per km² per day, not literal fractions of a restaurant, providing a probabilistic representation of clustering strength over space-time.
+
+
 
 
 ```{r}
