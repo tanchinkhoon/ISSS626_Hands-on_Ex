@@ -93,6 +93,7 @@ pacman::p_load(                                     # load (and auto-install if 
   terra,          # raster/SpatRaster conversion for KDE images
   sparr,
   spatstat.geom,
+  stpp,
   rvest,
   httr,      # HTTP client for OneMap geocoding calls
   spatstat,  # point pattern analysis meta-package (ppp, Kest, Lest, envelope, density)
@@ -1047,18 +1048,64 @@ par(op)
 ```
 
 
-The SSTKDE by day-of-year refines the island-wide analysis by tracking how restaurant clustering changes on a daily basis rather than relying on monthly or static snapshots. The model evaluates intensities across a 3D lattice (128 × 128 × 212), producing values that range from $5.3 \times 10^-(48)$  to $1.25 \times 10^-8$ restaurants per $km^2$ per day. The lower bound corresponds to background zero activity, while the upper bound marks the maximum hotspot intensity observed on peak days.
+The SSTKDE by day-of-year refines the island-wide analysis by tracking how restaurant clustering changes on a daily basis rather than relying on monthly or static snapshots. The model evaluates intensities across a 3D lattice (128 × 128 × 212), producing values that range from $5.3 \times 10^{-48}$  to $1.25 \times 10^{-8}$ restaurants per $km^2$ per day. The lower bound corresponds to background zero activity, while the upper bound marks the maximum hotspot intensity observed on peak days.
 
 When compared with first-order SPPA at the planning area level, which showed Orchard as the clear hotspot and weaker but noticeable activity in Jurong West, Tampines, and Punggol, the STKDE reveals that these clusters are highly time-dependent. Orchard’s concentration does not persist uniformly across the study period; instead, it appears in sharp bursts of activity that quickly dissipate. Jurong West and Tampines show only modest clustering spread over time, while Punggol remains marginal with scattered, intermittent signals. This temporal fluctuation is invisible in static SPPA maps, which aggregate activity and risk overstating long-term persistence.
 
 Importantly, these outputs are not counts of restaurants but model-derived intensities. The kernel estimator smooths each restaurant registration across space and time according to the selected bandwidths. As a result, the maps report expected density in restaurants per km² per day, not literal fractions of a restaurant, providing a probabilistic representation of clustering strength over space-time.
 
+## Second-order spatial point patterns analysis
 
+While first-order analysis (Section 9) identified where restaurant registrations were most intense, it does not tell us whether those hotspots are statistically significant or simply a result of background density. To address this, we perform second-order spatial point pattern analysis (SPPA), which examines how the relative positions of points deviate from complete spatial randomness (CSR).
 
+Among the four planning areas studied earlier, we now focus on Tampines and Punggol for detailed second-order analysis. This choice is motivated by:
+- Tampines: The KDE surface revealed multiple dense hotspots spread across the planning area, indicating strong potential for multi-scale clustering. With sufficient number of points, the second-order functions will produce stable envelopes and meaningful interpretations.  
+
+- Punggol: Though fewer points overall, the KDE showed concentrated hotspots (notably in the south-west and north). Analysing Punggol offers contrast to Tampines, highlighting clustering behaviour in an emerging town where new F&B growth is still geographically localised.  
+
+In practice, among the four classical second-order functions (G, F, K, L), the K-function and its variance-stabilised form, the L-function, are most widely adopted. They are preferred because they capture multi-scale clustering and dispersion across a range of distances, while G and F are primarily sensitive to nearest-neighbour effects. We therefore focus our analysis on K and L functions, supported by Monte Carlo CSR testing using 99/999 simulations.
+
+### 10.1 G-function Analysis
+
+The K-function measures the number of neighbours within distance r of each event and compares it against CSR. It detects clustering or dispersion at multiple spatial scales.
 
 ```{r}
 
+# K for Tampines (reusing Sect. 9 PPP)
+K_tm      <- Kest(rest_ppp_tampines_km, correction = "Ripley")
+K_tm.csr  <- envelope(rest_ppp_tampines_km, Kest, nsim = 99, rank = 1, glocal = TRUE)
 
+plot(K_tm.csr, . - r ~ r,
+     xlab = "Distance (m)", ylab = "K(d) - r",
+     main = "K-function with CSR envelope — Tampines (Jan–Jun 2025)")
+
+# K for Punggol
+K_pg      <- Kest(rest_ppp_punggol_km,  correction = "Ripley")
+K_pg.csr  <- envelope(rest_ppp_punggol_km,  Kest, nsim = 99, rank = 1, glocal = TRUE)
+
+plot(K_pg.csr, . - r ~ r,
+     xlab = "Distance (m)", ylab = "K(d) - r",
+     main = "K-function with CSR envelope — Punggol (Jan–Jun 2025)")
+
+```
+
+```{r}
+
+# K-function for Tampines
+K_tm <- Kest(rest_ppp_tampines, correction = "Ripley")
+K_tm.csr <- envelope(rest_ppp_tampines, Kest, nsim = 99, rank = 1, glocal = TRUE)
+
+plot(K_tm.csr, . - r ~ r,
+     xlab = "Distance (m)", ylab = "K(d)-r",
+     main = "K-function with CSR envelope (Tampines, Jan–Jun 2025)")
+
+# K-function for Punggol
+K_pg <- Kest(rest_ppp_punggol, correction = "Ripley")
+K_pg.csr <- envelope(rest_ppp_punggol, Kest, nsim = 99, rank = 1, glocal = TRUE)
+
+plot(K_pg.csr, . - r ~ r,
+     xlab = "Distance (m)", ylab = "K(d)-r",
+     main = "K-function with CSR envelope (Punggol, Jan–Jun 2025)")
 
 ```
 
@@ -1066,39 +1113,189 @@ Importantly, these outputs are not counts of restaurants but model-derived inten
 
 ```{r}
 
+G_rest <- Gest(biz_56111_ppp, correction = "border")
+G_rest.csr <- envelope(biz_56111_ppp, Gest, nsim = 999)
 
+plot(G_rest.csr, main = "G-function with CSR envelope (Restaurants, Jan–Jun 2025)")
+
+
+```
+
+### 10.2 F-function Analysis
+
+```{r}
+
+# L for Tampines
+L_tm      <- Lest(rest_ppp_tampines_km, correction = "Ripley")
+L_tm.csr  <- envelope(rest_ppp_tampines_km, Lest, nsim = 99, rank = 1, glocal = TRUE)
+
+plot(L_tm.csr, . - r ~ r,
+     xlab = "Distance (m)", ylab = "L(d) - r",
+     main = "L-function with CSR envelope — Tampines (Jan–Jun 2025)")
+
+# L for Punggol
+L_pg      <- Lest(rest_ppp_punggol_km, correction = "Ripley")
+L_pg.csr  <- envelope(rest_ppp_punggol_km, Lest, nsim = 99, rank = 1, glocal = TRUE)
+
+plot(L_pg.csr, . - r ~ r,
+     xlab = "Distance (m)", ylab = "L(d) - r",
+     main = "L-function with CSR envelope — Punggol (Jan–Jun 2025)")
+
+```
+
+### 10.3 Interactive L-function (ggplot → plotly)
+
+```{r}
+
+library(ggplot2)
+library(plotly)
+library(ggthemes)
+
+# --- Tampines ---
+L_tm_df <- as.data.frame(L_tm.csr)
+p_tm <- ggplot(L_tm_df, aes(r, obs - r)) +
+  geom_line() +
+  geom_line(aes(y = theo - r), linetype = "dashed", colour = "red") +
+  geom_ribbon(aes(ymin = lo - r, ymax = hi - r), alpha = 0.2) +
+  geom_rug(data = L_tm_df[L_tm_df$obs > L_tm_df$hi,], sides = "b") +  # significant clustering
+  geom_rug(data = L_tm_df[L_tm_df$obs < L_tm_df$lo,], sides = "b") +  # significant dispersion
+  xlab("Distance r (m)") + ylab("L(d) - r") +
+  ggtitle("Interactive L-function — Tampines") +
+  theme_tufte()
+ggplotly(p_tm, dynamicTicks = TRUE) |> rangeslider()
+
+# --- Punggol ---
+L_pg_df <- as.data.frame(L_pg.csr)
+p_pg <- ggplot(L_pg_df, aes(r, obs - r)) +
+  geom_line() +
+  geom_line(aes(y = theo - r), linetype = "dashed", colour = "red") +
+  geom_ribbon(aes(ymin = lo - r, ymax = hi - r), alpha = 0.2) +
+  geom_rug(data = L_pg_df[L_pg_df$obs > L_pg_df$hi,], sides = "b") +
+  geom_rug(data = L_pg_df[L_pg_df$obs < L_pg_df$lo,], sides = "b") +
+  xlab("Distance r (m)") + ylab("L(d) - r") +
+  ggtitle("Interactive L-function — Punggol") +
+  theme_tufte()
+ggplotly(p_pg, dynamicTicks = TRUE) |> rangeslider()
+
+```
+
+```{r}
+
+library(ggplot2); library(plotly); library(ggthemes)
+
+# --- Tampines ---
+stopifnot(exists("L_tm.csr"))
+L_tm_df <- as.data.frame(L_tm.csr)
+
+p_tm <- ggplot(L_tm_df, aes(r, obs - r)) +
+  geom_line() +
+  geom_line(aes(y = theo - r), linetype = "dashed", colour = "red") +
+  geom_ribbon(aes(ymin = lo - r, ymax = hi - r), alpha = 0.2) +
+  geom_rug(data = subset(L_tm_df, obs > hi), sides = "b") +      # clustering
+  geom_rug(data = subset(L_tm_df, obs < lo), sides = "b") +      # dispersion
+  xlab("Distance r (m)") + ylab("L(d) - r") +
+  ggtitle("Interactive L-function — Tampines") +
+  theme_tufte()
+ggplotly(p_tm, dynamicTicks = TRUE) |> rangeslider()
+
+# --- Punggol ---
+stopifnot(exists("L_pg.csr"))
+L_pg_df <- as.data.frame(L_pg.csr)
+
+p_pg <- ggplot(L_pg_df, aes(r, obs - r)) +
+  geom_line() +
+  geom_line(aes(y = theo - r), linetype = "dashed", colour = "red") +
+  geom_ribbon(aes(ymin = lo - r, ymax = hi - r), alpha = 0.2) +
+  geom_rug(data = subset(L_pg_df, obs > hi), sides = "b") +
+  geom_rug(data = subset(L_pg_df, obs < lo), sides = "b") +
+  xlab("Distance r (m)") + ylab("L(d) - r") +
+  ggtitle("Interactive L-function — Punggol") +
+  theme_tufte()
+ggplotly(p_pg, dynamicTicks = TRUE) |> rangeslider()
 
 ```
 
 
 
+### 10.4 Spatio-temporal Second-order Analysis (STIKhat)
+
+
 ```{r}
 
+### 10.4 Spatio-temporal Second-order Analysis (STIKhat) — STRICT REUSE
 
+library(spatstat.geom)
+library(sf)
+library(stpp)
 
+# Reuse-only guards
+stopifnot(exists("biz_56111_sf"),
+          exists("rest_ppp_tampines_km"),
+          exists("rest_ppp_punggol_km"),
+          "MONTH_NUM" %in% names(biz_56111_sf))
+
+# 1) Subset global sf by the *existing* PPP windows (no new polygons)
+coords_all <- st_coordinates(biz_56111_sf)
+
+inside_tm <- inside.owin(coords_all[,1], coords_all[,2], rest_ppp_tampines_km$window)
+inside_pg <- inside.owin(coords_all[,1], coords_all[,2], rest_ppp_punggol_km$window)
+
+rest_sf_tampines <- biz_56111_sf[inside_tm, ]
+rest_sf_punggol  <- biz_56111_sf[inside_pg, ]
+
+# 2) Drop rows with missing geometry or time mark (required by STIKhat)
+rest_sf_tampines <- rest_sf_tampines[!is.na(rest_sf_tampines$MONTH_NUM) & !st_is_empty(rest_sf_tampines), ]
+rest_sf_punggol  <- rest_sf_punggol[ !is.na(rest_sf_punggol$MONTH_NUM)  & !st_is_empty(rest_sf_punggol), ]
+
+# Helper to run STIKhat safely on an sf subset
+run_stik <- function(sf_subset, title_lbl) {
+  if (nrow(sf_subset) < 5L) {           # small-n guard; adjust if you wish
+    message(sprintf("[STIKhat skipped] %s has < 5 points after filtering.", title_lbl))
+    return(invisible(NULL))
+  }
+  coords <- st_coordinates(sf_subset)
+  # Ensure time is integer (Jan–Jun labels should already be 1..6 in your pipeline)
+  tvec <- as.integer(sf_subset$MONTH_NUM)
+  # Filter any remaining anomalies
+  good  <- is.finite(coords[,1]) & is.finite(coords[,2]) & is.finite(tvec)
+  coords <- coords[good, , drop = FALSE]
+  tvec   <- tvec[good]
+  if (length(tvec) < 5L) {
+    message(sprintf("[STIKhat skipped] %s has < 5 valid events after QC.", title_lbl))
+    return(invisible(NULL))
+  }
+  df <- data.frame(x = coords[,1], y = coords[,2], t = tvec)
+  stpp_obj <- as.3dpoints(df)
+  stik_obj <- STIKhat(stpp_obj)
+  plotK(stik_obj); title(main = sprintf("STIKhat contours — %s (Jan–Jun 2025)", title_lbl))
+  invisible(stik_obj)
+}
+
+# 3) Run for Tampines and Punggol (reused objects only)
+tm_stik <- run_stik(rest_sf_tampines, "Tampines")
+pg_stik <- run_stik(rest_sf_punggol,  "Punggol")
 ```
 
 
 
-```{r}
-
-
-
-```
-
-
 
 ```{r}
 
+# Reuse: biz_56111_sf (has MONTH_NUM, EPSG:3414)
+library(sf); library(stpp)
 
+coords_all <- st_coordinates(biz_56111_sf)
+ok <- is.finite(coords_all[,1]) & is.finite(coords_all[,2]) & is.finite(biz_56111_sf$MONTH_NUM)
 
-```
+df_all <- data.frame(
+  x = coords_all[ok, 1],
+  y = coords_all[ok, 2],
+  t = as.integer(biz_56111_sf$MONTH_NUM[ok])
+)
 
-
-
-```{r}
-
-
+stpp_all <- as.3dpoints(df_all)
+stik_all <- STIKhat(stpp_all)
+plotK(stik_all); title(main = "STIKhat contours — Restaurants, Island-wide (Jan–Jun 2025)")
 
 ```
 
