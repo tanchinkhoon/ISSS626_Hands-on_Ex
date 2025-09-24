@@ -734,9 +734,9 @@ The three KDE variants provide distinct perspectives on the spatial distribution
 For this exercise, we adopt the **Adaptive KDE** approach, as it strikes a balance between local detail and overall interpretability, making it well suited for planning, policy, and spatial decision-making in the Singapore context. Nonetheless, KDE is **sensitive to bandwidth choice and scale dependency**, and it does not account for underlying population or land-use factors. These limitations must be considered when interpreting the identified hotspots.
 
 
-### First-order SPPA at the Planning Subzone Level
+### First-order Spatial Point Pattern Analysis (SPPA) at the Planning Subzone Level
 
-This section applies First Order Spatial Point Pattern Analysis (SPPA) to assess how the distribution of restaurant locations varies across Singapore’s planning subzones. Unlike kernel density estimation at the continuous surface level, the subzone-based approach aggregates point counts into administrative boundaries, enabling direct comparison of spatial intensity relative to area size and population density. This allows us to identify subzones with unusually high or low restaurant concentrations, detect clustering patterns at a policy-relevant scale, and provide insights for urban planning and commercial decision-making.
+This section applies First Order SPPA to assess how the distribution of restaurant locations varies across Singapore’s planning subzones. Unlike kernel density estimation at the continuous surface level, the subzone-based approach aggregates point counts into administrative boundaries, enabling direct comparison of spatial intensity relative to area size and population density. This allows us to identify subzones with unusually high or low restaurant concentrations, detect clustering patterns at a policy-relevant scale, and provide insights for urban planning and commercial decision-making.
 
 #### Geospatial data wrangling
 
@@ -838,14 +838,17 @@ These differences confirm that KDE is effective in capturing the spatial heterog
 
 ### Spatio-Temporal KDE (STKDE) for Jan–Jun 2025
 
-In this section, we bring together the spatial and temporal dimensions of restaurant incorporations into a unified spatio-temporal analysis using Kernel Density Estimation (STKDE). The period of focus is January to June 2025, and the primary aim is to detect not only where incorporations cluster in space but also how these clusters evolve across time. The section begins with exploratory faceted maps that simply display the geographic distribution of restaurants month by month, offering a descriptive baseline. This is followed by computational STKDE at the monthly scale, where incorporation months are treated as temporal marks and used to generate a three-dimensional density surface across space (x, y) and time (t). Recognising that monthly aggregation can mask short-lived bursts of activity, the section then extends to day-level STKDE. By applying bootstrap bandwidth optimisation, the analysis achieves a careful balance between spatial and temporal smoothing, ensuring that density estimates capture meaningful patterns rather than artefacts of parameter choice. Finally, the section emphasises validation and interpretability, producing fixed-scale comparative panels that allow researchers to trace how hotspots intensify, persist, or dissipate across the study window. Overall, Section 9.9 transforms raw incorporation points into a dynamic surface that reveals the tempo and geography of restaurant entry, providing richer insight than purely spatial or purely temporal methods could offer in isolation.
+In this section, we bring together the spatial and temporal dimensions of restaurant incorporations into a unified spatio-temporal analysis using Kernel Density Estimation (STKDE). The period of focus is January to June 2025, and the primary aim is to detect not only where incorporations cluster in space but also how these clusters evolve across time. The section begins with exploratory faceted maps that simply display the geographic distribution of restaurants month by month, offering a descriptive baseline. This is followed by computational STKDE at the monthly scale, where incorporation months are treated as temporal marks and used to generate a three-dimensional density surface across space (x, y) and time (t). Recognising that monthly aggregation can mask short-lived bursts of activity, the section then extends to day-level STKDE. By applying bootstrap bandwidth optimisation, the analysis achieves a careful balance between spatial and temporal smoothing, ensuring that density estimates capture meaningful patterns rather than artefacts of parameter choice. Finally, the section emphasises validation and interpretability, producing fixed-scale comparative panels that allow researchers to trace how hotspots intensify, persist, or dissipate across the study window. Overall, Section 9.7 transforms raw incorporation points into a dynamic surface that reveals the tempo and geography of restaurant entry, providing richer insight than purely spatial or purely temporal methods could offer in isolation.
 
 #### Visualising geographic distribution by month
 
-Before advancing into formal spatio-temporal density estimation, the data is first explored visually to understand how restaurant incorporations are spread across Singapore from January to June 2025. Using the tmap package in static plot mode, individual incorporations are represented as dots, layered over the national planning boundary (sg_owin) to ensure geographic consistency. By applying tm_facets(by = "MONTH_ABBR"), the output generates a panel of maps, one for each month, which collectively illustrate how point distributions evolve across time. This faceted approach does not yet quantify clustering but serves as an intuitive diagnostic, highlighting months with visibly denser patterns or more dispersed incorporations. Such side-by-side visualisation is valuable for detecting preliminary trends—for example, whether activity is consistently concentrated in the central business districts or if new hotspots are emerging in suburban planning areas. As an exploratory step, these maps provide a baseline context that informs and motivates the more rigorous spatio-temporal KDE analysis developed later in the section.
+Before advancing into formal spatio-temporal density estimation, the data is first explored visually to understand how restaurant incorporations are spread across Singapore from January to June 2025. Using the tmap package in static plot mode, individual incorporations are represented as dots, layered over the national planning boundary (sg_owin) to ensure geographic consistency. By applying tm_facets (by = "MONTH_ABBR"), the output generates a panel of maps, one for each month, which collectively illustrate how point distributions evolve across time. This faceted approach does not yet quantify clustering but serves as an intuitive diagnostic, highlighting months with visibly denser patterns or more dispersed incorporations. Such side-by-side visualisation is valuable for detecting preliminary trends—for example, whether activity is consistently concentrated in the central business districts or if new hotspots are emerging in suburban planning areas. As an exploratory step, these maps provide a baseline context that informs and motivates the more rigorous spatio-temporal KDE analysis developed later in the section.
 
 
 ```{r}
+
+#| fig-width:
+#| fig-height: 8
 
 tmap::tmap_mode("plot")
 
@@ -859,6 +862,7 @@ tm_shape(biz_56111_sf) +
   tm_facets(by = "MONTH_ABBR", free.coords = FALSE, drop.units = TRUE)
 
 ```
+The monthly faceted maps reveal that new restaurant registrations between January and July 2025 are consistently concentrated in central and southern Singapore, particularly around Orchard and the Downtown Core. Peaks in activity occur in January, March, and June, while April and July show fewer openings, suggesting possible seasonality or regulatory timing in business formation. Outlying regions such as the north and east record more scattered entries, reflecting gradual suburban growth but lacking the intensity of core areas. Overall, the results confirm that spatial clustering in the city centre is persistent, while temporal fluctuations highlight business cycles that planners and policymakers should consider in managing urban foodscapes.
 
 #### STKDE by month
 
@@ -931,6 +935,14 @@ for (i in seq_along(t_idx)) {
 par(op)
 
 ```
+
+The spatio-temporal KDE (STKDE) surfaces provide a dynamic perspective on restaurant intensity across Singapore’s planning areas from January to July 2025. Unlike the static first-order SPPA, which offered a cumulative view of clustering, STKDE reveals how concentration shifts month by month.
+
+In the early months, February and March exhibit diffuse patterns with low overall intensity, indicating that restaurant registrations were spread broadly across several planning areas rather than concentrated in one location. April marks a sharp surge in activity, with central planning areas registering the highest intensity, exceeding 0.02 restaurants/km². This confirms the first-order result that central regions are the primary clusters but clarifies that the peak was temporally concentrated in April. Activity then disperses in May and June, with moderate levels appearing in eastern and western planning areas such as Tampines and Jurong West, suggesting a decentralization of openings. By July, the overall intensity weakens further, reflecting fewer new registrations across the island and confirming that April’s central spike was an anomaly rather than a sustained trend.
+
+Importantly, these outputs are not counts of restaurants but model-derived intensities. The kernel estimator smooths each restaurant registration across space and time according to the selected bandwidths. As a result, the maps report expected density in restaurants per km² per day, not literal fractions of a restaurant, providing a probabilistic representation of clustering strength over space-time.
+
+In summary, STKDE supports the first-order SPPA finding of central dominance but introduces essential temporal nuance: clustering was episodic, peaking in April, while other planning areas intermittently absorbed activity. This demonstrates the value of spatio-temporal methods in distinguishing short-lived bursts from longer-term geographic concentration.
 
 #### STKDE by day-of-year (improved bandwidths via BOOT.spattemp)
 
@@ -1035,22 +1047,11 @@ par(op)
 ```
 
 
+The SSTKDE by day-of-year refines the island-wide analysis by tracking how restaurant clustering changes on a daily basis rather than relying on monthly or static snapshots. The model evaluates intensities across a 3D lattice (128 × 128 × 212), producing values that range from $5.3 x 10^-48$  to $1.25 x 10^-8$ restaurants per $km^2$ per day. The lower bound corresponds to background zero activity, while the upper bound marks the maximum hotspot intensity observed on peak days.
 
+When compared with first-order SPPA at the planning area level, which showed Orchard as the clear hotspot and weaker but noticeable activity in Jurong West, Tampines, and Punggol, the STKDE reveals that these clusters are highly time-dependent. Orchard’s concentration does not persist uniformly across the study period; instead, it appears in sharp bursts of activity that quickly dissipate. Jurong West and Tampines show only modest clustering spread over time, while Punggol remains marginal with scattered, intermittent signals. This temporal fluctuation is invisible in static SPPA maps, which aggregate activity and risk overstating long-term persistence.
 
-```{r}
-
-
-
-```
-
-
-
-```{r}
-
-
-
-```
-
+Importantly, these outputs are not counts of restaurants but model-derived intensities. The kernel estimator smooths each restaurant registration across space and time according to the selected bandwidths. As a result, the maps report expected density in restaurants per km² per day, not literal fractions of a restaurant, providing a probabilistic representation of clustering strength over space-time.
 
 
 ```{r}
