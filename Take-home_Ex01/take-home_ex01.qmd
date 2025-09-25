@@ -2,7 +2,7 @@
 title: "Take-home Ex01: Geospatial Analytics for Public Good"
 author: "TAN Chin Khoon"
 date: "September 24, 2025"
-date-modified: "last-modified"
+date-modified: "September 24, 2025"
 number-sections: true
 execute: 
   eval: true
@@ -15,7 +15,7 @@ execute:
 
 ## Introduction
 
-Restaurants are a sensitive barometer of urban vitality: they emerge where pedestrian flows, accessibility, and complementary land uses intersect, and they amplify activity through agglomeration effects. This study examines the **first-order** (intensity) and **second-order** (interaction) properties of **new restaurant registrations** in Singapore between 1 January 2025 and 30 June 2025. The workflow comprises five steps: (i) **tidying** ACRA registration records, (ii) **geocoding** 6-digit postcodes via **OneMap**, (iii) projecting to **SVY21 (EPSG:3414)** to preserve distance accuracy, (iv) estimating **kernel densities** using fixed and adaptive bandwidths to reveal spatial concentrations over time, and (v) applying **Ripley's $L/K$ functions with Complete Spatial Randomness (CSR) envelopes** to identify statistically significant clustering scales. The results are interpreted through the lens of **planning and urban management**, with implications for town-centre provisioning, licensing cadence, last-mile logistics, and transit-oriented development.
+Restaurants are a sensitive barometer of urban vitality: they emerge where pedestrian flows, accessibility, and complementary land uses intersect, and they amplify activity through agglomeration effects. This study examines the **first-order** (intensity) and **second-order** (interaction) properties of **new restaurant registrations** in Singapore between 1 January 2025 and 30 June 2025. The workflow comprises five steps: (i) **tidying** ACRA registration records, (ii) **geocoding** 6-digit postcodes via **OneMap**, (iii) projecting to **SVY21 (EPSG:3414)** to preserve distance accuracy, (iv) estimating **kernel densities** using fixed and adaptive bandwidths to reveal spatial concentrations over time, and (v) applying **Ripley's** $L/K$ functions with Complete Spatial Randomness (CSR) envelopes to identify statistically significant clustering scales. The results are interpreted through the lens of **planning and urban management**, with implications for town-centre provisioning, licensing cadence, last-mile logistics, and transit-oriented development.
 
 ## The Data
 
@@ -533,7 +533,7 @@ qa_map_pa_int
 
 ```
 
-## First-Order Analysis: Kernel Density Estimation (KDE)
+## First-order analysis: Kernel Density Estimation (KDE)
 
 This section investigates the **first-order intensity** of new restaurant registrations using **KDE**. We first estimate intensity surfaces for all Singapore (national level). Next, we drill down to the planning subzone level to highlight local variations. Finally, we extend to **spatio-temporal KDE (STKDE)** to capture dynamics across both **space and time (Jan--Jun 2025)**.
 
@@ -579,7 +579,7 @@ The plot shows the spatial distribution of 677 restaurants across Singapore, rep
 
 ### Bandwidth estimation (km scale)
 
-The bandwidth ($\sigma$) controls the degree of spatial smoothing in kernel density estimation and therefore determines how finely or coarsely local clusters are represented. Choosing $\sigma$ well is essential: too small a value creates noisy, spike-like artefacts that can be mistaken for meaningful hotspots; too large a value can blur important local variation and hide genuine clusters. In this study, the working unit is kilometers, so all bandwidths are reported and interpreted in km. We first obtain a data-driven σ using Diggle's cross-validation approach, which balances bias and variance without manual tuning. We then compute three commonly used alternatives---CvL (Cronie--van Lieshout), Scott's rule, and PPL (profile likelihood)---to understand the sensitivity of our analysis to bandwidth choice. Reporting several selectors is good practice for transparency, but in the next subsection we will use the Diggle value as the principal $\sigma$ and compare it with a fixed σ (0.6 km) and an adaptive method.
+The bandwidth ($\sigma$) controls the degree of spatial smoothing in kernel density estimation and therefore determines how finely or coarsely local clusters are represented. Choosing $\sigma$ well is essential: too small a value creates noisy, spike-like artefacts that can be mistaken for meaningful hotspots; too large a value can blur important local variation and hide genuine clusters. In this study, the working unit is kilometers, so all bandwidths are reported and interpreted in km. We first obtain a data-driven σ using Diggle's cross-validation approach, which balances bias and variance without manual tuning. We then compute three commonly used alternatives---CvL (Cronie--van Lieshout), Scott's rule, and PPL (profile likelihood)---to understand the sensitivity of our analysis to bandwidth choice. Reporting several selectors is good practice for transparency, but in the next subsection we will use the Diggle value as the principal $\sigma$ and compare it with a fixed $\sigma$ (0.6 km) and an adaptive method.
 
 ```{r}
 
@@ -1093,7 +1093,7 @@ plot(K_pg.csr, . - r ~ r,
 
 ```
 
-The CSR test based on 999 simulations provides strong evidence about the spatial distribution of restaurants in both Tampines and Punggol during January to June 2025. In Punggol, the observed $K$-function lies consistently above the theoretical CSR curve and breaches the Monte Carlo simulation envelope at short distances below one kilometer. This indicates statistically significant clustering at small spatial scales, meaning that restaurants in Punggol are concentrated in tightly defined nodes rather than being randomly distributed. The clustering pattern is consistent with the urban design of Punggol, where food and beverage outlets are typically colocated within neighbourhood centres and mall-based developments. With 999 simulations, the envelope crossing confirms that this clustering is highly unlikely to occur by chance alone, meeting the strict threshold of p \< 0.001.
+The CSR test based on 999 simulations provides strong evidence about the spatial distribution of restaurants in both Tampines and Punggol during January to June 2025. In Punggol, the observed $K$-function lies consistently above the theoretical CSR curve and breaches the Monte Carlo simulation envelope at short distances below one kilometer. This indicates statistically significant clustering at small spatial scales, meaning that restaurants in Punggol are concentrated in tightly defined nodes rather than being randomly distributed. The clustering pattern is consistent with the urban design of Punggol, where food and beverage outlets are typically colocated within neighbourhood centres and mall-based developments. With 999 simulations, the envelope crossing confirms that this clustering is highly unlikely to occur by chance alone, meeting the strict threshold of $p$ \< 0.001.
 
 In Tampines, the observed $K$-function remains largely within the CSR envelope at short distances, but at wider spatial scales of around one to one and a half kilometers the observed curve rises above the envelope. This shows that clustering is not only present but emerges more strongly at broader scales, reflecting Tampines' role as a mature regional hub with multiple commercial centres distributed across the planning area. Rather than being confined to a single hotspot, restaurant registrations in Tampines form clusters across several sub-districts, which together create a pattern of multi-nodal concentration. The CSR test with 999 simulations confirms that this clustering is statistically significant under the strict alpha level of 0.001, indicating that the observed pattern cannot be explained by random chance.
 
@@ -1193,6 +1193,10 @@ plotK(stik_all); title(main = "STIKhat contours — Restaurants, Island-wide (Ja
 
 ```
 
+![](Warning_Message.png)
+
+![](STIKhat.png)
+
 The spatio-temporal $K$-function analysis using STIKhat for restaurants across Singapore from January to June 2025 highlights clustering tendencies at short spatial and temporal scales, but it also generates a warning about duplicated points in the dataset. These duplicated points occur when two or more establishments share exactly the same location and the same registration month, for example when multiple restaurants are registered at the same address in the same month. In practice, such duplications are meaningful because they represent real business activity and are not errors introduced during data wrangling. Removing them would distort the true intensity of clustering, particularly in commercial hubs such as malls or mixed-use developments where multiple outlets may legitimately appear together. Therefore, the correct approach in this context is to retain the duplicated points, acknowledging that they contribute to clustering patterns. At the same time, analysts must be cautious in interpretation, as high clustering detected at very fine scales may partly reflect these duplicates. Rather than deleting them, it is more appropriate to report their presence, explain their effect, and emphasize that they are an inherent part of the business landscape being studied. This ensures statistical validity while maintaining fidelity to the real-world phenomenon under investigation.
 
 ## Discussion
@@ -1209,19 +1213,29 @@ Finally, **RQ4 (Planning/Management Implications)** highlights the policy releva
 
 Overall, the combination of first- and second-order analyses, coupled with spatio-temporal modelling, provides strong empirical evidence that restaurant formation in early 2025 was spatially clustered, temporally bursty, and structured by Singapore's polycentric urban form. These findings are directly actionable for urban planning, licensing cadence, and economic development strategy.
 
-## References:
+## Conclusion
 
-- Ben-Said, M., 2021. Spatial point-pattern analysis as a powerful tool in identifying pattern-process relationships in plant ecology: an updated review. Ecological Processes, 10, p.56. https://doi.org/10.1186/s13717-021-00314-4  
+This exercise examined the spatial and spatio-temporal patterns of restaurants in Singapore using SSIC 56111 data within the URA Master Plan 2019 subzone framework. The first-order analysis, including kernel density estimation, highlighted uneven restaurant distribution, with strong concentrations in central commercial districts and mature residential areas while peripheral zones showed weaker intensities.
 
-- Ding, X., Zheng, F., Lyu, G. et al., 2025. An exploration of the spatial and temporal factors influencing industrial park vitality using multi-source geospatial data. Scientific Reports, 15, p.29584. https://doi.org/10.1038/s41598-025-15294-0  
+Second-order analysis with the $K$- and $L$-functions, supported by Monte Carlo envelope tests under CSR, provided statistical confirmation that restaurants are significantly clustered rather than randomly distributed. The observed curves consistently lay outside the theoretical expectation, and the CSR tests with 999 simulations ($p < 0.001$) led to rejection of the null hypothesis of randomness. The interactive $L$-function further clarified the spatial ranges where clustering is strongest, adding interpretive depth to the findings.
 
-- Kam, T.S., 2025. Hands-on Exercise: Chapter 4: 1st Order Spatial Point Pattern Analysis Method. Available at: https://r4gdsa.netlify.app/chap04 [Accessed September 2025].  
+The spatio-temporal analysis using STIKhat extended this perspective, showing that clustering is most evident at small spatial and temporal lags. This indicates that restaurants do not emerge independently but often appear in bursts, reflecting urban development cycles, commercial demand, and policy dynamics.
 
-- Kam, T.S., 2025. Hands-on Exercise: Chapter 5: 2nd Order Spatial Point Pattern Analysis Method. Available at: https://r4gdsa.netlify.app/chap04 [Accessed September 2025].  
+Taken together, the findings directly answer the research questions: restaurants in Singapore are not randomly distributed but clustered, clustering occurs at identifiable spatial scales, and temporal dynamics reveal episodic bursts of establishment. These insights underline the value of geospatial analytics for public good by providing robust, evidence-based understanding of how services concentrate across both space and time, offering clear implications for urban and commercial planning.
 
-- Kam, T.S., 2025. In-class Exercise 3a: Interactive K-function. Available at: https://isss626-ay2025-26aug.netlify.app/in-class_ex/in-class_ex03/in-class_ex03a [Accessed September 2025].  
 
-- Kam, T.S., 2025. In-class Exercise 3b: Working with Open Government Data. Available at: https://isss626-ay2025-26aug.netlify.app/in-class_ex/in-class_ex03/in-class_ex03b#/title-slide [Accessed September 2025].  
+## References
 
-- Park, S., Seo, H. & Koo, H., 2023. Exploring the spatio-temporal clusters of closed restaurants after the COVID-19 outbreak in Seoul using relative risk surfaces. Scientific Reports, 13, p.13889. https://doi.org/10.1038/s41598-023-40937-5
+-   Ben-Said, M., 2021. Spatial point-pattern analysis as a powerful tool in identifying pattern-process relationships in plant ecology: an updated review. Ecological Processes, 10, p.56. https://doi.org/10.1186/s13717-021-00314-4
 
+-   Ding, X., Zheng, F., Lyu, G. et al., 2025. An exploration of the spatial and temporal factors influencing industrial park vitality using multi-source geospatial data. Scientific Reports, 15, p.29584. https://doi.org/10.1038/s41598-025-15294-0
+
+-   Kam, T.S., 2025. Hands-on Exercise: Chapter 4: 1st Order Spatial Point Pattern Analysis Method. Available at: https://r4gdsa.netlify.app/chap04 \[Accessed September 2025\].
+
+-   Kam, T.S., 2025. Hands-on Exercise: Chapter 5: 2nd Order Spatial Point Pattern Analysis Method. Available at: https://r4gdsa.netlify.app/chap04 \[Accessed September 2025\].
+
+-   Kam, T.S., 2025. In-class Exercise 3a: Interactive K-function. Available at: https://isss626-ay2025-26aug.netlify.app/in-class_ex/in-class_ex03/in-class_ex03a \[Accessed September 2025\].
+
+-   Kam, T.S., 2025. In-class Exercise 3b: Working with Open Government Data. Available at: https://isss626-ay2025-26aug.netlify.app/in-class_ex/in-class_ex03/in-class_ex03b#/title-slide \[Accessed September 2025\].
+
+-   Park, S., Seo, H. & Koo, H., 2023. Exploring the spatio-temporal clusters of closed restaurants after the COVID-19 outbreak in Seoul using relative risk surfaces. Scientific Reports, 13, p.13889. https://doi.org/10.1038/s41598-023-40937-5
