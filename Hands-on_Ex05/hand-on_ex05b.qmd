@@ -1,5 +1,5 @@
 ---
-title: "Hands-on Ex05b"
+title: "Hands-on Ex5b"
 author: "TAN Chin Khoon"
 date: "26 September 2025"
 date-modified: "last-modified"
@@ -86,8 +86,6 @@ hunan <-
 ```
 
 ### 10.3.4 Visualising the regional indicator (equal vs quantile)
-
-
 
 ```{r}
 
