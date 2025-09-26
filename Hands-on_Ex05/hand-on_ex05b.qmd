@@ -1,0 +1,322 @@
+---
+title: "Hands-on Ex05b"
+author: "TAN Chin Khoon"
+date: "26 September 2025"
+date-modified: "last-modified"
+---
+
+# 10 Local Measures of Spatial Autocorrelation
+
+## 10.1 Overview
+
+We will import geospatial and aspatial data for **Hunan Province (county level)**, join attributes, visualise a regional indicator (GDP per capita, GDPPC), build **contiguity** and **distance** spatial weights, and compute two local spatial statistics:
+
+- **Local Moran’s I (LISA)** for cluster/outlier detection.
+- **Getis–Ord Gi* for Hot/Cold Spot** analysis (HCSA).
+
+We will then create choropleths for I values, $p$-values, **LISA clusters ($p < 0.05%$)**, and **HCSA clusters ($p < 0.05$)**, plus Moran scatterplots (raw and standardised).
+
+## 10.2 Getting Started
+
+### 10.2.1 The analytical question
+
+In spatial policy, one of the main development objective of the local govenment and planners is to ensure equal distribution of development in the province. Our task in this study, hence, is to apply appropriate spatial statistical methods to discover if development are even distributed geographically. If the answer is **No**. Then, our next question will be “is there sign of spatial clustering?”. And, if the answer for this question is yes, then our next question will be “where are these clusters?”
+
+In this case study, we are interested to examine the spatial pattern of a selected development indicator (i.e. GDP per capita) of Hunan Provice, People Republic of China.(https://en.wikipedia.org/wiki/Hunan)
+
+### 10.2.2 Study area and data
+
+Two data sets will be used in this hands-on exercise, they are:  
+
+- Hunan province administrative boundary layer at county level (Geospatial). This is a geospatial data set in ESRI shapefile format.
+- Hunan_2012.csv (Aspatial): This csv file contains selected Hunan’s local development indicators in 2012.
+
+### 10.2.3 Analytical tools
+
+```{r}
+
+# load packages (installs missing ones, then attaches)
+pacman::p_load(sf, sfdep, tmap, tidyverse)  # sf for spatial data; sfdep for spatial stats;
+                                            # tmap for mapping; tidyverse for wrangling/ggplot
+
+```
+
+## 10.3 Getting the data into R
+
+```{r}
+
+# --- 10.3.1 Import shapefile into R environment -----------------------------
+
+hunan <- 
+  st_read(                      # read a spatial layer from disk
+    dsn   = "data/geospatial",  # folder containing the shapefile set
+    layer = "Hunan"             # layer name (without .shp)
+  ) %>% 
+  
+  # reproject from WGS84 to UTM zone 50N (EPSG:32650)
+  # (projected CRS is recommended for spatial analysis)
+  st_transform(crs = 32650)        
+  
+
+```
+
+::: {.callout-tip}
+
+The raw data is in WGS 84 geographic coordinates system. For geospatial analysis, it is appropriate to use projected coordinates system. In the code chunk above, st_transform() is used to transform Hunan geospatial data from WGS 84 to UTM zone 50N (i.e. EPSG: 32650).
+
+:::
+
+```{r}
+
+# --- 10.3.2 Import CSV into R environment ----------------------------------
+
+hunan2012 <- 
+  readr::read_csv("data/aspatial/Hunan_2012.csv")  # read the attribute table (tabular CSV)
+
+```
+
+```{r}
+
+# --- 10.3.3 Join attributes into the sf object ------------------------------
+
+hunan <- 
+  left_join(hunan, hunan2012) %>%  # left join by the shared key column(s) (kept from shapefile)
+  select(1:4, 7, 15)               # keep only the columns used in this exercise (as per lesson)
+
+```
+
+### 10.3.4 Visualising the regional indicator (equal vs quantile)
+
+
+
+```{r}
+
+equal <- tm_shape(hunan) +
+  tm_polygons(fill = "GDPPC",
+              fill.scale = tm_scale_intervals(
+                style = "equal",
+                n = 5,
+                values = "brewer.blues"),
+              fill.legend = tm_legend(
+                title = "GDPPC",
+                position = tm_pos_in(
+                  "left", "bottom"))) + 
+  tm_borders(fill_alpha = 0.5) +
+  tm_title("Equal interval classification")
+
+quantile <- tm_shape(hunan) +
+  tm_polygons(fill = "GDPPC",
+              fill.scale = tm_scale_intervals(
+                style = "quantile",
+                n = 5,
+                values = "brewer.blues"),
+              fill.legend = tm_legend(
+                title = "GDPPC",
+                position = tm_pos_in(
+                  "left", "bottom"))) + 
+  tm_borders(fill_alpha = 0.5) +
+  tm_title("Quantile interval classification")
+
+tmap_arrange(equal, 
+             quantile, 
+             asp=1, 
+             ncol=2)
+
+```
+
+
+
+```{r}
+
+
+
+```
+
+
+
+
+```{r}
+
+
+
+```
+
+
+
+```{r}
+
+
+
+```
+
+
+
+```{r}
+
+
+
+```
+
+
+
+
+```{r}
+
+
+
+```
+
+
+
+
+```{r}
+
+
+
+```
+
+
+
+
+```{r}
+
+
+
+```
+
+
+
+
+```{r}
+
+
+
+```
+
+
+
+
+
+```{r}
+
+
+
+```
+
+
+
+
+```{r}
+
+
+
+```
+
+
+
+
+```{r}
+
+
+
+```
+
+
+
+
+```{r}
+
+
+
+```
+
+
+
+```{r}
+
+
+
+```
+
+
+
+
+```{r}
+
+
+
+```
+
+
+
+
+```{r}
+
+
+
+```
+
+
+
+```{r}
+
+
+
+```
+
+
+
+```{r}
+
+
+
+```
+
+
+
+
+```{r}
+
+
+
+```
+
+
+
+```{r}
+
+
+
+```
+
+
+
+
+```{r}
+
+
+
+```
+
+
+
+
+```{r}
+
+
+
+```
+
+
+
+
+```{r}
+
+
+
+```
+
+
+
+
+
