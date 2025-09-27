@@ -136,6 +136,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     </a>
     <ul class="dropdown-menu" aria-labelledby="nav-menu-hands-on-exercise">    
         <li>
+    <a class="dropdown-item" href="../Hands-on_Ex05/Hand-on_Ex05b">
+ <span class="dropdown-text">Hands-on Exercise 5b</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../Hands-on_Ex05/Hand-on_Ex05a">
+ <span class="dropdown-text">Hands-on Exercise 5a</span></a>
+  </li>  
+        <li>
     <a class="dropdown-item" href="../Hands-on_Ex04/Hand-on_Ex04">
  <span class="dropdown-text">Hands-on Exercise 4</span></a>
   </li>  
@@ -159,7 +167,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     </a>
     <ul class="dropdown-menu" aria-labelledby="nav-menu-in-class-exercise">    
         <li>
-    <a class="dropdown-item" href="../In-Class_Ex04/in-class_ex4">
+    <a class="dropdown-item" href="../In-Class_Ex05/in-class_ex05">
+ <span class="dropdown-text">In-class Exercise 5</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../In-Class_Ex04/in-class_ex04">
  <span class="dropdown-text">In-class Exercise 4</span></a>
   </li>  
         <li>
@@ -169,6 +181,17 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
         <li>
     <a class="dropdown-item" href="../In-Class_Ex03/in-class_Ex03a">
  <span class="dropdown-text">In-class Exercise 3a</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-take-home-exercise" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Take-home Exercise</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-take-home-exercise">    
+        <li>
+    <a class="dropdown-item" href="../Take-home_Ex01/take-home_ex01">
+ <span class="dropdown-text">Take-home Exercise 1</span></a>
   </li>  
     </ul>
   </li>
@@ -210,7 +233,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <ul>
   <li><a href="#loading-the-package" id="toc-loading-the-package" class="nav-link active" data-scroll-target="#loading-the-package">Loading the package</a></li>
   <li><a href="#preparing-the-data" id="toc-preparing-the-data" class="nav-link" data-scroll-target="#preparing-the-data">Preparing the Data</a>
-  <ul class="collapse">
+  <ul>
   <li><a href="#importing-hunan-shapefile" id="toc-importing-hunan-shapefile" class="nav-link" data-scroll-target="#importing-hunan-shapefile">Importing Hunan shapefile</a></li>
   <li><a href="#importing-hunan-2012-table" id="toc-importing-hunan-2012-table" class="nav-link" data-scroll-target="#importing-hunan-2012-table">Importing Hunan 2012 table</a></li>
   <li><a href="#joining-hunan-and-hunan_2012" id="toc-joining-hunan-and-hunan_2012" class="nav-link" data-scroll-target="#joining-hunan-and-hunan_2012">Joining Hunan and Hunan_2012</a></li>
@@ -218,23 +241,37 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#mapping-gdppc" id="toc-mapping-gdppc" class="nav-link" data-scroll-target="#mapping-gdppc">Mapping GDPPC</a></li>
   <li><a href="#converting-to-spatialpolygondataframe" id="toc-converting-to-spatialpolygondataframe" class="nav-link" data-scroll-target="#converting-to-spatialpolygondataframe">Converting to SpatialPolygonDataFrame</a></li>
   <li><a href="#geographically-weighted-summary-statistics-with-adaptive-bandwidth" id="toc-geographically-weighted-summary-statistics-with-adaptive-bandwidth" class="nav-link" data-scroll-target="#geographically-weighted-summary-statistics-with-adaptive-bandwidth">Geographically Weighted Summary Statistics with adaptive bandwidth</a>
+  <ul>
+  <li><a href="#determine-adaptive-bandwidth" id="toc-determine-adaptive-bandwidth" class="nav-link" data-scroll-target="#determine-adaptive-bandwidth">Determine adaptive bandwidth</a>
   <ul class="collapse">
-  <li><a href="#determine-adaptive-bandwidth" id="toc-determine-adaptive-bandwidth" class="nav-link" data-scroll-target="#determine-adaptive-bandwidth">Determine adaptive bandwidth</a></li>
+  <li><a href="#cross-validation" id="toc-cross-validation" class="nav-link" data-scroll-target="#cross-validation">Cross-validation</a></li>
+  <li><a href="#aic" id="toc-aic" class="nav-link" data-scroll-target="#aic">AIC</a></li>
+  </ul></li>
   <li><a href="#computing-geographically-wieghted-summary-statistics" id="toc-computing-geographically-wieghted-summary-statistics" class="nav-link" data-scroll-target="#computing-geographically-wieghted-summary-statistics">Computing geographically wieghted summary statistics</a></li>
   <li><a href="#preparing-the-output-data" id="toc-preparing-the-output-data" class="nav-link" data-scroll-target="#preparing-the-output-data">Preparing the output data</a></li>
   <li><a href="#visualising-geographically-weighted-summary-statistic" id="toc-visualising-geographically-weighted-summary-statistic" class="nav-link" data-scroll-target="#visualising-geographically-weighted-summary-statistic">Visualising geographically weighted summary statistic</a></li>
   </ul></li>
   <li><a href="#geographically-weighted-summary-statistics-with-fixed" id="toc-geographically-weighted-summary-statistics-with-fixed" class="nav-link" data-scroll-target="#geographically-weighted-summary-statistics-with-fixed">Geographically Weighted Summary Statistics with fixed</a>
+  <ul>
+  <li><a href="#determine-fixed-bandwodth" id="toc-determine-fixed-bandwodth" class="nav-link" data-scroll-target="#determine-fixed-bandwodth">Determine fixed bandwodth</a>
   <ul class="collapse">
-  <li><a href="#determine-fixed-bandwodth" id="toc-determine-fixed-bandwodth" class="nav-link" data-scroll-target="#determine-fixed-bandwodth">Determine fixed bandwodth</a></li>
+  <li><a href="#cross-validation-1" id="toc-cross-validation-1" class="nav-link" data-scroll-target="#cross-validation-1">Cross-validation</a></li>
+  <li><a href="#aic-1" id="toc-aic-1" class="nav-link" data-scroll-target="#aic-1">AIC</a></li>
+  </ul></li>
   <li><a href="#computing-adaptive-bandwidth" id="toc-computing-adaptive-bandwidth" class="nav-link" data-scroll-target="#computing-adaptive-bandwidth">Computing adaptive bandwidth</a></li>
   <li><a href="#preparing-the-output-data-1" id="toc-preparing-the-output-data-1" class="nav-link" data-scroll-target="#preparing-the-output-data-1">Preparing the output data</a></li>
   <li><a href="#visualising-geographically-weighted-summary-statistics" id="toc-visualising-geographically-weighted-summary-statistics" class="nav-link" data-scroll-target="#visualising-geographically-weighted-summary-statistics">Visualising geographically weighted summary statistics</a></li>
   </ul></li>
   <li><a href="#geographically-weighted-correlation-with-adaptive-bandwidth" id="toc-geographically-weighted-correlation-with-adaptive-bandwidth" class="nav-link" data-scroll-target="#geographically-weighted-correlation-with-adaptive-bandwidth">Geographically Weighted Correlation with Adaptive Bandwidth</a>
-  <ul class="collapse">
+  <ul>
   <li><a href="#conventional-statistical-solution" id="toc-conventional-statistical-solution" class="nav-link" data-scroll-target="#conventional-statistical-solution">Conventional statistical solution</a></li>
-  <li><a href="#geospatial-analytics-solution" id="toc-geospatial-analytics-solution" class="nav-link" data-scroll-target="#geospatial-analytics-solution">Geospatial analytics solution</a></li>
+  <li><a href="#geospatial-analytics-solution" id="toc-geospatial-analytics-solution" class="nav-link" data-scroll-target="#geospatial-analytics-solution">Geospatial analytics solution</a>
+  <ul class="collapse">
+  <li><a href="#determine-the-bandwidth" id="toc-determine-the-bandwidth" class="nav-link" data-scroll-target="#determine-the-bandwidth">Determine the bandwidth</a></li>
+  <li><a href="#computing-gwcorrelation" id="toc-computing-gwcorrelation" class="nav-link" data-scroll-target="#computing-gwcorrelation">Computing gwCorrelation</a></li>
+  <li><a href="#extracting-the-result" id="toc-extracting-the-result" class="nav-link" data-scroll-target="#extracting-the-result">Extracting the result</a></li>
+  <li><a href="#visualising-local-correlation" id="toc-visualising-local-correlation" class="nav-link" data-scroll-target="#visualising-local-correlation">Visualising Local Correlation</a></li>
+  </ul></li>
   </ul></li>
   </ul>
 </nav>
@@ -268,7 +305,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <div>
     <div class="quarto-title-meta-heading">Modified</div>
     <div class="quarto-title-meta-contents">
-      <p class="date-modified">September 20, 2025</p>
+      <p class="date-modified">September 27, 2025</p>
     </div>
   </div>
     
@@ -669,17 +706,17 @@ Adaptive bandwidth (number of nearest neighbours): 84 AICc value: 1869.537 </cod
 <h4 class="anchored" data-anchor-id="visualising-local-correlation">Visualising Local Correlation</h4>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_shape</span>(hunan_Corr) <span class="sc">+</span></span>
-<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_fill</span>(<span class="st">"gwSpearman"</span>,</span>
-<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>          <span class="at">n =</span> <span class="dv">5</span>,</span>
-<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a>          <span class="at">style =</span> <span class="st">"quantile"</span>) <span class="sc">+</span></span>
-<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_borders</span>(<span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
-<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_layout</span>(<span class="at">main.title =</span> <span class="st">"Local Spearman Rho"</span>,</span>
-<span id="cb38-7"><a href="#cb38-7" aria-hidden="true" tabindex="-1"></a>            <span class="at">main.title.position =</span> <span class="st">"center"</span>,</span>
-<span id="cb38-8"><a href="#cb38-8" aria-hidden="true" tabindex="-1"></a>            <span class="at">main.title.size =</span> <span class="fl">2.0</span>,</span>
-<span id="cb38-9"><a href="#cb38-9" aria-hidden="true" tabindex="-1"></a>            <span class="at">legend.text.size =</span> <span class="fl">1.2</span>,</span>
-<span id="cb38-10"><a href="#cb38-10" aria-hidden="true" tabindex="-1"></a>            <span class="at">legend.height =</span> <span class="fl">1.50</span>, </span>
-<span id="cb38-11"><a href="#cb38-11" aria-hidden="true" tabindex="-1"></a>            <span class="at">legend.width =</span> <span class="fl">1.50</span>,</span>
-<span id="cb38-12"><a href="#cb38-12" aria-hidden="true" tabindex="-1"></a>            <span class="at">frame =</span> <span class="cn">TRUE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_polygons</span>(<span class="at">fill =</span> <span class="st">"gwSpearman"</span>,</span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>              <span class="at">fill.scale =</span> <span class="fu">tm_scale_intervals</span>(</span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a>                <span class="at">style =</span> <span class="st">"quantile"</span>,</span>
+<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a>                <span class="at">n =</span> <span class="dv">5</span>,</span>
+<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a>                <span class="at">values =</span> <span class="st">"brewer.blues"</span>),</span>
+<span id="cb38-7"><a href="#cb38-7" aria-hidden="true" tabindex="-1"></a>              <span class="at">fill.legend =</span> <span class="fu">tm_legend</span>(</span>
+<span id="cb38-8"><a href="#cb38-8" aria-hidden="true" tabindex="-1"></a>                <span class="at">title =</span> <span class="st">"local Spearman Rho"</span>)) <span class="sc">+</span></span>
+<span id="cb38-9"><a href="#cb38-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_borders</span>(<span class="at">fill_alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb38-10"><a href="#cb38-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_title</span>(<span class="st">"Local Spearman Rho"</span>, </span>
+<span id="cb38-11"><a href="#cb38-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">size =</span> <span class="fl">2.0</span>) <span class="sc">+</span></span>
+<span id="cb38-12"><a href="#cb38-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_layout</span>(<span class="at">frame =</span> <span class="cn">TRUE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">

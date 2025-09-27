@@ -325,17 +325,17 @@ hunan_Corr <- cbind(hunan_sf, gwstat_df)
 ```{r}
 
 tm_shape(hunan_Corr) +
-  tm_fill("gwSpearman",
-          n = 5,
-          style = "quantile") +
-  tm_borders(alpha = 0.5) +
-  tm_layout(main.title = "Local Spearman Rho",
-            main.title.position = "center",
-            main.title.size = 2.0,
-            legend.text.size = 1.2,
-            legend.height = 1.50, 
-            legend.width = 1.50,
-            frame = TRUE)
+  tm_polygons(fill = "gwSpearman",
+              fill.scale = tm_scale_intervals(
+                style = "quantile",
+                n = 5,
+                values = "brewer.blues"),
+              fill.legend = tm_legend(
+                title = "local Spearman Rho")) +
+  tm_borders(fill_alpha = 0.5) +
+  tm_title("Local Spearman Rho", 
+  size = 2.0) +
+  tm_layout(frame = TRUE)
 
 ```
 
