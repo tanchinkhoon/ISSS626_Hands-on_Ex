@@ -9,7 +9,7 @@
 <meta name="author" content="TAN Chin Khoon">
 <meta name="dcterms.date" content="2025-09-24">
 
-<title>In-class Exercise 5: Global and Local Measures of Spatial Autocorrelation: sfdep methods – ISSS626</title>
+<title>In-class Exercise 5 – ISSS626</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -281,7 +281,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">In-class Exercise 5: Global and Local Measures of Spatial Autocorrelation: sfdep methods</h1>
+<h1 class="title">In-class Exercise 5</h1>
 </div>
 
 
@@ -332,10 +332,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="the-data" class="level2" data-number="1.3">
 <h2 data-number="1.3" class="anchored" data-anchor-id="the-data"><span class="header-section-number">1.3</span> The data</h2>
-<p>For the purpose of this in-class exercise, the Hunan data sets will be used. There are two data sets in this use case, they are:<br>
-- Hunan, a geospatial data set in ESRI shapefile format, and</p>
+<p>For the purpose of this in-class exercise, the Hunan data sets will be used. There are two data sets in this use case, they are:</p>
 <ul>
-<li>Hunan_2012, an attribute data set in csv format.</li>
+<li><p>Hunan, a geospatial data set in ESRI shapefile format, and</p></li>
+<li><p>Hunan_2012, an attribute data set in csv format.</p></li>
 </ul>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>hunan <span class="ot">&lt;-</span> <span class="fu">st_read</span>(<span class="at">dsn =</span> <span class="st">"/Users/cktan/Desktop/SMU/01_Geospatial Analytics (ISSS626)/Hands-on_Ex/Hands-on_Ex05/data/geospatial"</span>, </span>
@@ -662,23 +662,6 @@ Geodetic CRS:  WGS 84
 #   ENGTYPE_3 &lt;chr&gt;, County &lt;chr&gt;, GDPPC &lt;dbl&gt;, geometry &lt;POLYGON [°]&gt;</code></pre>
 </div>
 </div>
-<p>The output:</p>
-<p>The output of local_moran() is a sf data.frame containing the columns ii, eii, var_ii, z_ii, p_ii, p_ii_sim, and p_folded_sim.</p>
-<ul>
-<li>ii: local moran statistic<br>
-</li>
-<li>eii: expectation of local moran statistic; for localmoran_permthe permutation sample means<br>
-</li>
-<li>var_ii: variance of local moran statistic; for localmoran_permthe permutation sample standard deviations<br>
-</li>
-<li>z_ii: standard deviate of local moran statistic; for localmoran_perm based on permutation sample means and standard deviations<br>
-</li>
-<li>p_ii: p-value of local moran statistic using pnorm(); for localmoran_perm using standard deviatse based on permutation sample means and standard deviations p_ii_sim: For localmoran_perm(), rank() and punif() of observed statistic rank for [0, 1] p-values using alternative= -p_folded_sim: the simulation folded [0, 0.5] range ranked p-value (based on https://github.com/pysal/esda/blob/4a63e0b5df1e754b17b5f1205b cadcbecc5e061/esda/crand.py#L211-L213)<br>
-</li>
-<li>skewness: For localmoran_perm, the output of e1071::skewness() for the permutation samples underlying the standard deviates<br>
-</li>
-<li>kurtosis: For localmoran_perm, the output of e1071::kurtosis() for the permutation samples underlying the standard deviates.</li>
-</ul>
 </section>
 <section id="visualising-local-morans-i" class="level3" data-number="1.8.2">
 <h3 data-number="1.8.2" class="anchored" data-anchor-id="visualising-local-morans-i"><span class="header-section-number">1.8.2</span> Visualising local Moran’s I</h3>
@@ -1013,8 +996,18 @@ Geodetic CRS:  WGS 84
 </div>
 </div>
 </div>
-<div class="callout.note">
+<div class="callout callout-style-default callout-note no-icon callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Observation:
+</div>
+</div>
+<div class="callout-body-container callout-body">
 <p>Figure above reveals that there is one hot spot area and two cold spot areas. Interestingly, the hot spot areas coincide with the High-high cluster identifies by using local Moran’s I method in the earlier sub-section.</p>
+</div>
 </div>
 
 

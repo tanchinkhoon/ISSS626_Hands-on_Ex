@@ -31,6 +31,7 @@ pacman::p_load(sf, sfdep, tmap, tidyverse)
 ## The data
 
 For the purpose of this in-class exercise, the Hunan data sets will be used. There are two data sets in this use case, they are:  
+
 - Hunan, a geospatial data set in ESRI shapefile format, and  
 
 - Hunan_2012, an attribute data set in csv format.
