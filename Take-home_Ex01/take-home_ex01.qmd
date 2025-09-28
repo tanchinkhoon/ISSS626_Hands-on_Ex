@@ -861,9 +861,8 @@ In this section, we bring together the spatial and temporal dimensions of restau
 Before advancing into formal spatio-temporal density estimation, the data is first explored visually to understand how restaurant incorporations are spread across Singapore from January to June 2025. Using the tmap package in static plot mode, individual incorporations are represented as dots, layered over the national planning boundary (sg_owin) to ensure geographic consistency. By applying tm_facets (by = "MONTH_ABBR"), the output generates a panel of maps, one for each month, which collectively illustrate how point distributions evolve across time. This faceted approach does not yet quantify clustering but serves as an intuitive diagnostic, highlighting months with visibly denser patterns or more dispersed incorporations. Such side-by-side visualisation is valuable for detecting preliminary trends---for example, whether activity is consistently concentrated in the central business districts or if new hotspots are emerging in suburban planning areas. As an exploratory step, these maps provide a baseline context that informs and motivates the more rigorous spatio-temporal KDE analysis developed later in the section.
 
 ```{r}
-#| fig-width: 20
-#| fig-height: 10
-#| 
+#| fig-width: 12
+#| fig-height: 8
 
 tmap::tmap_mode("plot")
 
@@ -873,7 +872,7 @@ sf::st_crs(study_owin_sf) <- 3414  # SVY21
 tm_shape(study_owin_sf) +
   tm_polygons(col = NA, border.col = "grey70", lwd = 0.4) +
 tm_shape(biz_56111_sf) +
-  tm_dots(size = 0.08, fill = "red") +
+  tm_dots(size = 0.2, fill = "red") +
   tm_facets(by = "MONTH_ABBR", free.coords = FALSE, drop.units = TRUE)
 
 study_owin_sf
@@ -1079,12 +1078,6 @@ The insight is that restaurant openings during this period are highly persistent
 
 While first-order analysis (Section 9) identified where restaurant registrations were most intense, it does not tell us whether those hotspots are statistically significant or simply a result of background density. To address this, we perform second-order SPPA, which examines how the relative positions of points deviate from CSR.
 
-Among the four planning areas studied earlier, we now focus on Tampines and Punggol for detailed second-order analysis. This choice is motivated by:
-
--   Tampines: The KDE surface revealed multiple dense hotspots spread across the planning area, indicating strong potential for multi-scale clustering. With sufficient number of points, the second-order functions will produce stable envelopes and meaningful interpretations.
-
--   Punggol: Though fewer points overall, the KDE showed concentrated hotspots (notably in the south-west and north). Analysing Punggol offers contrast to Tampines, highlighting clustering behaviour in an emerging town where new F&B growth is still geographically localised.
-
 In practice, among the four classical second-order functions ($G$, $F$, $K$, $L$), the $K$-function and its variance-stabilised form, the $L$-function, are most widely adopted. They are preferred because they capture multi-scale clustering and dispersion across a range of distances, while $G$ and $F$ are primarily sensitive to nearest-neighbour effects. We therefore focus our analysis on $K$ and $L$ functions, supported by Monte Carlo CSR testing using 99/999 simulations.
 
 ### Analysing apatial point process using $K$-function
@@ -1092,6 +1085,22 @@ In practice, among the four classical second-order functions ($G$, $F$, $K$, $L$
 The $K$-function is a second-order spatial point process statistic that measures the number of neighbouring events within a given distance of each observed point and compares the result to a theoretical expectation under CSR. Unlike first-order methods such as kernel density estimation that highlight intensity variations across space, the $K$-function examines spatial dependence between points, thereby detecting clustering or dispersion at multiple scales. In this exercise, the analysis is applied to the restaurant dataset filtered for the period January to June 2025, focusing on Tampines and Punggol planning areas. The $K$-function is estimated for each subregion and tested against a CSR benchmark using 999 Monte Carlo simulations to generate significance envelopes. By comparing the observed function with the simulation envelope, the analysis reveals whether the observed distribution of restaurants reflects random processes, significant clustering, or spatial regularity. This approach is crucial because it provides statistical evidence to support visual impressions from density maps and allows the detection of spatial interactions across a range of distances. Ultimately, the $K$-function offers deeper insights into how restaurants are spatially distributed in different planning contexts and whether their locations are shaped by systematic clustering forces or can be explained by chance alone.
 
 ```{r}
+
+# K for Orchard
+K_or      <- Kest(rest_ppp_orchard_km,  correction = "Ripley")
+K_or.csr  <- envelope(rest_ppp_orchard_km,  Kest, nsim = 999, rank = 1, glocal = TRUE)
+
+plot(K_or.csr, . - r ~ r,
+     xlab = "Distance (km)", ylab = "K(d) - r",
+     main = "K-function with CSR envelope — Orchard (Jan–Jun 2025)")
+
+# K for Jurong West
+K_jw      <- Kest(rest_ppp_jurongw_km,  correction = "Ripley")
+K_jw.csr  <- envelope(rest_ppp_jurongw_km,  Kest, nsim = 999, rank = 1, glocal = TRUE)
+
+plot(K_jw.csr, . - r ~ r,
+     xlab = "Distance (km)", ylab = "K(d) - r",
+     main = "K-function with CSR envelope — Jurong West (Jan–Jun 2025)")
 
 # K for Tampines (reusing Sect. 9 PPP)
 K_tm      <- Kest(rest_ppp_tampines_km, correction = "Ripley")
@@ -1111,17 +1120,41 @@ plot(K_pg.csr, . - r ~ r,
 
 ```
 
-The CSR tests using the K-function provide insights into whether restaurant establishments in Tampines and Punggol between January and June 2025 exhibit clustering, dispersion, or a random pattern of distribution. For Tampines, the observed  $K(d)−r$ curve remains consistently within the grey simulation envelope generated from 999 Monte Carlo simulations of CSR. Across distances from 0 to approximately 1.6 km, the black observed curve closely follows the red theoretical expectation under CSR, with only minor fluctuations. This indicates that the distribution of restaurants in Tampines does not deviate significantly from CSR. In practical terms, there is no statistical evidence of either strong clustering or systematic dispersion in Tampines at neighborhood scales. Instead, the results suggest that restaurant establishments are relatively evenly distributed across the planning area, consistent with a balanced spread of services rather than dominance by localized agglomeration.
+The second-order analysis using Ripley’s $K$-function provides important insights into how restaurant establishments are distributed across different planning areas of Singapore between January and June 2025. By comparing the observed distribution of restaurants against CSR envelopes, the analysis highlights whether clustering or dispersion dominates at neighborhood scales.
 
-In contrast, the Punggol plot shows a different shape. The observed curve dips slightly below the CSR expectation at very short distances (0 – 0.3 km), suggesting weak local inhibition, then rises above the CSR line between 0.4 km and 1.0 km, which might indicate clustering at sub-kilometer scales. However, a critical limitation is that the CSR simulation envelope is not drawn on this plot. Without the envelope, we cannot assess whether the deviations observed are statistically significant or simply due to random variation. Visual inspection alone is insufficient to confirm clustering. To resolve this, the analysis should be rerun with the L-function, plotting $L(r)−r$ against distance and including the simulation envelopes.
+For **Orchard**, the observed $K$-function remains almost entirely within the CSR envelope across the evaluated distance range of 0 – 0.3 km. At very short distances ($< 0.15 km$), the curve dips slightly below the CSR expectation, suggesting weak local inhibition, where restaurants appear marginally more spaced out than expected under randomness. However, this deviation is minor and does not persist. Beyond 0.15 km, the curve converges back toward the CSR line, indicating no strong evidence of clustering. These results align with Orchard’s role as a mature, high-density commercial area, where planning controls and established tenancy structures may limit excessive agglomeration at micro-scales.
 
-Overall, the Tampines analysis provides strong evidence of spatial randomness, while Punggol’s results are inconclusive without the envelope. Together, these findings highlight the importance of including simulation bands when interpreting second-order spatial statistics.
+In contrast, **Jurong West** demonstrates marginal clustering. The observed curve consistently rises above the CSR expectation and approaches the upper bounds of the simulation envelope across distances up to ~1.2 km. This indicates that restaurants in Jurong West tend to co-locate more than would be expected under randomness, reflecting localized agglomeration effects. Such clustering could be driven by town-center development, transport nodes, or concentrated demand in an expanding residential population.
+
+For **Tampines**, the observed curve closely tracks the CSR expectation and remains well within the envelope over distances from 0 to 1.6 km. The absence of significant deviation suggests that the distribution of restaurants here is broadly consistent with spatial randomness, neither clustering nor dispersing in a systematic manner. This even spread reflects balanced urban planning, where amenities are distributed across the planning area to serve residential neighborhoods efficiently.
+
+Finally, **Punggol** shows a more ambiguous pattern. At short distances (<0.3 km), the curve dips below CSR expectation, hinting at weak repulsion, but rises above CSR between 0.4 and 1.0 km, which may suggest clustering at sub-kilometer scales. However, a critical limitation is that the CSR envelope is missing for this plot, making statistical significance impossible to confirm. Visual inspection alone is insufficient, and further analysis using the L-function with envelopes is recommended to validate potential clustering in this emerging town.
+
+Overall, the comparison underscores the diversity of spatial dynamics: Orchard shows near randomness with slight inhibition, Jurong West exhibits strong clustering, Tampines reflects balanced distribution, and Punggol remains inconclusive without full statistical testing. These findings emphasize the importance of using envelopes and complementary methods to robustly interpret spatial point patterns.
+
 
 ### Analysing spatial point process using $L$-function
 
 The $L$-function is a variance-stabilised transformation of the $K$-function that provides a more interpretable measure of spatial point pattern dependence across different distance scales. While the $K$-function often grows rapidly with increasing distance, making it difficult to compare observed and expected values directly, the $L$-function linearises the expectation under CSR, such that deviations above or below the theoretical line can be more clearly identified. In this study, the $L$-function is applied to restaurant locations in Tampines and Punggol for the period January to June 2025, using the same point process objects generated in earlier sections. Monte Carlo simulations with 999 iterations are performed to construct CSR envelopes, providing a rigorous statistical test of spatial randomness at multiple scales. The $L$-function plots make it possible to distinguish between significant clustering and dispersion patterns with greater clarity compared to the raw K-function, especially at shorter distances where statistical fluctuations are most pronounced. By applying this method, the analysis can reveal not only whether clustering exists, but also the spatial range over which it occurs, offering deeper insights into how restaurant distributions reflect underlying urban design and commercial activity patterns in both new town and regional centre contexts.
 
 ```{r}
+
+# L for Orchard
+L_or      <- Lest(rest_ppp_orchard_km, correction = "Ripley")
+L_or.csr  <- envelope(rest_ppp_orchard_km, Lest, nsim = 999, rank = 1, glocal = TRUE)
+
+plot(L_or.csr, . - r ~ r,
+     xlab = "Distance (km)", ylab = "L(d) - r",
+     main = "L-function with CSR envelope — Orchard (Jan–Jun 2025)")
+
+# L for Jurong West
+L_jw      <- Lest(rest_ppp_jurongw_km, correction = "Ripley")
+L_jw.csr  <- envelope(rest_ppp_jurongw_km, Lest, nsim = 999, rank = 1, glocal = TRUE)
+
+plot(L_jw.csr, . - r ~ r,
+     xlab = "Distance (km)", ylab = "L(d) - r",
+     main = "L-function with CSR envelope — Jurong West (Jan–Jun 2025)")
+
 
 # L for Tampines
 L_tm      <- Lest(rest_ppp_tampines_km, correction = "Ripley")
@@ -1141,19 +1174,53 @@ plot(L_pg.csr, . - r ~ r,
 
 ```
 
-The $L$-function analysis was conducted for Tampines and Punggol to evaluate whether restaurant openings between January and June 2025 exhibit statistically significant clustering or dispersion when compared against CSR. The $L$-function, being a variance-stabilised transformation of the K-function, allows more direct interpretation by linearising the expectation under CSR, where deviations above zero imply clustering and deviations below zero suggest inhibition. For both study areas, CSR envelopes were constructed using Monte Carlo simulations with 999 iterations, providing a rigorous benchmark for assessing departures from randomness at multiple spatial scales.
+The application of the $L$-function with CSR envelopes provides deeper insight into the spatial arrangement of restaurants across Orchard, Jurong West, Tampines, and Punggol between January and June 2025. By linearising the $K$-function expectation, the $L$-function makes it easier to discern whether restaurant distributions follow CSR, or whether clustering or dispersion tendencies dominate at specific spatial scales.
 
-In Tampines, the observed $L$-function curve remains entirely within the CSR envelope across all tested distances up to approximately 1.6 km. Although the curve dips slightly below the theoretical expectation between 0 and 0.4 km, suggesting weak inhibition, and shows minor positive deviations near 1.3–1.6 km, these fluctuations are contained within the simulation bounds. Statistically, this indicates that the spatial pattern of restaurants in Tampines cannot be distinguished from CSR at the 0.001 significance level. Thus, restaurant openings in Tampines appear spatially random, with no consistent evidence of clustering or regular spacing across neighbourhood or sub-regional scales.
+For **Orchard**, the observed $L(d) – r$ curve remains tightly bounded within the CSR envelope across the full range of distances considered (0–0.3 km). The curve oscillates only slightly around the theoretical CSR line, with no systematic departures above or below. This finding indicates that restaurant locations in Orchard do not exhibit statistically significant clustering or dispersion. Instead, they are distributed in a manner that aligns with spatial randomness. Given Orchard’s status as a dense, highly regulated commercial core, this result is consistent with deliberate urban planning that balances accessibility with saturation, ensuring even service distribution within a small and competitive district.
 
-In Punggol, the observed curve also remains within the CSR envelope. The curve dips negative at very short distances (< 0.35 km), pointing to mild local inhibition, before rising above zero between 0.4 and 1.0 km, where weak clustering is suggested. However, because the curve does not cross the simulated bounds, these patterns are not statistically significant. Overall, restaurant openings in Punggol also conform to CSR across the analysed distances.
+In **Jurong West**, the $L$-function suggests a more dynamic pattern. While the observed curve remains within the CSR simulation envelope, positive deviations emerge at mid-range distances (0.4 – 0.8 km). These upward departures, although not statistically conclusive, hint at weak clustering tendencies at the neighbourhood scale. Such patterns could reflect the pull of transport hubs, shopping malls, or residential-commercial nodes that naturally attract several establishments in proximity. Nevertheless, because the curve never clearly exits the CSR band, the clustering tendency remains suggestive rather than definitive. Jurong West therefore presents a case of emerging but not strongly validated agglomeration.
 
-Taken together, the results for both Tampines and Punggol indicate that recent restaurant distributions are consistent with spatial randomness, with no statistically validated clustering. This suggests that openings are more likely driven by individual business decisions rather than strong localised agglomeration forces.
+The results for **Tampines** reveal perhaps the strongest case of spatial randomness. Across the distance range of 0–1.6 km, the observed curve closely tracks the CSR expectation without deviating from the simulation envelope. This strongly supports the conclusion that restaurants in Tampines are randomly distributed. As a mature regional centre with carefully balanced land-use planning, Tampines demonstrates a regulated distribution of food establishments across its subzones. Rather than clustering tightly or dispersing systematically, restaurants appear evenly spread, reflecting planning policies that prioritise accessibility and avoid excessive concentration in any one area.
+
+In contrast, **Punggol** produces an irregular output. The observed curve dips below CSR at very short distances ($<0.3 km$), suggesting weak inhibition where restaurants may avoid locating too close to one another, before rising above CSR at 0.4–0.8 km, which may imply some degree of clustering. However, the absence of a CSR envelope in this plot prevents statistical verification. Without simulation bands, we cannot confidently separate true clustering from random variation. Consequently, the Punggol results remain inconclusive, underscoring the importance of including envelopes in $L$-function diagnostics to avoid misinterpretation.
+
+Taken together, these findings reveal meaningful contrasts across planning areas. Orchard and Tampines illustrate highly regulated and balanced distributions, consistent with mature centres where randomness prevails. Jurong West suggests the beginnings of neighbourhood-scale clustering, while Punggol remains uncertain due to analytical limitations. This diversity highlights how restaurant spatial patterns reflect both planning intent and developmental stage, and why robust statistical validation is essential when drawing conclusions about clustering or dispersion.
 
 ### Interactive $L$-function (ggplot → plotly)
 
 The interactive L-function analysis provides an advanced extension to the traditional $L$-function test by leveraging the power of ggplot2 and plotly to create dynamic and user-friendly visualizations. Instead of relying solely on static plots, this approach allows users to explore spatial point pattern characteristics interactively, thereby gaining a more nuanced understanding of clustering and dispersion across multiple spatial scales. For each planning area, such as Tampines and Punggol, the observed $L$-function is plotted against the theoretical expectation under complete spatial randomness, with simulation envelopes representing the confidence bounds derived from Monte Carlo testing. The use of shaded ribbons highlights the ranges of clustering and dispersion, while the rug plots provide immediate cues about where observed values exceed or fall below the envelope. Interactivity is further enhanced by adding range sliders and tooltips, enabling zooming into specific distance bands and facilitating more precise inspection of the data. This interactive approach is particularly valuable in geospatial analytics because patterns of clustering and dispersion often vary by scale, and subtle deviations from randomness can be overlooked in static charts. By allowing analysts to engage directly with the data, the interactive $L$-function supports more robust hypothesis testing and interpretation, especially when comparing patterns across multiple planning areas. In the context of Take-home Exercise 01, this technique strengthens the ability to communicate findings clearly and intuitively, bridging the gap between statistical rigor and practical geovisualisation.
 
 ```{r}
+# --- Orchard ---
+stopifnot(exists("L_or.csr"))
+L_or_df <- as.data.frame(L_or.csr)
+
+p_tm <- ggplot(L_or_df, aes(r, obs - r)) +
+  geom_line() +
+  geom_line(aes(y = theo - r), linetype = "dashed", colour = "red") +
+  geom_ribbon(aes(ymin = lo - r, ymax = hi - r), alpha = 0.2) +
+  geom_rug(data = subset(L_or_df, obs > hi), sides = "b") +      # clustering
+  geom_rug(data = subset(L_or_df, obs < lo), sides = "b") +      # dispersion
+  xlab("Distance r (km)") + ylab("L(d) - r") +
+  ggtitle("Interactive L-function — Orchard") +
+  theme_tufte()
+ggplotly(p_tm, dynamicTicks = TRUE) |> rangeslider()
+
+# --- Jurong West ---
+stopifnot(exists("L_jw.csr"))
+L_jw_df <- as.data.frame(L_jw.csr)
+
+p_tm <- ggplot(L_jw_df, aes(r, obs - r)) +
+  geom_line() +
+  geom_line(aes(y = theo - r), linetype = "dashed", colour = "red") +
+  geom_ribbon(aes(ymin = lo - r, ymax = hi - r), alpha = 0.2) +
+  geom_rug(data = subset(L_jw_df, obs > hi), sides = "b") +      # clustering
+  geom_rug(data = subset(L_jw_df, obs < lo), sides = "b") +      # dispersion
+  xlab("Distance r (km)") + ylab("L(d) - r") +
+  ggtitle("Interactive L-function — Jurong West") +
+  theme_tufte()
+ggplotly(p_tm, dynamicTicks = TRUE) |> rangeslider()
+
 
 # --- Tampines ---
 stopifnot(exists("L_tm.csr"))
@@ -1249,19 +1316,29 @@ In practice, such duplications are meaningful because they represent real busine
 
 The analyses undertaken in this exercise provide an integrated view of the spatial and spatio-temporal dynamics of new restaurant establishments in Singapore between January and June 2025. Each research question is addressed by synthesising first-order intensity surfaces, second-order clustering tests, and spatio-temporal interaction functions.
 
-**RQ1 — Where/When:** The monthly KDE and STKDE analyses show that new restaurant registrations between January and June 2025 are concentrated in central Singapore, particularly in the Orchard and Downtown Core areas. Visual inspection of the monthly point maps confirms this central dominance, although the intensity varies across months. January shows a dense and compact central cluster, while April demonstrates broader spatial spread, with points extending further into northern and eastern districts. June again displays a strong central grouping, while July is comparatively subdued. These patterns reveal that clustering is not static but episodic, with bursts of activity punctuating quieter periods. Suburban areas such as Tampines, Punggol, and Jurong West consistently show lower densities and scattered points, with no persistent hotspots emerging. The findings suggest that while suburban growth exists, it is gradual and lacks the reinforcing dynamics seen in the central corridor. Understanding where and when bursts occur is essential for anticipating pressure on amenities and infrastructure.
+**RQ1 – Where/When: Spatial and Temporal Concentrations**
 
-**RQ2 — First-order intensity:** First-order intensity surfaces reinforce the observation that Orchard and Downtown Core dominate the spatial distribution of new restaurants. Kernel density estimation, with bandwidths tuned to ~1 km, smooths over random noise and confirms that these areas maintain persistent hotspots month after month. The intensity in Orchard reaches its highest values in April and June, reflecting periods of heightened registration, while suburban planning areas remain at near-background intensity levels. The absence of comparable secondary hotspots underscores the centralisation of Singapore’s foodscape. Suburban entries are present but dispersed, preventing the formation of meaningful agglomeration. This imbalance highlights Orchard’s entrenched structural advantage, linked to foot traffic, accessibility, and established commercial ecosystems. For planners, these findings imply that Orchard will continue to demand investment in infrastructure and management, while suburbs may require targeted policies—such as zoning adjustments or incentives—to seed sustainable clusters that could eventually compete with the central core.
+The monthly point pattern plots reveal that restaurant openings between January and June 2025 are not uniformly distributed across Singapore. Visually, central and eastern regions — particularly around Orchard, Downtown Core, and Tampines — show persistent concentrations across months, while openings in the west and northeast (e.g., Jurong West, Punggol) appear more sporadic. Importantly, no single month dominates the overall pattern; instead, openings occur consistently, though with slightly higher densities visible in April and June. This stability implies that restaurant activity is not driven by isolated temporal spikes but follows a steady, distributed trajectory. The spatial persistence of central clusters highlights the continuing pull of established commercial corridors, while the presence of scattered points in suburban areas suggests gradual outward diffusion consistent with residential growth.
 
-**RQ3 — Second-order clustering scales:** Second-order analyses provide further evidence of the scale at which clustering occurs. In Tampines and Punggol, the K- and L-function results show observed curves remaining within CSR envelopes across distances up to 1.5 km. This indicates that, at the suburban level, restaurant distributions approximate randomness, suggesting limited agglomeration forces. At the island-wide scale, however, the STIKhat contour plot reveals a more nuanced story. The first contour, close to the origin, appears as a narrow vertical band confined to <1500 m, reflecting weak clustering at very fine distances. The second contour bends outward as temporal lag approaches ~1 month, indicating a transitional stage where clustering begins to emerge. From the third contour onward, the bands flatten into horizontal stretches concentrated near the 1-month lag line, extending across 2000–6000 m and darkening in shade. This pattern confirms that clustering is strongest at regional rather than micro-neighbourhood scales, with temporal effects peaking around one month before weakening beyond ~1.2 months. Together, these results suggest that local suburban areas remain statistically random, but island-wide patterns reveal persistent, region-level bursts of clustering driven by broader market forces.
+**RQ2 – First-Order Intensity (Core Hotspots)**
 
-**RQ4 — Planning and Management Implications:** These findings carry significant implications for planning and policy. The persistence of Orchard as the dominant hotspot highlights the risks of over-concentration: congestion, escalating rents, and competition for limited resources. Authorities may need to balance market-driven clustering with interventions that encourage decentralisation, such as incentives for suburban dining hubs or differentiated licensing strategies. The weak clustering signals in Tampines and Punggol point to opportunities for stimulating suburban foodscapes. Introducing anchor tenants, enhancing transport connectivity, and supporting integrated developments could help generate agglomeration effects, reducing dependency on Orchard. The temporal dynamics revealed by STKDE and STIKhat show that clustering often occurs in one-month bursts. Licensing bodies should therefore consider staggering approvals to avoid sharp surges that overwhelm utilities, logistics, and service delivery. For supply chain managers, the findings highlight the need for flexible networks capable of adapting to short-lived but intense central clustering. Ultimately, the combined analyses reveal that Singapore’s restaurant landscape is shaped by entrenched central dominance and episodic regional surges, requiring planners to adopt strategies that balance efficiency, resilience, and equity across the island.
+Kernel density estimation (KDE) and spatio-temporal KDE provide finer insight into intensity. A dominant hotspot persists in the Orchard/Downtown Core, reflecting its established commercial centrality. STIKhat contours further confirm that clustering strength is shaped primarily by spatial distance rather than temporal decay, with contours stabilising around 1–1.5 km. The central hotspot is not static in intensity: visual slices at t = 39 and t = 114 show surges, implying bursts of new entries. However, no new secondary hotspots emerge at comparable strength. Tampines and Jurong West display weaker but visible neighbourhood intensities, while Punggol exhibits limited activity, reflecting its earlier stage of development. Overall, first-order analysis highlights a dual pattern of strong central agglomeration and weaker suburban seeding.
+
+**RQ3 – Second-Order Clustering Scales**
+
+Second-order statistics refine these impressions by testing deviations from CSR. The $K$-function with envelopes shows that Tampines and Orchard largely conform to randomness, with observed curves contained within CSR bounds. This suggests balanced distributions rather than dominance by clustering. Jurong West displays mild positive departures at 0.4–0.8 km, consistent with neighbourhood-scale agglomeration near hubs. Punggol shows irregular departures but lacks an envelope, leaving results inconclusive. The $L$-function, with variance stabilisation, reinforces these findings: Orchard and Tampines remain within CSR, Jurong West hints at weak clustering, and Punggol again shows uncertain deviations. Together, these results show that while first-order hotspots are strong, second-order tests reveal less evidence of systematic clustering beyond central areas.
+
+At the island-wide scale, however, the STIKhat contour plot reveals a more nuanced story. The first contour, close to the origin, appears as a narrow vertical band confined to <1500 m, reflecting weak clustering at very fine distances. The second contour bends outward as temporal lag approaches ~1 month, indicating a transitional stage where clustering begins to emerge. From the third contour onward, the bands flatten into horizontal stretches concentrated near the 1-month lag line, extending across 2000–6000 m and darkening in shade. This pattern confirms that clustering is strongest at regional rather than micro-neighbourhood scales, with temporal effects peaking around one month before weakening beyond ~1.2 months. Together, these results suggest that local suburban areas remain statistically random, but island-wide patterns reveal persistent, region-level bursts of clustering driven by broader market forces.
+
+**RQ4 – Planning and Management Implications**
+
+From a planning perspective, these findings underline important contrasts. Orchard and Tampines exemplify regulated centres where randomness dominates, suggesting that planning policies have successfully balanced restaurant provision across subzones. Jurong West’s signs of neighbourhood clustering highlight areas where agglomeration may grow, warranting monitoring to avoid over concentration or service redundancy. Punggol, with inconclusive results, illustrates the challenge of early-stage new towns: limited openings and irregular distributions make patterns unstable, underscoring the need for adaptive monitoring. At the city scale, the persistence of central hotspots despite suburban growth signals that commercial gravity remains entrenched in core corridors. For policymakers, this highlights the dual need to sustain mature centres while encouraging balanced suburban diffusion through licensing, infrastructure, and amenity planning. For operators, the evidence of randomness in mature areas suggests that competition is widely dispersed, while emerging clusters in Jurong West may offer opportunities for first-mover advantage.
 
 ## Conclusion
 
 This study examined the spatial and temporal dynamics of new restaurant registrations in Singapore from January to June 2025 using a combination of first-order, second-order, and spatio-temporal point pattern methods. The findings reveal several consistent themes.
 
-First, central Singapore, particularly the Orchard and Downtown Core areas, remains the dominant hotspot across all months. While bursts of activity are visible in certain months such as April and June, suburban areas like Tampines, Punggol, and Jurong West display only scattered and low-intensity activity, confirming the resilience of the central corridor as the anchor of the foodscape.
+First, central Singapore, particularly the Orchard and Downtown Core areas, remains the dominant hotspot across all months. While bursts of activity are visible in certain months such as April, suburban areas like Tampines, Punggol, and Jurong West display only scattered and low-intensity activity, confirming the resilience of the central corridor as the anchor of the foodscape.
 
 Second, first-order intensity estimates reinforce the persistence of this central dominance, while suburban entries remain too dispersed to generate secondary hotspots. Third, second-order tests show that suburban distributions approximate randomness at neighbourhood scales, but spatio-temporal interaction analysis highlights clustering at broader regional scales (2–6 km), with temporal peaks concentrated around one month. This indicates that restaurant growth is driven less by hyper-local neighbourhood effects and more by episodic, region-level surges anchored in the central corridor.
 
