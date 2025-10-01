@@ -63,13 +63,13 @@ With **tidyverse**, we get readr, ggplot2, dplyr, purrr, etc.
 ```{r}
 
 # Read township boundaries shapefile (sf) ---------------------------------------
-shan_sf <- st_read(dsn = "data/geospatial",                # folder containing the shapefile
+shan_sf <- st_read(dsn = "data/geospatial",      # folder containing the shapefile
                    layer = "myanmar_township_boundaries") %>%     # shapefile layer name (without .shp)
   dplyr::filter(ST %in% c("Shan (East)", "Shan (North)", "Shan (South)")) %>%  # keep only Shan State parts
-  dplyr::select(c(2:7))                                            # keep fields 2..7 as in professor’s notes
+  dplyr::select(c(2:7))                          # keep fields 2..7
 
 # Inspect the resulting simple feature data.frame --------------------------------
-shan_sf                                                             # prints sf summary (rows, cols, bbox)
+shan_sf                                          # prints sf summary (rows, cols, bbox)
 
 glimpse(shan_sf)  
 
@@ -141,7 +141,7 @@ ggplot(data = ict_derived, aes(x = `RADIO`)) +          # choose RADIO (raw) for
   geom_histogram(bins = 20, color = "black", fill = "light blue")  # 20 bins; black border; light blue fill
 
 ggplot(data = ict_derived, aes(x = `RADIO`)) +          # same variable for outlier check
-  geom_boxplot(color = "black", fill = "light blue")    # boxplot style used by professor
+  geom_boxplot(color = "black", fill = "light blue")    # boxplot style
 
 # Histogram and boxplot for RADIO_PR (per-thousand) ----------------------------
 ggplot(data = ict_derived, aes(x = `RADIO_PR`)) +       # scaled rate variable
@@ -201,7 +201,7 @@ computer <- ggplot(ict_derived, aes(x = `COMPUTER_PR`)) + geom_histogram(bins=20
 internet <- ggplot(ict_derived, aes(x = `INTERNET_PR`)) + geom_histogram(bins=20, color="black", fill="light blue")
 
 ggpubr::ggarrange(radio, tv, llphone, mphone, computer, internet,  # arrange 6 histograms
-                   ncol = 3, nrow = 2)                             # grid 3x2 like professor’s figure
+                   ncol = 3, nrow = 2)                             # arrange plots in grid 3x2 
 
 ```
 
@@ -218,7 +218,7 @@ shan_sf <- dplyr::left_join(shan_sf, ict_derived, by = c("TS_PCODE" = "TS_PCODE"
 
 ```{r}
 
-# Persist and reload to mirror professor’s workflow -----------------------------
+# Persist and reload  -----------------------------
 
 readr::write_rds(shan_sf, "data/rds/shan_sf.rds")  # save result to RDS
 
@@ -254,7 +254,7 @@ tmap_arrange(TT_HOUSEHOLDS.map, RADIO.map, asp = NA, ncol = 2)     # view side-b
 tm_shape(shan_sf) +
   tm_polygons(c("TT_HOUSEHOLDS", "RADIO_PR"), style = "jenks") +   # show both variables as facets
   tm_facets(sync = TRUE, ncol = 2) +                               # same breaks/legends aligned
-  tm_legend(legend.position = c("right", "bottom")) +              # legend position per professor
+  tm_legend(legend.position = c("right", "bottom")) +              # legend position
   tm_layout(outer.margins = 0, asp = 0)                             # fill layout; ignore aspect lock
 
 ```
@@ -427,7 +427,7 @@ ggpubr::ggarrange(r, s, z, ncol = 3, nrow = 1) # 3 histograms in one row
 2.  **Min--Max Standardisation**
     -   Scales all values to the fixed interval \[0,1\].\
     -   Preserves the **distribution shape and relative distances**.\
-    -   Works well when features are bounded and you want to keep proportionality (e.g., image pixels, probabilities).\
+    -   Works well when features are bounded and we want to keep proportionality (e.g., image pixels, probabilities).\
     -   Sensitive to outliers: a single extreme value can stretch the range and compress the majority of the data.
 3.  **Z-score Standardisation**
     -   Centers data at mean = 0, scales variance to 1.\
@@ -490,7 +490,7 @@ plot(hclust_ward, cex = 0.6) # visual tree of township similarity
 
 ### 12.7.8 Selecting the optimal clustering algorithm
 
-One of the challenge in performing hierarchical clustering is to identify stronger clustering structures. The issue can be solved by using use `agnes()` function of cluster package. It functions like `hclus()`, however, with the `agnes()` function you can also get the agglomerative coefficient, which measures the amount of clustering structure found (values closer to 1 suggest strong clustering structure).
+One of the challenge in performing hierarchical clustering is to identify stronger clustering structures. The issue can be solved by using use `agnes()` function of cluster package. It functions like `hclus()`, however, with the `agnes()` function we can also get the agglomerative coefficient, which measures the amount of clustering structure found (values closer to 1 suggest strong clustering structure).
 
 The code chunk below will be used to compute the agglomerative coefficients of all hierarchical clustering algorithms.
 
@@ -636,7 +636,7 @@ The choropleth map above reveals the clusters are very fragmented. The is one of
 
 ## 12.8 Spatially Constrained Clustering: SKATER approach
 
-In this section, you will learn how to derive spatially constrained cluster by using `skater()` method of **spdep package**.
+In this section, we will learn how to derive spatially constrained cluster by using `skater()` method of **spdep package**.
 
 ### 12.8.1 Converting into SpatialPolygonsDataFrame
 
@@ -675,7 +675,7 @@ plot(shan.nb, coords, col = "blue", add = TRUE) # overlay neighbour graph
 ```
 :::{.callout-note}
 
-Note that if you plot the network first and then the boundaries, some of the areas will be clipped. This is because the plotting area is determined by the characteristics of the first plot. In this example, because the boundary map extends further than the graph, we plot it first.
+Note that if we plot the network first and then the boundaries, some of the areas will be clipped. This is because the plotting area is determined by the characteristics of the first plot. In this example, because the boundary map extends further than the graph, we plot it first.
 
 :::
 
