@@ -681,80 +681,294 @@ Note that if we plot the network first and then the boundaries, some of the area
 
 ### 12.8.3 Computing minimum spanning tree — edge costs
 
-
-
-
-
+#### 12.8.3.1 Calculating edge costs
 
 ```{r}
 
+# Edge costs as attribute-space dissimilarity between neighbouring townships ----
+lcosts <- spdep::nbcosts(shan.nb, shan_ict)
 
+glimpse(lcosts)
 
 ```
 
 ```{r}
 
+# Convert neighbour list + costs into a weights list object --------------------
+shan.w <- spdep::nb2listw(shan.nb, lcosts, style = "B") # 'B' keeps raw costs (no row standardise)
+summary(shan.w)
 
+```
+
+### 12.8.4 Computing minimum spanning tree
+
+
+```{r}
+
+# Compute Minimum Spanning Tree (MST) over the neighbour graph with edge costs --------------------------
+shan.mst <- spdep::mstree(shan.w) # returns an 'mst' matrix (n-1 edges)
 
 ```
 
 ```{r}
 
-
-
-```
-
-```{r}
-
-
+# Check its class 
+class(shan.mst); 
 
 ```
 
 ```{r}
 
+# Check its dimension 
+dim(shan.mst)
 
+```
+
+> The dimension is 54 and not 55. This is because the minimum spanning tree consists on n-1 edges (links) in order to traverse all the nodes.
+
+
+```{r}
+
+# Inspect the content of shan.mst
+head(shan.mst)
 
 ```
 
 ```{r}
 
+# Plot MST atop map -------------------------------------------------------------
+plot(sf::st_geometry(shan_sf), border = gray(.5)) # base map
+spdep::plot.mst(shan.mst, coords, col = "blue", cex.lab = 0.7, # draw MST links + node ids
+cex.circles = 0.005, add = TRUE)
 
+```
+
+> The plot method for the MST include a way to show the observation numbers of the nodes in addition to the edge. As before, we plot this together with the township boundaries. We can see how the initial neighbour list is simplified to just one edge connecting each of the nodes, while passing through all the nodes.
+
+### 12.8.5 Computing spatially constrained clusters using SKATER method
+
+```{r}
+
+# Cut MST into k-1 edges (ncuts = 5 → k = 6 clusters) --------------------------
+clust6 <- spdep::skater(edges = shan.mst[, 1:2], # first 2 columns are node indices
+data = shan_ict, # attribute data to update SSW
+method = "euclidean", # distance in attribute space
+ncuts = 5) # 6 clusters (k = ncuts + 1)
+
+```
+
+:::{.callout-note}
+
+The `skater()` takes three mandatory arguments:   
+
+- the first two columns of the MST matrix (i.e. not the cost),   
+- the data matrix (to update the costs as units are being grouped), and 
+- the number of cuts. 
+
+Note: It is set to **one less than the number of clusters**. So, the value specified is not the number of clusters, but the number of cuts in the graph, one less than the number of clusters.
+
+:::
+
+```{r}
+
+str(clust6) # list; includes $groups (cluster labels)
+
+```
+
+> The most interesting component of this list structure is the groups vector containing the labels of the cluster to which each observation belongs (as before, the label itself is arbitary). This is followed by a detailed summary for each of the clusters in the edges.groups list. Sum of squares measures are given as ssto for the total and ssw to show the effect of each of the cuts on the overall criterion.
+
+We can check the cluster assignment by using the conde chunk below.
+
+```{r}
+
+# Check the cluster assignment
+cc6 <- clust6$groups; cc6 # vector of cluster assignments
+cc6
+
+```
+
+We can find out how many observations are in each cluster by means of the table command. Parenthetially, we can also find this as the dimension of each vector in the lists contained in edges.groups. For example, the first list has node with dimension 12, which is also the number of observations in the first cluster.
+
+```{r}
+
+table(cc6) # size of each cluster
+
+```
+
+Lastly, we can also plot the pruned tree that shows the five clusters on top of the townshop area.
+
+```{r}
+
+# Visualise the pruned tree coloured by groups ---------------------------------
+plot(sf::st_geometry(shan_sf), border = gray(.5)) # background polygons
+plot(clust6, coords, cex.lab = .7, # SKATER plotting helper
+groups.colors = c("red", "green", "blue", "brown", "pink"),
+cex.circles = 0.005, add = TRUE)
+
+```
+
+### 12.8.6 Visualising the clusters in choropleth map
+
+The code chunk below is used to plot the newly derived clusters by using SKATER method.
+
+```{r}
+
+# Append SKATER groups to sf and map -------------------------------------------
+groups_mat <- as.matrix(clust6$groups) # coerce to matrix for cbind
+
+
+shan_sf_spatialcluster <- cbind(shan_sf_cluster, as.factor(groups_mat)) %>% # bind to previous sf
+dplyr::rename(`SP_CLUSTER` = `as.factor.groups_mat.`) # new field name per notes
+
+
+qtm(shan_sf_spatialcluster, "SP_CLUSTER") # map spatially constrained clusters
+
+```
+
+For easy comparison, it will be better to place both the hierarchical clustering and spatially constrained hierarchical clustering maps next to each other.
+
+```{r}
+
+# Side-by-side comparison of non-spatial vs spatially constrained clusters -----
+hclust.map <- qtm(shan_sf_cluster, "CLUSTER") + tm_borders(alpha = 0.5) # non-spatial clusters
+shclust.map <- qtm(shan_sf_spatialcluster, "SP_CLUSTER") + tm_borders(alpha = 0.5) # SKATER clusters
+
+tmap_arrange(hclust.map, shclust.map, asp = NA, ncol = 2) # compare fragmentation vs contiguity
+
+```
+
+## 12.9 Spatially Constrained Clustering: ClustGeo Method
+
+### 12.9.1 A short note about ClustGeo
+
+**ClustGeo** implements Ward‑like hierarchical clustering with a mixing parameter **alpha ∈ [0,1]** combining attribute dissimilarities (**D0**) and spatial dissimilarities (**D1**). Use **choicealpha()** to pick alpha balancing contiguity and attribute fit.
+
+### 12.9.2 Ward‑like hierarchical clustering (non‑spatial): ClustGeo
+
+```{r}
+
+# Run hclustgeo() with attribute-space dissimilarity only -----------------------
+nongeo_cluster <- ClustGeo::hclustgeo(proxmat) # same D0 as from dist()
+
+
+plot(nongeo_cluster, cex = 0.5) # dendrogram
+rect.hclust(nongeo_cluster, k = 6, border = 2:5) # highlight 6 clusters
+
+
+# Map the non-spatial ClustGeo clusters ----------------------------------------
+groups <- as.factor(cutree(nongeo_cluster, k = 6)) # cut into 6 groups
+
+
+shan_sf_ngeo_cluster <- cbind(shan_sf, as.matrix(groups)) %>% # bind to polygons
+dplyr::rename(`CLUSTER` = `as.matrix.groups.`)
+
+
+qtm(shan_sf_ngeo_cluster, "CLUSTER") # categorical map
+
+```
+
+### 12.9.3 Spatially Constrained Hierarchical Clustering
+
+```{r}
+
+# Build spatial distance matrix between polygon centroids ----------------------
+dist <- sf::st_distance(shan_sf, shan_sf) # pairwise great-circle distances
+
+
+distmat <- stats::as.dist(dist) # convert to 'dist' object for ClustGeo (convert dataframe into matrix)
 
 ```
 
 ```{r}
 
-
-
-```
-
-```{r}
-
-
+# Choose alpha that trades off contiguity vs attribute fit ---------------------
+cr <- ClustGeo::choicealpha(proxmat, distmat, # D0 and D1 matrices
+range.alpha = seq(0, 1, 0.1), K = 6, # evaluate alpha from 0..1 for K=6
+graph = TRUE) # display criterion curves
 
 ```
 
 ```{r}
 
-
-
-```
-
-```{r}
-
-
+# With reference to the plot above, adopt alpha = 0.2 -------------------------------------
+clustG <- ClustGeo::hclustgeo(proxmat, distmat, alpha = 0.2) # combined D0/D1 with alpha=0.2
 
 ```
 
 ```{r}
 
+# Cut into 6 groups and map ----------------------------------------------------
+groups <- as.factor(cutree(clustG, k = 6)) # labels 1..6
 
+
+shan_sf_Gcluster <- cbind(shan_sf, as.matrix(groups)) %>% # append to polygons
+dplyr::rename(`CLUSTER` = `as.matrix.groups.`)
+
+
+qtm(shan_sf_Gcluster, "CLUSTER") # spatially constrained (ClustGeo) map
 
 ```
 
+## 12.10 Visual Interpretation of Clusters
+
+### 12.10.1 Visualising individual clustering variable
+
 ```{r}
 
+# Boxplot of RADIO_PR by cluster (non-spatial ClustGeo example) ----------------
+ggplot(data = shan_sf_ngeo_cluster, # use non-spatial clusters for example
+aes(x = CLUSTER, y = RADIO_PR)) +
+geom_boxplot()
 
+```
+
+> The boxplot reveals Cluster 3 displays the highest mean Radio Ownership Per Thousand Household. This is followed by Cluster 2, 1, 4, 6 and 5.
+
+### 12.10.2 Multivariate Visualisation
+
+```{r}
+
+# Parallel coordinates (GGally) to compare all ICT rates by cluster -------------
+ggparcoord(data = shan_sf_ngeo_cluster,       # data with cluster labels
+           columns = c(17:21),                # columns of *_PR variables (as in notes)
+           scale = "globalminmax",            # same vertical scale 0..1 per global range
+           alphaLines = 0.2,                  # faint lines 
+           boxplot = TRUE,                    # add per-variable boxplots in background
+           title = "Multiple Parallel Coordinates Plots of ICT Variables by Cluster") +
+  facet_grid(~ CLUSTER) +                     # one panel per cluster
+  theme(axis.text.x = element_text(angle = 30))  # improve x-axis label readability
+
+```
+
+The parallel coordinate plot above reveals that households in Cluster 4 townships tend to own the highest number of TV and mobile-phone. On the other hand, households in Cluster 5 tends to own the lowest of all the five ICT.
+
+Note that the **scale** argument of `ggparcoor()` provide several methods to scale the clustering variables. They are:
+
+- std: univariately, subtract mean and divide by standard deviation.  
+- robust: univariately, subtract median and divide by median absolute deviation.  
+- uniminmax: univariately, scale so the minimum of the variable is zero, and the maximum is one.  
+- globalminmax: no scaling is done; the range of the graphs is defined by the global minimum and the global maximum.  
+- center: use uniminmax to standardize vertical height, then center each variable at a value specified by the scaleSummary param.  
+- centerObs: use uniminmax to standardize vertical height, then center each variable at the value of the observation specified by the centerObsID param
+
+There is no one best scaling method to use. You should explore them and select the one that best meet your analysis need.
+
+Last but not least, we can also compute the summary statistics such as mean, median, sd, etc to complement the visual interpretation.
+
+In the code chunk below, `group_by()` and `summarise()` of dplyr are used to derive mean values of the clustering variables.
+
+```{r}
+
+# Compute cluster-wise means to complement visual inspection -------------------
+
+shan_sf_ngeo_cluster %>% 
+  st_set_geometry(NULL) %>%                         # work on attributes only
+  group_by(CLUSTER) %>%                             # aggregate by cluster label
+  summarise(mean_RADIO_PR = mean(RADIO_PR),         # mean Radio per 1000 households
+            mean_TV_PR = mean(TV_PR),               # mean TV per 1000 households
+            mean_LLPHONE_PR = mean(LLPHONE_PR),     # mean Landline per 1000 households
+            mean_MPHONE_PR = mean(MPHONE_PR),       # mean Mobile per 1000 households
+            mean_COMPUTER_PR = mean(COMPUTER_PR))   # mean Computer per 1000 households
 
 ```
 
