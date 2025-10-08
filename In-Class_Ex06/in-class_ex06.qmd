@@ -3,6 +3,7 @@ title: "In-class Ex06: Take-home Exercise 2 Kick Starter"
 author: "TAN Chin Khoon"
 date: "04 October 2025"
 date-modified: "last-modified"
+number-sections: true
 ---
 
 ## Loading the R package
@@ -101,7 +102,7 @@ tm_layout(
 
 However, figure above reveals that there a several bus stops (i.e black dots appear at the upper left) located outside of the main Singapore boundary.
 
-## Extracting Bus Stops located within Singapore
+### Extracting Bus Stops located within Singapore
 
 ```{r}
 
@@ -161,7 +162,7 @@ hexagon <- st_make_grid(
 
 ```
 
-
+Now, let's inspecting the hexagon layer visually.
 
 ```{r, fig.width=10,fig.height=5}
 
@@ -206,6 +207,7 @@ hexagon_with_bs <- filter(
 
 ```
 
+Next, let's inspecting the hexagon layer after filtering visually.
 
 ```{r, fig.width=10,fig.height=5}
 
@@ -233,7 +235,7 @@ tm_layout(
 
 ### Assigning ids to each hexagon
 
-Let us examine the content of hexagon sf data:
+Let us examine the content of ***hexagon*** sf data:
 
 ```{r}
 
@@ -259,7 +261,7 @@ Below are the code chunk to include the ID field:
 #   as.factor()
 
 hexagon_with_id <- hexagon_with_bs %>%
-  select(-busstop_count) %>%  # ✅ remove the busstop_count column
+  select(-busstop_count) %>%  # remove the busstop_count column
   mutate(
     HEX_ID = sprintf("H%04d", seq_len(nrow(hexagon_with_bs))) %>% as.factor()
   )
@@ -274,7 +276,7 @@ hexagon_with_id <- hexagon_with_bs %>%
 
 :::
 
-Now, let's inspect the new hexagon sf data frame below 
+Now, let's inspect the new ***hexagon*** sf data frame below 
 
 ```{r}
 
@@ -308,7 +310,7 @@ trips$BUS_STOP_N <- as.factor(trips$BUS_STOP_N)
 
 ```
 
-Inspect the content of the trips dataframe:
+Inspect the content of the ***trips*** dataframe:
 
 ```{r}
 
@@ -329,7 +331,7 @@ bs_hex <- st_intersection(
 
 ```
 
-Inspect the content of the bs_hex dataframe:
+Inspect the content of the ***bs_hex*** dataframe:
 
 ```{r}
 
@@ -349,7 +351,7 @@ trips <- inner_join(trips, bs_hex)
 
 ```
 
-Inspect the dataframe of trip after adding HEX_ID:
+Inspect the dataframe of ***trip*** after adding HEX_ID:
 
 ```{r}
 

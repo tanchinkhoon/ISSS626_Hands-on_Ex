@@ -239,29 +239,31 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#loading-the-r-package" id="toc-loading-the-r-package" class="nav-link active" data-scroll-target="#loading-the-r-package">Loading the R package</a></li>
-  <li><a href="#importing-data" id="toc-importing-data" class="nav-link" data-scroll-target="#importing-data">Importing data</a>
+  <li><a href="#loading-the-r-package" id="toc-loading-the-r-package" class="nav-link active" data-scroll-target="#loading-the-r-package"><span class="header-section-number">1</span> Loading the R package</a></li>
+  <li><a href="#importing-data" id="toc-importing-data" class="nav-link" data-scroll-target="#importing-data"><span class="header-section-number">2</span> Importing data</a>
   <ul>
-  <li><a href="#importing-bus-stop-location" id="toc-importing-bus-stop-location" class="nav-link" data-scroll-target="#importing-bus-stop-location">Importing Bus Stop Location</a></li>
-  <li><a href="#importing-importing-master-plan-2019-subzone-boundary-no-sea" id="toc-importing-importing-master-plan-2019-subzone-boundary-no-sea" class="nav-link" data-scroll-target="#importing-importing-master-plan-2019-subzone-boundary-no-sea">Importing Importing Master Plan 2019 Subzone Boundary (No Sea)</a></li>
-  <li><a href="#importing-passenger-volume-by-origin-destination-bus-stops" id="toc-importing-passenger-volume-by-origin-destination-bus-stops" class="nav-link" data-scroll-target="#importing-passenger-volume-by-origin-destination-bus-stops">Importing Passenger Volume by Origin Destination Bus Stops</a></li>
+  <li><a href="#importing-bus-stop-location" id="toc-importing-bus-stop-location" class="nav-link" data-scroll-target="#importing-bus-stop-location"><span class="header-section-number">2.1</span> Importing Bus Stop Location</a></li>
+  <li><a href="#importing-importing-master-plan-2019-subzone-boundary-no-sea" id="toc-importing-importing-master-plan-2019-subzone-boundary-no-sea" class="nav-link" data-scroll-target="#importing-importing-master-plan-2019-subzone-boundary-no-sea"><span class="header-section-number">2.2</span> Importing Importing Master Plan 2019 Subzone Boundary (No Sea)</a></li>
+  <li><a href="#importing-passenger-volume-by-origin-destination-bus-stops" id="toc-importing-passenger-volume-by-origin-destination-bus-stops" class="nav-link" data-scroll-target="#importing-passenger-volume-by-origin-destination-bus-stops"><span class="header-section-number">2.3</span> Importing Passenger Volume by Origin Destination Bus Stops</a></li>
   </ul></li>
-  <li><a href="#visualising-the-geospatial-data" id="toc-visualising-the-geospatial-data" class="nav-link" data-scroll-target="#visualising-the-geospatial-data">Visualising the geospatial data</a></li>
-  <li><a href="#extracting-bus-stops-located-within-singapore" id="toc-extracting-bus-stops-located-within-singapore" class="nav-link" data-scroll-target="#extracting-bus-stops-located-within-singapore">Extracting Bus Stops located within Singapore</a></li>
-  <li><a href="#analytical-hexagon" id="toc-analytical-hexagon" class="nav-link" data-scroll-target="#analytical-hexagon">Analytical Hexagon</a>
+  <li><a href="#visualising-the-geospatial-data" id="toc-visualising-the-geospatial-data" class="nav-link" data-scroll-target="#visualising-the-geospatial-data"><span class="header-section-number">3</span> Visualising the geospatial data</a>
   <ul>
-  <li><a href="#why-analytical-grids" id="toc-why-analytical-grids" class="nav-link" data-scroll-target="#why-analytical-grids">Why analytical grids?</a></li>
-  <li><a href="#why-hexagon" id="toc-why-hexagon" class="nav-link" data-scroll-target="#why-hexagon">Why hexagon?</a></li>
-  <li><a href="#deriving-analytical-hexagon" id="toc-deriving-analytical-hexagon" class="nav-link" data-scroll-target="#deriving-analytical-hexagon">Deriving Analytical Hexagon</a></li>
-  <li><a href="#selecting-hexagons-with-bus-stops" id="toc-selecting-hexagons-with-bus-stops" class="nav-link" data-scroll-target="#selecting-hexagons-with-bus-stops">Selecting hexagons with bus stops</a></li>
-  <li><a href="#assigning-ids-to-each-hexagon" id="toc-assigning-ids-to-each-hexagon" class="nav-link" data-scroll-target="#assigning-ids-to-each-hexagon">Assigning ids to each hexagon</a></li>
+  <li><a href="#extracting-bus-stops-located-within-singapore" id="toc-extracting-bus-stops-located-within-singapore" class="nav-link" data-scroll-target="#extracting-bus-stops-located-within-singapore"><span class="header-section-number">3.1</span> Extracting Bus Stops located within Singapore</a></li>
   </ul></li>
-  <li><a href="#preparing-trip-generation-data" id="toc-preparing-trip-generation-data" class="nav-link" data-scroll-target="#preparing-trip-generation-data">Preparing trip generation data</a>
+  <li><a href="#analytical-hexagon" id="toc-analytical-hexagon" class="nav-link" data-scroll-target="#analytical-hexagon"><span class="header-section-number">4</span> Analytical Hexagon</a>
   <ul>
-  <li><a href="#cleaning-the-data" id="toc-cleaning-the-data" class="nav-link" data-scroll-target="#cleaning-the-data">Cleaning the data</a></li>
-  <li><a href="#populating-hexagon-ids-into-busstop-data-frame" id="toc-populating-hexagon-ids-into-busstop-data-frame" class="nav-link" data-scroll-target="#populating-hexagon-ids-into-busstop-data-frame">Populating Hexagon IDs into BusStop data frame</a></li>
-  <li><a href="#adding-hex_id-into-bus-trips-data" id="toc-adding-hex_id-into-bus-trips-data" class="nav-link" data-scroll-target="#adding-hex_id-into-bus-trips-data">Adding HEX_ID into bus trips data</a></li>
-  <li><a href="#aggregating-trips-based-on-hex_id" id="toc-aggregating-trips-based-on-hex_id" class="nav-link" data-scroll-target="#aggregating-trips-based-on-hex_id">Aggregating TRIPS based on HEX_ID</a></li>
+  <li><a href="#why-analytical-grids" id="toc-why-analytical-grids" class="nav-link" data-scroll-target="#why-analytical-grids"><span class="header-section-number">4.1</span> Why analytical grids?</a></li>
+  <li><a href="#why-hexagon" id="toc-why-hexagon" class="nav-link" data-scroll-target="#why-hexagon"><span class="header-section-number">4.2</span> Why hexagon?</a></li>
+  <li><a href="#deriving-analytical-hexagon" id="toc-deriving-analytical-hexagon" class="nav-link" data-scroll-target="#deriving-analytical-hexagon"><span class="header-section-number">4.3</span> Deriving Analytical Hexagon</a></li>
+  <li><a href="#selecting-hexagons-with-bus-stops" id="toc-selecting-hexagons-with-bus-stops" class="nav-link" data-scroll-target="#selecting-hexagons-with-bus-stops"><span class="header-section-number">4.4</span> Selecting hexagons with bus stops</a></li>
+  <li><a href="#assigning-ids-to-each-hexagon" id="toc-assigning-ids-to-each-hexagon" class="nav-link" data-scroll-target="#assigning-ids-to-each-hexagon"><span class="header-section-number">4.5</span> Assigning ids to each hexagon</a></li>
+  </ul></li>
+  <li><a href="#preparing-trip-generation-data" id="toc-preparing-trip-generation-data" class="nav-link" data-scroll-target="#preparing-trip-generation-data"><span class="header-section-number">5</span> Preparing trip generation data</a>
+  <ul>
+  <li><a href="#cleaning-the-data" id="toc-cleaning-the-data" class="nav-link" data-scroll-target="#cleaning-the-data"><span class="header-section-number">5.1</span> Cleaning the data</a></li>
+  <li><a href="#populating-hexagon-ids-into-busstop-data-frame" id="toc-populating-hexagon-ids-into-busstop-data-frame" class="nav-link" data-scroll-target="#populating-hexagon-ids-into-busstop-data-frame"><span class="header-section-number">5.2</span> Populating Hexagon IDs into BusStop data frame</a></li>
+  <li><a href="#adding-hex_id-into-bus-trips-data" id="toc-adding-hex_id-into-bus-trips-data" class="nav-link" data-scroll-target="#adding-hex_id-into-bus-trips-data"><span class="header-section-number">5.3</span> Adding HEX_ID into bus trips data</a></li>
+  <li><a href="#aggregating-trips-based-on-hex_id" id="toc-aggregating-trips-based-on-hex_id" class="nav-link" data-scroll-target="#aggregating-trips-based-on-hex_id"><span class="header-section-number">5.4</span> Aggregating TRIPS based on HEX_ID</a></li>
   </ul></li>
   </ul>
 </nav>
@@ -306,8 +308,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<section id="loading-the-r-package" class="level2">
-<h2 class="anchored" data-anchor-id="loading-the-r-package">Loading the R package</h2>
+<section id="loading-the-r-package" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="loading-the-r-package"><span class="header-section-number">1</span> Loading the R package</h2>
 <p>Write a code chunk to install and load tidyverse, sf, sfdep, tmap, knitr, kableExtra, and DT into R environment.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>pacman<span class="sc">::</span><span class="fu">p_load</span>(</span>
@@ -346,8 +348,8 @@ Note
 </div>
 </div>
 </section>
-<section id="importing-data" class="level2">
-<h2 class="anchored" data-anchor-id="importing-data">Importing data</h2>
+<section id="importing-data" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="importing-data"><span class="header-section-number">2</span> Importing data</h2>
 <p>Write code chunks to perform the followings:</p>
 <ul>
 <li>Importing Bus Stop Location shapefile downloaded from LTA DataMall into R environment.<br>
@@ -356,8 +358,8 @@ Note
 </li>
 <li>Importing Passenger Volume by Origin Destination Bus Stops downloaded from LTA DataMall into R environment.</li>
 </ul>
-<section id="importing-bus-stop-location" class="level3">
-<h3 class="anchored" data-anchor-id="importing-bus-stop-location">Importing Bus Stop Location</h3>
+<section id="importing-bus-stop-location" class="level3" data-number="2.1">
+<h3 data-number="2.1" class="anchored" data-anchor-id="importing-bus-stop-location"><span class="header-section-number">2.1</span> Importing Bus Stop Location</h3>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>BusStop <span class="ot">=</span> <span class="fu">st_read</span>(<span class="at">dsn =</span> <span class="st">"/Users/cktan/Desktop/SMU/01_Geospatial Analytics (ISSS626)/Hands-on_Ex/In-Class_Ex06/data/geospatial"</span>,</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>                  <span class="at">layer =</span> <span class="st">"BusStop"</span>) <span class="sc">%&gt;%</span></span>
@@ -374,8 +376,8 @@ Projected CRS: SVY21</code></pre>
 </div>
 </div>
 </section>
-<section id="importing-importing-master-plan-2019-subzone-boundary-no-sea" class="level3">
-<h3 class="anchored" data-anchor-id="importing-importing-master-plan-2019-subzone-boundary-no-sea">Importing Importing Master Plan 2019 Subzone Boundary (No Sea)</h3>
+<section id="importing-importing-master-plan-2019-subzone-boundary-no-sea" class="level3" data-number="2.2">
+<h3 data-number="2.2" class="anchored" data-anchor-id="importing-importing-master-plan-2019-subzone-boundary-no-sea"><span class="header-section-number">2.2</span> Importing Importing Master Plan 2019 Subzone Boundary (No Sea)</h3>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Read the subzone boundary KML into an sf object named 'mpsz_sf'</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>mpsz <span class="ot">&lt;-</span> sf<span class="sc">::</span><span class="fu">st_read</span>(<span class="st">"data/geospatial/MasterPlan2019SubzoneBoundaryNoSeaKML.kml"</span>) <span class="sc">%&gt;%</span></span>
@@ -407,8 +409,8 @@ Note
 </div>
 </div>
 </section>
-<section id="importing-passenger-volume-by-origin-destination-bus-stops" class="level3">
-<h3 class="anchored" data-anchor-id="importing-passenger-volume-by-origin-destination-bus-stops">Importing Passenger Volume by Origin Destination Bus Stops</h3>
+<section id="importing-passenger-volume-by-origin-destination-bus-stops" class="level3" data-number="2.3">
+<h3 data-number="2.3" class="anchored" data-anchor-id="importing-passenger-volume-by-origin-destination-bus-stops"><span class="header-section-number">2.3</span> Importing Passenger Volume by Origin Destination Bus Stops</h3>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>odbus <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"data/origin_destination_bus_202508.csv"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stderr">
@@ -437,8 +439,8 @@ Note
 </div>
 </section>
 </section>
-<section id="visualising-the-geospatial-data" class="level2">
-<h2 class="anchored" data-anchor-id="visualising-the-geospatial-data">Visualising the geospatial data</h2>
+<section id="visualising-the-geospatial-data" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="visualising-the-geospatial-data"><span class="header-section-number">3</span> Visualising the geospatial data</h2>
 <p>Below is the code chunk that is used to visualise the bus stops within Singapore.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tmap_mode</span>(<span class="st">"plot"</span>)   <span class="co"># use "view" for interactive</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -471,9 +473,8 @@ Note
 </div>
 </div>
 <p>However, figure above reveals that there a several bus stops (i.e black dots appear at the upper left) located outside of the main Singapore boundary.</p>
-</section>
-<section id="extracting-bus-stops-located-within-singapore" class="level2">
-<h2 class="anchored" data-anchor-id="extracting-bus-stops-located-within-singapore">Extracting Bus Stops located within Singapore</h2>
+<section id="extracting-bus-stops-located-within-singapore" class="level3" data-number="3.1">
+<h3 data-number="3.1" class="anchored" data-anchor-id="extracting-bus-stops-located-within-singapore"><span class="header-section-number">3.1</span> Extracting Bus Stops located within Singapore</h3>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># If BusStop has Z/M dims, drop them (harmless if not)</span></span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>BusStop <span class="ot">&lt;-</span> <span class="fu">st_zm</span>(BusStop, <span class="at">drop =</span> <span class="cn">TRUE</span>, <span class="at">what =</span> <span class="st">"ZM"</span>)</span>
@@ -516,18 +517,19 @@ Note
 </div>
 </div>
 </section>
-<section id="analytical-hexagon" class="level2">
-<h2 class="anchored" data-anchor-id="analytical-hexagon">Analytical Hexagon</h2>
-<section id="why-analytical-grids" class="level3">
-<h3 class="anchored" data-anchor-id="why-analytical-grids">Why analytical grids?</h3>
+</section>
+<section id="analytical-hexagon" class="level2" data-number="4">
+<h2 data-number="4" class="anchored" data-anchor-id="analytical-hexagon"><span class="header-section-number">4</span> Analytical Hexagon</h2>
+<section id="why-analytical-grids" class="level3" data-number="4.1">
+<h3 data-number="4.1" class="anchored" data-anchor-id="why-analytical-grids"><span class="header-section-number">4.1</span> Why analytical grids?</h3>
 <p>In geospatial analysis, regularly shaped grids are used for many reasons such as normalizing geography for mapping or to mitigate the issues of using irregularly shaped polygons created arbitrarily (such as county boundaries or block groups that have been created from a political process). Regularly shaped grids can only be comprised of equilateral triangles, squares, or hexagons, as these three polygon shapes are the only three that can tessellate (repeating the same shape over and over again, edge to edge, to cover an area without gaps or overlaps) to create an evenly spaced grid.</p>
 </section>
-<section id="why-hexagon" class="level3">
-<h3 class="anchored" data-anchor-id="why-hexagon">Why hexagon?</h3>
+<section id="why-hexagon" class="level3" data-number="4.2">
+<h3 data-number="4.2" class="anchored" data-anchor-id="why-hexagon"><span class="header-section-number">4.2</span> Why hexagon?</h3>
 <p>Hexagons reduce sampling bias due to edge effects of the grid shape, this is related to the low perimeter-to-area ratio of the shape of the hexagon. A circle has the lowest ratio but cannot tessellate to form a continuous grid. Hexagons are the most circular-shaped polygon that can tessellate to form an evenly spaced grid.</p>
 </section>
-<section id="deriving-analytical-hexagon" class="level3">
-<h3 class="anchored" data-anchor-id="deriving-analytical-hexagon">Deriving Analytical Hexagon</h3>
+<section id="deriving-analytical-hexagon" class="level3" data-number="4.3">
+<h3 data-number="4.3" class="anchored" data-anchor-id="deriving-analytical-hexagon"><span class="header-section-number">4.3</span> Deriving Analytical Hexagon</h3>
 <p>Create analytics hexagon layer cover the entire Singapore.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>hexagon <span class="ot">&lt;-</span> <span class="fu">st_make_grid</span>(</span>
@@ -538,6 +540,7 @@ Note
 <span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>) <span class="sc">%&gt;%</span></span>
 <span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_sf</span>()             <span class="co"># convert sfc to full sf object</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
+<p>Now, let’s inspecting the hexagon layer visually.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Merge all subzones into one geometry (Singapore mainland + islands)</span></span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>sg_outline <span class="ot">&lt;-</span> <span class="fu">st_union</span>(mpsz)</span>
@@ -578,8 +581,8 @@ Note
 </div>
 </div>
 </section>
-<section id="selecting-hexagons-with-bus-stops" class="level3">
-<h3 class="anchored" data-anchor-id="selecting-hexagons-with-bus-stops">Selecting hexagons with bus stops</h3>
+<section id="selecting-hexagons-with-bus-stops" class="level3" data-number="4.4">
+<h3 data-number="4.4" class="anchored" data-anchor-id="selecting-hexagons-with-bus-stops"><span class="header-section-number">4.4</span> Selecting hexagons with bus stops</h3>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 1) Count bus stops per hex</span></span>
 <span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>hexagon<span class="sc">$</span>busstop_count <span class="ot">=</span></span>
@@ -590,6 +593,7 @@ Note
 <span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>hexagon_with_bs <span class="ot">&lt;-</span> <span class="fu">filter</span>(</span>
 <span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>  hexagon, busstop_count <span class="sc">&gt;</span> <span class="dv">0</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
+<p>Next, let’s inspecting the hexagon layer after filtering visually.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 3) Plot (only remaining hexagons)</span></span>
 <span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="fu">tmap_mode</span>(<span class="st">"plot"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -626,9 +630,9 @@ Note
 </div>
 </div>
 </section>
-<section id="assigning-ids-to-each-hexagon" class="level3">
-<h3 class="anchored" data-anchor-id="assigning-ids-to-each-hexagon">Assigning ids to each hexagon</h3>
-<p>Let us examine the content of hexagon sf data:</p>
+<section id="assigning-ids-to-each-hexagon" class="level3" data-number="4.5">
+<h3 data-number="4.5" class="anchored" data-anchor-id="assigning-ids-to-each-hexagon"><span class="header-section-number">4.5</span> Assigning ids to each hexagon</h3>
+<p>Let us examine the content of <strong><em>hexagon</em></strong> sf data:</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(hexagon_with_bs)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
@@ -670,7 +674,7 @@ Warning
 <span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a><span class="co">#   as.factor()</span></span>
 <span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a>hexagon_with_id <span class="ot">&lt;-</span> hexagon_with_bs <span class="sc">%&gt;%</span></span>
-<span id="cb29-10"><a href="#cb29-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>busstop_count) <span class="sc">%&gt;%</span>  <span class="co"># ✅ remove the busstop_count column</span></span>
+<span id="cb29-10"><a href="#cb29-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>busstop_count) <span class="sc">%&gt;%</span>  <span class="co"># remove the busstop_count column</span></span>
 <span id="cb29-11"><a href="#cb29-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
 <span id="cb29-12"><a href="#cb29-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">HEX_ID =</span> <span class="fu">sprintf</span>(<span class="st">"H%04d"</span>, <span class="fu">seq_len</span>(<span class="fu">nrow</span>(hexagon_with_bs))) <span class="sc">%&gt;%</span> <span class="fu">as.factor</span>()</span>
 <span id="cb29-13"><a href="#cb29-13" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -692,7 +696,7 @@ Note
 </ol>
 </div>
 </div>
-<p>Now, let’s inspect the new hexagon sf data frame below</p>
+<p>Now, let’s inspect the new <strong><em>hexagon</em></strong> sf data frame below</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(hexagon_with_id)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
@@ -725,10 +729,10 @@ Note
 </div>
 </section>
 </section>
-<section id="preparing-trip-generation-data" class="level2">
-<h2 class="anchored" data-anchor-id="preparing-trip-generation-data">Preparing trip generation data</h2>
-<section id="cleaning-the-data" class="level3">
-<h3 class="anchored" data-anchor-id="cleaning-the-data">Cleaning the data</h3>
+<section id="preparing-trip-generation-data" class="level2" data-number="5">
+<h2 data-number="5" class="anchored" data-anchor-id="preparing-trip-generation-data"><span class="header-section-number">5</span> Preparing trip generation data</h2>
+<section id="cleaning-the-data" class="level3" data-number="5.1">
+<h3 data-number="5.1" class="anchored" data-anchor-id="cleaning-the-data"><span class="header-section-number">5.1</span> Cleaning the data</h3>
 <p>Before going deep in the wrangling, we will clean up the data so that we are left with a lightweight data set that R can process more easily.</p>
 <ol type="1">
 <li>We will retain and rename columns below to make them more understandable and easier to join with other data sets.<br>
@@ -745,7 +749,7 @@ Note
 <span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">TRIPS =</span> TOTAL_TRIPS)</span>
 <span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>trips<span class="sc">$</span>BUS_STOP_N <span class="ot">&lt;-</span> <span class="fu">as.factor</span>(trips<span class="sc">$</span>BUS_STOP_N)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<p>Inspect the content of the trips dataframe:</p>
+<p>Inspect the content of the <strong><em>trips</em></strong> dataframe:</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(trips)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
@@ -761,8 +765,8 @@ Note
 </div>
 </div>
 </section>
-<section id="populating-hexagon-ids-into-busstop-data-frame" class="level3">
-<h3 class="anchored" data-anchor-id="populating-hexagon-ids-into-busstop-data-frame">Populating Hexagon IDs into BusStop data frame</h3>
+<section id="populating-hexagon-ids-into-busstop-data-frame" class="level3" data-number="5.2">
+<h3 data-number="5.2" class="anchored" data-anchor-id="populating-hexagon-ids-into-busstop-data-frame"><span class="header-section-number">5.2</span> Populating Hexagon IDs into BusStop data frame</h3>
 <p>Before we can aggregate trips generate at bus stops onto hexagon level, we need to populate the hexagon ids in hexagon data frame into BusStop data frame.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>bs_hex <span class="ot">&lt;-</span> <span class="fu">st_intersection</span>(</span>
@@ -774,7 +778,7 @@ Note
 all geometries</code></pre>
 </div>
 </div>
-<p>Inspect the content of the bs_hex dataframe:</p>
+<p>Inspect the content of the <strong><em>bs_hex</em></strong> dataframe:</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(bs_hex)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
@@ -788,8 +792,8 @@ all geometries</code></pre>
 </div>
 </div>
 </section>
-<section id="adding-hex_id-into-bus-trips-data" class="level3">
-<h3 class="anchored" data-anchor-id="adding-hex_id-into-bus-trips-data">Adding HEX_ID into bus trips data</h3>
+<section id="adding-hex_id-into-bus-trips-data" class="level3" data-number="5.3">
+<h3 data-number="5.3" class="anchored" data-anchor-id="adding-hex_id-into-bus-trips-data"><span class="header-section-number">5.3</span> Adding HEX_ID into bus trips data</h3>
 <p>To derive the hourly number of bus trips per hexagon, we need to add <strong><em>HEX_ID</em></strong> to trips data. By doing so, we will be able to aswer location questions such as how many bus trip originate from a certain hexagon?</p>
 <p>In the code chunk below <code>inner_join()</code> is used to join the trips data with <strong><em>bs_hex</em></strong>.</p>
 <div class="cell">
@@ -805,7 +809,7 @@ all geometries</code></pre>
   "many-to-many"` to silence this warning.</code></pre>
 </div>
 </div>
-<p>Inspect the dataframe of trip after adding HEX_ID:</p>
+<p>Inspect the dataframe of <strong><em>trip</em></strong> after adding HEX_ID:</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(trips)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
@@ -821,8 +825,8 @@ all geometries</code></pre>
 </div>
 </div>
 </section>
-<section id="aggregating-trips-based-on-hex_id" class="level3">
-<h3 class="anchored" data-anchor-id="aggregating-trips-based-on-hex_id">Aggregating TRIPS based on HEX_ID</h3>
+<section id="aggregating-trips-based-on-hex_id" class="level3" data-number="5.4">
+<h3 data-number="5.4" class="anchored" data-anchor-id="aggregating-trips-based-on-hex_id"><span class="header-section-number">5.4</span> Aggregating TRIPS based on HEX_ID</h3>
 <p>In the code chunk below, <code>group_by()</code> and <code>summarise()</code> is used to aggregate <strong><em>TRIPS</em></strong> by <strong><em>HEX_ID</em></strong>, <strong><em>DAY_TYPE</em></strong> and <strong><em>HOUR_OF_DAY</em></strong>.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>trips <span class="ot">&lt;-</span> trips <span class="sc">%&gt;%</span></span>
