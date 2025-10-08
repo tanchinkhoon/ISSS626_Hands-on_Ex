@@ -9,7 +9,7 @@
 <meta name="author" content="TAN Chin Khoon">
 <meta name="dcterms.date" content="2025-10-04">
 
-<title>In-class Ex06 – ISSS626</title>
+<title>In-class Ex06: Take-home Exercise 2 Kick Starter – ISSS626</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -21,6 +21,41 @@ ul.task-list li input[type="checkbox"] {
   width: 0.8em;
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 </style>
 
@@ -199,15 +234,44 @@ ul.task-list li input[type="checkbox"] {
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
-        
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#loading-the-r-package" id="toc-loading-the-r-package" class="nav-link active" data-scroll-target="#loading-the-r-package">Loading the R package</a></li>
+  <li><a href="#importing-data" id="toc-importing-data" class="nav-link" data-scroll-target="#importing-data">Importing data</a>
+  <ul>
+  <li><a href="#importing-bus-stop-location" id="toc-importing-bus-stop-location" class="nav-link" data-scroll-target="#importing-bus-stop-location">Importing Bus Stop Location</a></li>
+  <li><a href="#importing-importing-master-plan-2019-subzone-boundary-no-sea" id="toc-importing-importing-master-plan-2019-subzone-boundary-no-sea" class="nav-link" data-scroll-target="#importing-importing-master-plan-2019-subzone-boundary-no-sea">Importing Importing Master Plan 2019 Subzone Boundary (No Sea)</a></li>
+  <li><a href="#importing-passenger-volume-by-origin-destination-bus-stops" id="toc-importing-passenger-volume-by-origin-destination-bus-stops" class="nav-link" data-scroll-target="#importing-passenger-volume-by-origin-destination-bus-stops">Importing Passenger Volume by Origin Destination Bus Stops</a></li>
+  </ul></li>
+  <li><a href="#visualising-the-geospatial-data" id="toc-visualising-the-geospatial-data" class="nav-link" data-scroll-target="#visualising-the-geospatial-data">Visualising the geospatial data</a></li>
+  <li><a href="#extracting-bus-stops-located-within-singapore" id="toc-extracting-bus-stops-located-within-singapore" class="nav-link" data-scroll-target="#extracting-bus-stops-located-within-singapore">Extracting Bus Stops located within Singapore</a></li>
+  <li><a href="#analytical-hexagon" id="toc-analytical-hexagon" class="nav-link" data-scroll-target="#analytical-hexagon">Analytical Hexagon</a>
+  <ul>
+  <li><a href="#why-analytical-grids" id="toc-why-analytical-grids" class="nav-link" data-scroll-target="#why-analytical-grids">Why analytical grids?</a></li>
+  <li><a href="#why-hexagon" id="toc-why-hexagon" class="nav-link" data-scroll-target="#why-hexagon">Why hexagon?</a></li>
+  <li><a href="#deriving-analytical-hexagon" id="toc-deriving-analytical-hexagon" class="nav-link" data-scroll-target="#deriving-analytical-hexagon">Deriving Analytical Hexagon</a></li>
+  <li><a href="#selecting-hexagons-with-bus-stops" id="toc-selecting-hexagons-with-bus-stops" class="nav-link" data-scroll-target="#selecting-hexagons-with-bus-stops">Selecting hexagons with bus stops</a></li>
+  <li><a href="#assigning-ids-to-each-hexagon" id="toc-assigning-ids-to-each-hexagon" class="nav-link" data-scroll-target="#assigning-ids-to-each-hexagon">Assigning ids to each hexagon</a></li>
+  </ul></li>
+  <li><a href="#preparing-trip-generation-data" id="toc-preparing-trip-generation-data" class="nav-link" data-scroll-target="#preparing-trip-generation-data">Preparing trip generation data</a>
+  <ul>
+  <li><a href="#cleaning-the-data" id="toc-cleaning-the-data" class="nav-link" data-scroll-target="#cleaning-the-data">Cleaning the data</a></li>
+  <li><a href="#populating-hexagon-ids-into-busstop-data-frame" id="toc-populating-hexagon-ids-into-busstop-data-frame" class="nav-link" data-scroll-target="#populating-hexagon-ids-into-busstop-data-frame">Populating Hexagon IDs into BusStop data frame</a></li>
+  <li><a href="#adding-hex_id-into-bus-trips-data" id="toc-adding-hex_id-into-bus-trips-data" class="nav-link" data-scroll-target="#adding-hex_id-into-bus-trips-data">Adding HEX_ID into bus trips data</a></li>
+  <li><a href="#aggregating-trips-based-on-hex_id" id="toc-aggregating-trips-based-on-hex_id" class="nav-link" data-scroll-target="#aggregating-trips-based-on-hex_id">Aggregating TRIPS based on HEX_ID</a></li>
+  </ul></li>
+  </ul>
+</nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">In-class Ex06</h1>
+<h1 class="title">In-class Ex06: Take-home Exercise 2 Kick Starter</h1>
 </div>
 
 
@@ -231,7 +295,7 @@ ul.task-list li input[type="checkbox"] {
     <div>
     <div class="quarto-title-meta-heading">Modified</div>
     <div class="quarto-title-meta-contents">
-      <p class="date-modified">October 4, 2025</p>
+      <p class="date-modified">October 8, 2025</p>
     </div>
   </div>
     
@@ -242,8 +306,593 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
+<section id="loading-the-r-package" class="level2">
+<h2 class="anchored" data-anchor-id="loading-the-r-package">Loading the R package</h2>
+<p>Write a code chunk to install and load tidyverse, sf, sfdep, tmap, knitr, kableExtra, and DT into R environment.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>pacman<span class="sc">::</span><span class="fu">p_load</span>(</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  tidyverse,</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  sf,</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  sfdep,</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  tmap,</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  knitr,</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  kableExtra,</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>  DT</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>  )  </span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li>tidyverse, a family of modern R packages specially developed for performing data science tasks,<br>
+</li>
+<li>sf, a modern R package specially developed for performing geospatial data science tasks except visualising geospatial data;<br>
+</li>
+<li>tmap, an R package for create elegant thematic maps based on the principles of Layered Grammar of Graphics;<br>
+</li>
+<li>knitr, an R package that provide an elegant, flexible, and fast static table generation with R;<br>
+</li>
+<li>kableExtra, an extension of knitr for creating elegant html table with R; and<br>
+</li>
+<li>DT, an R package DT provides an R interface to the JavaScript library DataTables for create interactive htnl tables.</li>
+</ul>
+</div>
+</div>
+</section>
+<section id="importing-data" class="level2">
+<h2 class="anchored" data-anchor-id="importing-data">Importing data</h2>
+<p>Write code chunks to perform the followings:</p>
+<ul>
+<li>Importing Bus Stop Location shapefile downloaded from LTA DataMall into R environment.<br>
+</li>
+<li>Importing Master Plan 2019 Subzone Boundary (No Sea) from Singapore’s open data portal.<br>
+</li>
+<li>Importing Passenger Volume by Origin Destination Bus Stops downloaded from LTA DataMall into R environment.</li>
+</ul>
+<section id="importing-bus-stop-location" class="level3">
+<h3 class="anchored" data-anchor-id="importing-bus-stop-location">Importing Bus Stop Location</h3>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>BusStop <span class="ot">=</span> <span class="fu">st_read</span>(<span class="at">dsn =</span> <span class="st">"/Users/cktan/Desktop/SMU/01_Geospatial Analytics (ISSS626)/Hands-on_Ex/In-Class_Ex06/data/geospatial"</span>,</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>                  <span class="at">layer =</span> <span class="st">"BusStop"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="fu">st_transform</span>(<span class="at">crs =</span> <span class="dv">3414</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Reading layer `BusStop' from data source 
+  `/Users/cktan/Desktop/SMU/01_Geospatial Analytics (ISSS626)/Hands-on_Ex/In-Class_Ex06/data/geospatial' 
+  using driver `ESRI Shapefile'
+Simple feature collection with 5172 features and 2 fields
+Geometry type: POINT
+Dimension:     XY
+Bounding box:  xmin: 3970.122 ymin: 26482.1 xmax: 48285.52 ymax: 52983.82
+Projected CRS: SVY21</code></pre>
+</div>
+</div>
+</section>
+<section id="importing-importing-master-plan-2019-subzone-boundary-no-sea" class="level3">
+<h3 class="anchored" data-anchor-id="importing-importing-master-plan-2019-subzone-boundary-no-sea">Importing Importing Master Plan 2019 Subzone Boundary (No Sea)</h3>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Read the subzone boundary KML into an sf object named 'mpsz_sf'</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>mpsz <span class="ot">&lt;-</span> sf<span class="sc">::</span><span class="fu">st_read</span>(<span class="st">"data/geospatial/MasterPlan2019SubzoneBoundaryNoSeaKML.kml"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  sf<span class="sc">::</span><span class="fu">st_zm</span>(<span class="at">drop =</span> <span class="cn">TRUE</span>, <span class="at">what =</span> <span class="st">"ZM"</span>) <span class="sc">%&gt;%</span>  <span class="co"># remove Z (elevation) and M (measure) dimensions to keep 2D only</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  sf<span class="sc">::</span><span class="fu">st_transform</span>(<span class="at">crs =</span> <span class="dv">3414</span>)   </span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Reading layer `URA_MP19_SUBZONE_NO_SEA_PL' from data source 
+  `/Users/cktan/Desktop/SMU/01_Geospatial Analytics (ISSS626)/Hands-on_Ex/In-Class_Ex06/data/geospatial/MasterPlan2019SubzoneBoundaryNoSeaKML.kml' 
+  using driver `KML'
+Simple feature collection with 332 features and 2 fields
+Geometry type: MULTIPOLYGON
+Dimension:     XY, XYZ
+Bounding box:  xmin: 103.6057 ymin: 1.158699 xmax: 104.0885 ymax: 1.470775
+z_range:       zmin: 0 zmax: 0
+Geodetic CRS:  WGS 84</code></pre>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Refer to <a href="https://r4gdsa.netlify.app/chap02#importing-geospatial-data-into-r">2.3.2 Importing Geospatial Data into R</a> of R for Geospatial Data Science and Analytics to learn how to import and tidy a kml file.</p>
+</div>
+</div>
+</section>
+<section id="importing-passenger-volume-by-origin-destination-bus-stops" class="level3">
+<h3 class="anchored" data-anchor-id="importing-passenger-volume-by-origin-destination-bus-stops">Importing Passenger Volume by Origin Destination Bus Stops</h3>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>odbus <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"data/origin_destination_bus_202508.csv"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Rows: 5876969 Columns: 7
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr (5): YEAR_MONTH, DAY_TYPE, PT_TYPE, ORIGIN_PT_CODE, DESTINATION_PT_CODE
+dbl (2): TIME_PER_HOUR, TOTAL_TRIPS
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><code>read_csv()</code> of readr package should be used instead of <code>read.csv()</code> of of Base R. <code>read_csv()</code> is <strong>written in C++</strong>, optimized for performance. On the other hands, <code>read.csv()</code> is <strong>pure R</strong>, much slower for large files. Besides that, <code>read_csv()</code> automatically infers column types (numeric, character, date, etc.) more accurately. In comparison, <code>read.csv()</code> often converts strings to factors by default, which can lead to subtle bugs.</p>
+</div>
+</div>
+</section>
+</section>
+<section id="visualising-the-geospatial-data" class="level2">
+<h2 class="anchored" data-anchor-id="visualising-the-geospatial-data">Visualising the geospatial data</h2>
+<p>Below is the code chunk that is used to visualise the bus stops within Singapore.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tmap_mode</span>(<span class="st">"plot"</span>)   <span class="co"># use "view" for interactive</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>ℹ tmap mode set to "plot".</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_shape</span>(mpsz) <span class="sc">+</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_polygons</span>(<span class="at">col =</span> <span class="st">"grey95"</span>, <span class="at">border.col =</span> <span class="st">"darkgrey"</span>) <span class="sc">+</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_shape</span>(BusStop) <span class="sc">+</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_dots</span>(<span class="at">col =</span> <span class="st">"red"</span>, <span class="at">size =</span> <span class="fl">0.1</span>, <span class="at">alpha =</span> <span class="fl">0.6</span>) <span class="sc">+</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_layout</span>(</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">title =</span> <span class="st">"Bus Stop Locations within Singapore Subzones"</span>,</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">title.position =</span> <span class="fu">c</span>(<span class="st">"bottom"</span>,<span class="st">"right"</span>),</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">title.size =</span> <span class="fl">0.8</span>,</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">frame =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">legend.outside =</span> <span class="cn">TRUE</span></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>
+── tmap v3 code detected ───────────────────────────────────────────────────────
+[v3-&gt;v4] `tm_polygons()`: use 'fill' for the fill color of polygons/symbols
+(instead of 'col'), and 'col' for the outlines (instead of 'border.col').[v3-&gt;v4] `tm_dots()`: use `fill_alpha` instead of `alpha`.[v3-&gt;v4] `tm_layout()`: use `tm_title()` instead of `tm_layout(title = )`</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="in-class_ex06_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid figure-img" width="576"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>However, figure above reveals that there a several bus stops (i.e black dots appear at the upper left) located outside of the main Singapore boundary.</p>
+</section>
+<section id="extracting-bus-stops-located-within-singapore" class="level2">
+<h2 class="anchored" data-anchor-id="extracting-bus-stops-located-within-singapore">Extracting Bus Stops located within Singapore</h2>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># If BusStop has Z/M dims, drop them (harmless if not)</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>BusStop <span class="ot">&lt;-</span> <span class="fu">st_zm</span>(BusStop, <span class="at">drop =</span> <span class="cn">TRUE</span>, <span class="at">what =</span> <span class="st">"ZM"</span>)</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Now do the spatial join: keep only bus stops that fall inside Singapore subzones</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>BusStop_in_SG <span class="ot">&lt;-</span> <span class="fu">st_join</span>(</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>  BusStop, mpsz,</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">join =</span> st_within,</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">left =</span> <span class="cn">FALSE</span></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Now, plot the bus stops within Singapore.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tmap_mode</span>(<span class="st">"plot"</span>)   <span class="co"># use "view" for interactive</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>ℹ tmap mode set to "plot".</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_shape</span>(mpsz) <span class="sc">+</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_polygons</span>(<span class="at">col =</span> <span class="st">"grey95"</span>, <span class="at">border.col =</span> <span class="st">"darkgrey"</span>) <span class="sc">+</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_shape</span>(BusStop_in_SG) <span class="sc">+</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_dots</span>(<span class="at">col =</span> <span class="st">"red"</span>, <span class="at">size =</span> <span class="fl">0.1</span>, <span class="at">alpha =</span> <span class="fl">0.6</span>) <span class="sc">+</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_layout</span>(</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">title =</span> <span class="st">"Bus Stop Locations within Singapore Subzones"</span>,</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">title.position =</span> <span class="fu">c</span>(<span class="st">"bottom"</span>,<span class="st">"right"</span>),</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">title.size =</span> <span class="fl">0.6</span>,</span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">frame =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">legend.outside =</span> <span class="cn">TRUE</span></span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>
+── tmap v3 code detected ───────────────────────────────────────────────────────
+[v3-&gt;v4] `tm_dots()`: use `fill_alpha` instead of `alpha`.[v3-&gt;v4] `tm_layout()`: use `tm_title()` instead of `tm_layout(title = )`</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="in-class_ex06_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid figure-img" width="576"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="analytical-hexagon" class="level2">
+<h2 class="anchored" data-anchor-id="analytical-hexagon">Analytical Hexagon</h2>
+<section id="why-analytical-grids" class="level3">
+<h3 class="anchored" data-anchor-id="why-analytical-grids">Why analytical grids?</h3>
+<p>In geospatial analysis, regularly shaped grids are used for many reasons such as normalizing geography for mapping or to mitigate the issues of using irregularly shaped polygons created arbitrarily (such as county boundaries or block groups that have been created from a political process). Regularly shaped grids can only be comprised of equilateral triangles, squares, or hexagons, as these three polygon shapes are the only three that can tessellate (repeating the same shape over and over again, edge to edge, to cover an area without gaps or overlaps) to create an evenly spaced grid.</p>
+</section>
+<section id="why-hexagon" class="level3">
+<h3 class="anchored" data-anchor-id="why-hexagon">Why hexagon?</h3>
+<p>Hexagons reduce sampling bias due to edge effects of the grid shape, this is related to the low perimeter-to-area ratio of the shape of the hexagon. A circle has the lowest ratio but cannot tessellate to form a continuous grid. Hexagons are the most circular-shaped polygon that can tessellate to form an evenly spaced grid.</p>
+</section>
+<section id="deriving-analytical-hexagon" class="level3">
+<h3 class="anchored" data-anchor-id="deriving-analytical-hexagon">Deriving Analytical Hexagon</h3>
+<p>Create analytics hexagon layer cover the entire Singapore.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>hexagon <span class="ot">&lt;-</span> <span class="fu">st_make_grid</span>(</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  mpsz,               <span class="co"># Singapore subzone boundary object</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">cellsize =</span> <span class="dv">700</span>,     <span class="co"># side-to-side distance between hex centers (in metres)</span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">what =</span> <span class="st">"polygons"</span>,  <span class="co"># output polygons</span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">square =</span> <span class="cn">FALSE</span>      <span class="co"># hexagonal grid (TRUE → square grid)</span></span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>) <span class="sc">%&gt;%</span></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_sf</span>()             <span class="co"># convert sfc to full sf object</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Merge all subzones into one geometry (Singapore mainland + islands)</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>sg_outline <span class="ot">&lt;-</span> <span class="fu">st_union</span>(mpsz)</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a><span class="fu">tmap_mode</span>(<span class="st">"plot"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>ℹ tmap mode set to "plot".</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_shape</span>(sg_outline) <span class="sc">+</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_polygons</span>(<span class="at">col =</span> <span class="st">"palegreen3"</span>, <span class="at">border.col =</span> <span class="cn">NA</span>) <span class="sc">+</span>        <span class="co"># unified green Singapore</span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_shape</span>(hexagon) <span class="sc">+</span></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_borders</span>(<span class="at">col =</span> <span class="st">"grey50"</span>, <span class="at">lwd =</span> <span class="fl">0.25</span>) <span class="sc">+</span>                 <span class="co"># grey hex grid overlay</span></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_shape</span>(BusStop_in_SG) <span class="sc">+</span>                        <span class="co"># detailed bus stop distribution</span></span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_dots</span>(<span class="at">col =</span> <span class="st">"red"</span>, <span class="at">size =</span> <span class="fl">0.1</span>, <span class="at">fill_alpha =</span> <span class="fl">0.08</span>) <span class="sc">+</span></span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_compass</span>(<span class="at">type =</span> <span class="st">"8star"</span>, <span class="at">size =</span> <span class="dv">2</span>, <span class="at">position =</span> <span class="fu">c</span>(<span class="st">"right"</span>, <span class="st">"bottom"</span>)) <span class="sc">+</span></span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_scalebar</span>(<span class="at">position =</span> <span class="fu">c</span>(<span class="st">"right"</span>, <span class="st">"bottom"</span>)) <span class="sc">+</span></span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_layout</span>(</span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">title =</span> <span class="st">"Analytical hexagon layer overplot on Singapore"</span>,</span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">title.position =</span> <span class="fu">c</span>(<span class="st">"center"</span>, <span class="st">"top"</span>),</span>
+<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">title.size =</span> <span class="fl">1.2</span>,</span>
+<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">title.fontface =</span> <span class="st">"bold"</span>,  </span>
+<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">inner.margins =</span> <span class="fu">c</span>(<span class="fl">0.05</span>, <span class="fl">0.08</span>, <span class="fl">0.20</span>, <span class="fl">0.05</span>),  <span class="co"># adjust bottom margin (0.10) pushes title below frame</span></span>
+<span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">outer.margins =</span> <span class="fu">c</span>(<span class="fl">0.05</span>, <span class="fl">0.08</span>, <span class="fl">0.08</span>, <span class="fl">0.05</span>),  <span class="co"># keeps white space around map</span></span>
+<span id="cb20-16"><a href="#cb20-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">frame =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb20-17"><a href="#cb20-17" aria-hidden="true" tabindex="-1"></a>  <span class="at">legend.show =</span> <span class="cn">FALSE</span></span>
+<span id="cb20-18"><a href="#cb20-18" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>
+── tmap v3 code detected ───────────────────────────────────────────────────────
+[v3-&gt;v4] `tm_layout()`: use `tm_title()` instead of `tm_layout(title = )`</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="in-class_ex06_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid figure-img" width="960"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="selecting-hexagons-with-bus-stops" class="level3">
+<h3 class="anchored" data-anchor-id="selecting-hexagons-with-bus-stops">Selecting hexagons with bus stops</h3>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 1) Count bus stops per hex</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>hexagon<span class="sc">$</span>busstop_count <span class="ot">=</span></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">lengths</span>(<span class="fu">st_intersects</span>(</span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>    hexagon, BusStop_in_SG))</span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a><span class="co"># 2) Keep ONLY hexes with ≥ 1 bus stop</span></span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>hexagon_with_bs <span class="ot">&lt;-</span> <span class="fu">filter</span>(</span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>  hexagon, busstop_count <span class="sc">&gt;</span> <span class="dv">0</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 3) Plot (only remaining hexagons)</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="fu">tmap_mode</span>(<span class="st">"plot"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>ℹ tmap mode set to "plot".</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_shape</span>(sg_outline) <span class="sc">+</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_polygons</span>(<span class="at">col =</span> <span class="st">"palegreen3"</span>, <span class="at">border.col =</span> <span class="cn">NA</span>) <span class="sc">+</span>          <span class="co"># clean SG outline</span></span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_shape</span>(hexagon_with_bs) <span class="sc">+</span></span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_borders</span>(<span class="at">col =</span> <span class="st">"white"</span>, <span class="at">alpha =</span> <span class="dv">1</span>, <span class="at">border.col =</span> <span class="st">"grey40"</span>, <span class="at">lwd =</span> <span class="fl">0.25</span>) <span class="sc">+</span>                    <span class="co"># ONLY these hexes remain</span></span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_compass</span>(<span class="at">type =</span> <span class="st">"8star"</span>, <span class="at">size =</span> <span class="dv">2</span>, <span class="at">position =</span> <span class="fu">c</span>(<span class="st">"right"</span>,<span class="st">"bottom"</span>)) <span class="sc">+</span></span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_scalebar</span>(<span class="at">position =</span> <span class="fu">c</span>(<span class="st">"right"</span>,<span class="st">"bottom"</span>)) <span class="sc">+</span></span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_layout</span>(</span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">title =</span> <span class="st">"Analytical hexagon layer overplot on Singapore"</span>,</span>
+<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">title.position =</span> <span class="fu">c</span>(<span class="st">"center"</span>, <span class="st">"top"</span>),</span>
+<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">title.size =</span> <span class="fl">1.2</span>,</span>
+<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">title.fontface =</span> <span class="st">"bold"</span>,  </span>
+<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">inner.margins =</span> <span class="fu">c</span>(<span class="fl">0.05</span>, <span class="fl">0.08</span>, <span class="fl">0.20</span>, <span class="fl">0.05</span>),  <span class="co"># adjust bottom margin (0.10) pushes title below frame</span></span>
+<span id="cb25-13"><a href="#cb25-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">outer.margins =</span> <span class="fu">c</span>(<span class="fl">0.05</span>, <span class="fl">0.08</span>, <span class="fl">0.08</span>, <span class="fl">0.05</span>),  <span class="co"># keeps white space around map</span></span>
+<span id="cb25-14"><a href="#cb25-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">frame =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb25-15"><a href="#cb25-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">legend.show =</span> <span class="cn">FALSE</span></span>
+<span id="cb25-16"><a href="#cb25-16" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>
+── tmap v3 code detected ───────────────────────────────────────────────────────
+[v3-&gt;v4] `tm_borders()`: use `fill_alpha` instead of `alpha`.[v3-&gt;v4] `tm_layout()`: use `tm_title()` instead of `tm_layout(title = )`</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="in-class_ex06_files/figure-html/unnamed-chunk-11-1.png" class="img-fluid figure-img" width="960"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="assigning-ids-to-each-hexagon" class="level3">
+<h3 class="anchored" data-anchor-id="assigning-ids-to-each-hexagon">Assigning ids to each hexagon</h3>
+<p>Let us examine the content of hexagon sf data:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(hexagon_with_bs)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Simple feature collection with 6 features and 1 field
+Geometry type: POLYGON
+Dimension:     XY
+Bounding box:  xmin: 3717.538 ymin: 27468.93 xmax: 5117.538 ymax: 31914.53
+Projected CRS: SVY21 / Singapore TM
+                        geometry busstop_count
+1 POLYGON ((4067.538 27468.93...             1
+2 POLYGON ((4417.538 28075.15...             2
+3 POLYGON ((4417.538 30500.02...             1
+4 POLYGON ((4767.538 28681.37...             1
+5 POLYGON ((4767.538 29893.8,...             4
+6 POLYGON ((4767.538 31106.24...             1</code></pre>
+</div>
+</div>
+<div class="callout callout-style-default callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Warning
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Notice that the data frame does not include an ID field.</p>
+</div>
+</div>
+<p>Below are the code chunk to include the ID field:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="co"># hexagon_with_id &lt;- hexagon_with_bs %&gt;% </span></span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a><span class="co">#   select(, -busstop_count)</span></span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a><span class="co"># hexagon_with_id$HEX_ID &lt;- sprintf(</span></span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a><span class="co">#   "H%04d", seq_len(</span></span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a><span class="co">#     nrow(hexagon))) %&gt;% </span></span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a><span class="co">#   as.factor()</span></span>
+<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a>hexagon_with_id <span class="ot">&lt;-</span> hexagon_with_bs <span class="sc">%&gt;%</span></span>
+<span id="cb29-10"><a href="#cb29-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>busstop_count) <span class="sc">%&gt;%</span>  <span class="co"># ✅ remove the busstop_count column</span></span>
+<span id="cb29-11"><a href="#cb29-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb29-12"><a href="#cb29-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">HEX_ID =</span> <span class="fu">sprintf</span>(<span class="st">"H%04d"</span>, <span class="fu">seq_len</span>(<span class="fu">nrow</span>(hexagon_with_bs))) <span class="sc">%&gt;%</span> <span class="fu">as.factor</span>()</span>
+<span id="cb29-13"><a href="#cb29-13" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ol type="1">
+<li><code>select()</code> is used to drop busstop_count field from the sf data frame.</li>
+<li>A new feld called <strong><em>HEX_ID</em></strong> is created. Then, <code>sprintf()</code>, <code>seq_len()</code> and <code>nrow()</code> are used to insert sequential ID values with a character H in front.</li>
+<li><code>as.factor()</code> is used to convert the values into factor data type.</li>
+</ol>
+</div>
+</div>
+<p>Now, let’s inspect the new hexagon sf data frame below</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(hexagon_with_id)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Simple feature collection with 6 features and 1 field
+Geometry type: POLYGON
+Dimension:     XY
+Bounding box:  xmin: 3717.538 ymin: 27468.93 xmax: 5117.538 ymax: 31914.53
+Projected CRS: SVY21 / Singapore TM
+                        geometry HEX_ID
+1 POLYGON ((4067.538 27468.93...  H0001
+2 POLYGON ((4417.538 28075.15...  H0002
+3 POLYGON ((4417.538 30500.02...  H0003
+4 POLYGON ((4767.538 28681.37...  H0004
+5 POLYGON ((4767.538 29893.8,...  H0005
+6 POLYGON ((4767.538 31106.24...  H0006</code></pre>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Notice that a new ID column called <strong><em>HEX_ID</em></strong> has been added into hexagon data frame and the values are 5-digit running number start with the letter H. At the same time, <strong><em>busstop_count</em></strong> field has been dropped from the data frame.</p>
+</div>
+</div>
+</section>
+</section>
+<section id="preparing-trip-generation-data" class="level2">
+<h2 class="anchored" data-anchor-id="preparing-trip-generation-data">Preparing trip generation data</h2>
+<section id="cleaning-the-data" class="level3">
+<h3 class="anchored" data-anchor-id="cleaning-the-data">Cleaning the data</h3>
+<p>Before going deep in the wrangling, we will clean up the data so that we are left with a lightweight data set that R can process more easily.</p>
+<ol type="1">
+<li>We will retain and rename columns below to make them more understandable and easier to join with other data sets.<br>
+</li>
+<li>We will also rename the columns to make them more understandable and will make joining with other data sets easier.<br>
+</li>
+<li>Lastly, will also convert BUS_STOP_N to factor as it has a finite set of values so we can convert it to categorical data to make it easier to work with.</li>
+</ol>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>trips <span class="ot">&lt;-</span> odbus <span class="sc">%&gt;%</span></span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="fu">c</span>(ORIGIN_PT_CODE, DAY_TYPE, TIME_PER_HOUR, TOTAL_TRIPS)) <span class="sc">%&gt;%</span></span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">BUS_STOP_N =</span> ORIGIN_PT_CODE) <span class="sc">%&gt;%</span></span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">HOUR_OF_DAY =</span> TIME_PER_HOUR) <span class="sc">%&gt;%</span></span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">TRIPS =</span> TOTAL_TRIPS)</span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>trips<span class="sc">$</span>BUS_STOP_N <span class="ot">&lt;-</span> <span class="fu">as.factor</span>(trips<span class="sc">$</span>BUS_STOP_N)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Inspect the content of the trips dataframe:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(trips)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 4
+  BUS_STOP_N DAY_TYPE         HOUR_OF_DAY TRIPS
+  &lt;fct&gt;      &lt;chr&gt;                  &lt;dbl&gt; &lt;dbl&gt;
+1 84671      WEEKENDS/HOLIDAY           9     3
+2 10099      WEEKENDS/HOLIDAY          13    31
+3 64601      WEEKENDS/HOLIDAY          21     3
+4 53009      WEEKENDS/HOLIDAY          16    10
+5 80051      WEEKENDS/HOLIDAY          18     4
+6 70031      WEEKDAY                   14     1</code></pre>
+</div>
+</div>
+</section>
+<section id="populating-hexagon-ids-into-busstop-data-frame" class="level3">
+<h3 class="anchored" data-anchor-id="populating-hexagon-ids-into-busstop-data-frame">Populating Hexagon IDs into BusStop data frame</h3>
+<p>Before we can aggregate trips generate at bus stops onto hexagon level, we need to populate the hexagon ids in hexagon data frame into BusStop data frame.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>bs_hex <span class="ot">&lt;-</span> <span class="fu">st_intersection</span>(</span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>  BusStop, hexagon_with_id) <span class="sc">%&gt;%</span></span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_drop_geometry</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="fu">c</span>(BUS_STOP_N, HEX_ID))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: attribute variables are assumed to be spatially constant throughout
+all geometries</code></pre>
+</div>
+</div>
+<p>Inspect the content of the bs_hex dataframe:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(bs_hex)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>     BUS_STOP_N HEX_ID
+3092      25059  H0001
+2439      25751  H0002
+2554      25761  H0002
+241       26379  H0003
+2652      25741  H0004
+1635      26399  H0005</code></pre>
+</div>
+</div>
+</section>
+<section id="adding-hex_id-into-bus-trips-data" class="level3">
+<h3 class="anchored" data-anchor-id="adding-hex_id-into-bus-trips-data">Adding HEX_ID into bus trips data</h3>
+<p>To derive the hourly number of bus trips per hexagon, we need to add <strong><em>HEX_ID</em></strong> to trips data. By doing so, we will be able to aswer location questions such as how many bus trip originate from a certain hexagon?</p>
+<p>In the code chunk below <code>inner_join()</code> is used to join the trips data with <strong><em>bs_hex</em></strong>.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>trips <span class="ot">&lt;-</span> <span class="fu">inner_join</span>(trips, bs_hex)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Joining with `by = join_by(BUS_STOP_N)`</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning in inner_join(trips, bs_hex): Detected an unexpected many-to-many relationship between `x` and `y`.
+ℹ Row 65 of `x` matches multiple rows in `y`.
+ℹ Row 2834 of `y` matches multiple rows in `x`.
+ℹ If a many-to-many relationship is expected, set `relationship =
+  "many-to-many"` to silence this warning.</code></pre>
+</div>
+</div>
+<p>Inspect the dataframe of trip after adding HEX_ID:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(trips)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 5
+  BUS_STOP_N DAY_TYPE         HOUR_OF_DAY TRIPS HEX_ID
+  &lt;chr&gt;      &lt;chr&gt;                  &lt;dbl&gt; &lt;dbl&gt; &lt;fct&gt; 
+1 84671      WEEKENDS/HOLIDAY           9     3 H0842 
+2 10099      WEEKENDS/HOLIDAY          13    31 H0424 
+3 64601      WEEKENDS/HOLIDAY          21     3 H0700 
+4 53009      WEEKENDS/HOLIDAY          16    10 H0564 
+5 80051      WEEKENDS/HOLIDAY          18     4 H0665 
+6 70031      WEEKDAY                   14     1 H0678 </code></pre>
+</div>
+</div>
+</section>
+<section id="aggregating-trips-based-on-hex_id" class="level3">
+<h3 class="anchored" data-anchor-id="aggregating-trips-based-on-hex_id">Aggregating TRIPS based on HEX_ID</h3>
+<p>In the code chunk below, <code>group_by()</code> and <code>summarise()</code> is used to aggregate <strong><em>TRIPS</em></strong> by <strong><em>HEX_ID</em></strong>, <strong><em>DAY_TYPE</em></strong> and <strong><em>HOUR_OF_DAY</em></strong>.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>trips <span class="ot">&lt;-</span> trips <span class="sc">%&gt;%</span></span>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(</span>
+<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a>    HEX_ID,</span>
+<span id="cb44-4"><a href="#cb44-4" aria-hidden="true" tabindex="-1"></a>    DAY_TYPE,</span>
+<span id="cb44-5"><a href="#cb44-5" aria-hidden="true" tabindex="-1"></a>    HOUR_OF_DAY) <span class="sc">%&gt;%</span></span>
+<span id="cb44-6"><a href="#cb44-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">TRIPS =</span> <span class="fu">sum</span>(TRIPS))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>`summarise()` has grouped output by 'HEX_ID', 'DAY_TYPE'. You can override
+using the `.groups` argument.</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(<span class="fu">head</span>(trips))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: left;">HEX_ID</th>
+<th style="text-align: left;">DAY_TYPE</th>
+<th style="text-align: right;">HOUR_OF_DAY</th>
+<th style="text-align: right;">TRIPS</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">H0001</td>
+<td style="text-align: left;">WEEKDAY</td>
+<td style="text-align: right;">6</td>
+<td style="text-align: right;">120</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">H0001</td>
+<td style="text-align: left;">WEEKDAY</td>
+<td style="text-align: right;">7</td>
+<td style="text-align: right;">111</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">H0001</td>
+<td style="text-align: left;">WEEKDAY</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">77</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">H0001</td>
+<td style="text-align: left;">WEEKDAY</td>
+<td style="text-align: right;">9</td>
+<td style="text-align: right;">66</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">H0001</td>
+<td style="text-align: left;">WEEKDAY</td>
+<td style="text-align: right;">10</td>
+<td style="text-align: right;">32</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">H0001</td>
+<td style="text-align: left;">WEEKDAY</td>
+<td style="text-align: right;">11</td>
+<td style="text-align: right;">66</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 
 
+</section>
+</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
