@@ -11,20 +11,4 @@ execute:
   freeze: true
 ---
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+![](v2-5srm1-b0hhz.jpg)

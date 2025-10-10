@@ -1,0 +1,2 @@
+"use strict";(self.webpackChunk_N_E=self.webpackChunk_N_E||[]).push([[5631],{5631:(e,n,s)=>{s.r(n),s.d(n,{PaymentPlanContainer:()=>a});var r=s(424629),t=s(762140);let a=({children:e,padding:n="30px 0 0 0",margin:s="0",border:a})=>(0,r.jsx)(t.A,{sx:{padding:n,margin:s,...a?{border:a}:{borderBottom:({tokens:{color:e}})=>`1px solid ${e.gray["onyx-12"]}`}},children:e})}}]);
+//# sourceMappingURL=5631.667ecbb8332c1a71.js.map
