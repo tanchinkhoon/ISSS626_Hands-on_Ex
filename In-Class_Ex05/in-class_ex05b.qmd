@@ -241,7 +241,7 @@ head(emerging)
 
 ## Performing Emerging Hotspot Spatial Analysis (EHSA)
 
-Lastly, we will perform EHSA analysis by using [emerging_hotspot_analysis()](https://sfdep.josiahparry.com/reference/emerging_hotspot_analysis.html) of sfdep package. It takes a spacetime object x (i.e. GDPPC_st), and the quoted name of the variable of interest (i.e. GDPPC) for .var argument. The k argument is used to specify the number of time lags which is set to 1 by default. Lastly, nsim map numbers of simulation t![](Screenshot 2025-10-12 at 6.26.27 PM.png)o be performed.
+Lastly, we will perform EHSA analysis by using [emerging_hotspot_analysis()](https://sfdep.josiahparry.com/reference/emerging_hotspot_analysis.html) of sfdep package. It takes a spacetime object x (i.e. GDPPC_st), and the quoted name of the variable of interest (i.e. GDPPC) for .var argument. The k argument is used to specify the number of time lags which is set to 1 by default. Lastly, nsim map numbers of simulation t![](Screenshot%202025-10-12%20at%206.26.27%20PM.png)o be performed.
 
 ```{r}
 
@@ -298,10 +298,10 @@ tm_shape(ehsa_sig) +
 
 ### Interpretation of EHSA classes
 
-![](Screenshot 2025-10-12 at 6.26.27 PM.png)
+![](EHSA_1.jpg)
 
-![](Screenshot 2025-10-12 at 6.26.41 PM.png)
+![](EHSA_2.jpg)
 
-![](Screenshot 2025-10-12 at 6.26.54 PM.png)
+![](EHSA_3.jpg)
 
-![](Screenshot 2025-10-12 at 6.27.04 PM.png)
+![](EHSA_4.jpg)
