@@ -1,8 +1,8 @@
 ---
-title: "In-class Exercise 5"
+title: "In-class Exercise 5a: Global and Local Measures of Spatial Autocorrelation using sfdep methods"
 author: "TAN Chin Khoon"
-date: "September 24, 2025"
-date-modified:: "last-modified"
+date: "September 27, 2025"
+date-modified:: "September 27, 2025d"
 number-sections: true
 ---
 
