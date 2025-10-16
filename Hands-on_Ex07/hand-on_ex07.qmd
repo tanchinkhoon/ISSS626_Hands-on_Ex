@@ -687,9 +687,11 @@ longlat = FALSE) # coordinates are projected (meters)
 
 ```
 
-:::{.callout-note}
+:::{.callout-note icon=false}
 
-The result shows that the recommended bandwidth is 971.3405 metres. (Quiz: Do you know why it is in metre?)
+#### Do you know why it is in meter?
+
+The reason why the recommended bandwidth (971.3405) is expressed in meters because of the coordinate reference system (CRS) were projected in **SVY21 (EPSG:3414)**, all distances and spatial computations (like buffer, bandwidth, kernel distance, etc.) are measured in meters.
 
 :::
 
