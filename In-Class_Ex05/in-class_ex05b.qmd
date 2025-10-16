@@ -1,5 +1,5 @@
 ---
-title: "In-class Ex5b: Emerging Host Spot Analysis"
+title: "In-class Ex5b: Emerging Hot Spot Analysis"
 author: "TAN Chin Khoon"
 date: "27 September 2025"
 date-modified: "last-modified"

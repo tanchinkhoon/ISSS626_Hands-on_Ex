@@ -12,3 +12,254 @@ execute:
 ---
 
 ![](v2-5srm1-b0hhz.jpg)
+
+## Introduction
+
+Public transport is the backbone of Singapore’s urban mobility system, linking homes, workplaces and commercial centres into an integrated city network. Within this system, public buses remain the most extensive and inclusive mode, serving both central and peripheral areas. As Singapore advances toward the Land Transport Master Plan 2040, analysing spatial and temporal variations in bus passenger movement is essential for informed planning. Descriptive statistics and heat maps offer only surface patterns and cannot reveal the deeper spatial relationships among travel zones.
+
+This study applies Local Measures of Spatial Autocorrelation, including Local Moran I, Local Geary C and Getis Ord Gi Star, to identify clusters and outliers in bus trip intensity across Singapore. These indicators reveal neighbourhoods of consistently high or low ridership and pinpoint areas that diverge from surrounding conditions. To incorporate the temporal dimension, the study employs Emerging Hot Spot Analysis using the Gi Star statistic together with the Mann Kendall trend test to assess how hot and cold spots evolve during morning, evening and weekend periods.
+
+The results will provide empirical evidence for improving bus network design, enhancing accessibility and promoting a more efficient and equitable transport system that supports sustainable urban development.
+
+## Research Questions
+
+The present study aims to examine spatial and temporal patterns of public bus mobility in Singapore through the application of local spatial statistical methods. Building upon the objectives outlined in the exercise, the research is guided by four interrelated questions that connect theoretical analysis with practical urban transport planning.
+
+**RQ1 – Spatial Distribution:** Where do bus trips concentrate across the city during weekday morning, weekday evening and weekend periods, and what does this reveal about overall mobility intensity?
+
+**RQ2 – Local Spatial Clustering:** Which areas display statistically significant clusters or outliers of bus trip intensity as detected by Local Moran I, Local Geary C and Getis Ord Gi Star?
+
+**RQ3 – Temporal Evolution:** How do the identified hot and cold spots change over time, and what categories of emerging, intensifying, diminishing or sporadic patterns can be observed through the Mann Kendall trend analysis?
+
+**RQ4 – Policy and Planning Implications:** How can the identified spatial and temporal patterns of bus ridership inform the design of transport policies, allocation of resources and long-term planning for an efficient and inclusive public transport network?
+
+Together these questions structure the analytical framework and ensure direct alignment between the study objectives and subsequent methods.
+
+## The Data
+
+This study uses official datasets from national agencies to analyse spatial and temporal patterns of bus mobility in Singapore. The Land Transport Authority (LTA) DataMall Passenger Volume OD Bus dataset provides detailed records of passenger trips between bus stops, including origin code, destination code, day type, hour and total trip volume. The LTA Bus Stop layer supplies the geographic locations and attributes of all active bus stops, while the Urban Redevelopment Authority (URA) Master Plan 2019 Subzone Boundary defines the official spatial units for aggregation and mapping.
+
+All spatial data are projected to the Singapore SVY21 coordinate system (EPSG 3414) to preserve distance accuracy. The datasets are cleaned and joined in the R environment to generate analytical hexagonal zones containing at least one bus stop. These integrated data support the computation of local spatial statistics and the identification of emerging patterns in public bus ridership.
+
+```{r}
+
+# --- 3.1 Create data source table --------------------------------------------
+
+# Load knitr (already part of pacman::p_load in setup)
+pacman::p_load(knitr)
+
+# Create a data frame listing all datasets used in the study
+data_sources <- data.frame(
+  Dataset_Name = c(
+    "LTA Passenger Volume OD Bus",
+    "LTA Bus Stop Location",
+    "URA Master Plan 2019 Subzone Boundary",
+    "Coordinate Reference System"
+  ),
+  Description = c(
+    "Passenger trips by origin, destination, day type and hour.",
+    "Geographic location and attributes of all operational bus stops.",
+    "Official planning boundaries for spatial aggregation and mapping.",
+    "Projected Singapore SVY21 system ensuring metric distance accuracy."
+  ),
+  Format = c("CSV", "Shapefile", "KML / GeoJSON", "EPSG 3414"),
+  Source = c(
+    "LTA DataMall",
+    "LTA DataMall",
+    "data.gov.sg (URA)",
+    "Singapore Land Authority"
+  )
+)
+
+# Render the table in Quarto / R Markdown output
+kable(
+  data_sources,
+  caption = "Table 1: Data Sources for Bus Mobility Analysis in Singapore",
+  align = "llll"
+)
+
+```
+
+## Setup the Environment
+
+A consistent analytical environment ensures reproducibility and transparency in spatial data analysis. This section defines the R environment used in the study. All scripts were executed in RStudio using packages that support data wrangling, spatial statistics and visualisation. The **pacman** package is used to automate installation and loading of required libraries. Each library serves a specific purpose within the analytical workflow, and a random seed is set to guarantee consistent statistical outputs across repeated runs.
+
+```{r}
+
+# --- 4.1 Load and install required packages ----------------------------------
+
+if (!require(pacman)) install.packages("pacman")  
+# Checks whether 'pacman' is already installed. 
+# If missing, it installs the package so that subsequent commands can run.
+
+pacman::p_load(                           
+  sf,              # Handles spatial vector data such as points, lines, and polygons.
+  sfdep,           # Performs spatial dependence analysis (Moran I, Gi* and related statistics).
+  tmap,            # Creates static and interactive thematic maps for visualisation.
+  tidyverse,       # Provides data manipulation and plotting tools (dplyr, ggplot2, readr).
+  plotly,          # Adds interactivity to ggplot maps and statistical plots.
+  Kendall,         # Performs the Mann Kendall trend test for temporal trend detection.
+  knitr,           # Enables dynamic report generation in Quarto or R Markdown.
+  kableExtra       # Enhances table formatting for publication-quality outputs.
+)
+
+# --- 4.2 Reproducibility setting ---------------------------------------------
+
+set.seed(626)  
+# Establishes a fixed random seed so that random processes 
+# (for example, simulation-based significance tests) produce identical results on each run.
+
+```
+
+## Data Pre-processing and Wrangling
+
+This section details the rigorous preparation of both spatial and aspatial datasets to establish a unified analytical foundation for the subsequent spatial and spatio-temporal analyses of Singapore’s bus-mobility patterns.  The procedures convert raw geospatial layers and passenger-volume tables into metrically consistent, quality-assured analytical units capable of supporting Local Moran I, LISA, and Emerging Hot Spot Analysis (EHSA).  All geometries are projected into the Singapore Transverse Mercator coordinate system (EPSG 3414) to maintain measurements in metres.  The workflow proceeds through seven major stages: importing and projecting geospatial layers, constructing a regular hexagonal grid, validating geometric integrity, filtering relevant spatial units, integrating the aspatial passenger data, and building a balanced space–time panel for subsequent statistical modelling.
+
+### Import Bus Stop Layer
+
+The Bus Stop layer provides the geographic locations of all active bus stops in Singapore. Importing and projecting this layer to SVY21 ensures consistency with other datasets.
+
+```{r}
+
+# --- 5.1 Import Bus Stop layer ----------------------------------------------
+
+BusStop <- st_read(dsn = "/Users/cktan/Desktop/SMU/01_Geospatial Analytics (ISSS626)/Hands-on_Ex/Take-home_Ex02/data/geospatial", layer = "BusStop") %>%
+  st_transform(crs = 3414)
+# Reads the BusStop shapefile and converts its coordinates to Singapore SVY21 (EPSG 3414).
+
+```
+
+### Import URA Master Plan 2019 Subzone Boundary
+
+The URA Master Plan 2019 Subzone Boundary provides official planning areas and serves as the spatial extent for generating the analytical grid.
+
+```{r}
+
+# --- 5.2 Import URA Master Plan 2019 Subzone Boundary -----------------------
+
+mpsz <- st_read("/Users/cktan/Desktop/SMU/01_Geospatial Analytics (ISSS626)/Hands-on_Ex/Take-home_Ex02/data/geospatial/MasterPlan2019SubzoneBoundaryNoSeaKML.kml") %>%
+  st_zm(drop = TRUE, what = "ZM") %>%
+  st_transform(crs = 3414)
+# Loads the KML boundary file, removes Z or M dimensions, and reprojects to SVY21.
+
+sg_outline <- st_union(mpsz) # merge subzones for basemap plotting
+
+```
+
+### Import Passenger Volume OD Bus Dataset
+
+The Passenger Volume OD Bus dataset from LTA DataMall contains hourly origin and destination passenger volumes, forming the aspatial foundation for mobility intensity.
+
+```{r}
+
+# --- 5.3 Import Passenger Volume OD Bus dataset -----------------------------
+
+odbus <- read_csv("/Users/cktan/Desktop/SMU/01_Geospatial Analytics (ISSS626)/Hands-on_Ex/Take-home_Ex02/data/aspatial/origin_destination_bus_202508.csv")
+# Reads the CSV file containing origin stop code, destination stop code, day type, hour and total trips.
+
+# Inspect the data structure and 
+glimpse(odbus)              # displays data structure
+summary(odbus$TOTAL_TRIPS)  # confirms realistic numeric values
+
+```
+
+```{r}
+
+tm_shape(sg_outline) +
+  tm_polygons(col = "grey95", border.col = "darkgrey") +
+tm_shape(BusStop) +
+  tm_dots(col = "red", size = 0.1, alpha = 0.6) +
+tm_layout(
+  title = "Bus Stop Locations within Singapore Subzones",
+  title.position = c("bottom","right"),
+  title.size = 0.8,
+  frame = TRUE,
+  legend.outside = TRUE
+)
+
+```
+
+
+
+
+
+
+
+
+### Generate 375 m Hexagonal Traffic Analysis Zone (TAZ) Grid
+
+A uniform hexagonal grid is generated to represent TAZs across Singapore. Hexagons reduce sampling bias due to edge effects of the grid shape, this is related to the low perimeter-to-area ratio of the shape of the hexagon. A circle has the lowest ratio but cannot tessellate to form a continuous grid. Hexagons are the most circular-shaped polygon that can tessellate to form an evenly spaced grid. Each hexagon has an apothem of 375 meters, giving a flat-to-flat width of approximately 750 meters. The grid provides the spatial framework for aggregating bus-trip intensity.
+
+```{r}
+
+# --- 5.4 Generate 375 m hexagonal TAZ grid ----------------------------------
+
+hexagon <- st_make_grid(
+  mpsz,                      # coverage extent from URA boundary
+  cellsize = 750,            # flat-to-flat spacing equals twice the 375 m apothem
+  what = "polygons",         # create polygon geometries
+  square = FALSE             # request hexagons instead of squares
+) %>%
+  st_sf()                    # convert the grid to an sf object
+
+sg_outline <- st_union(mpsz) # merge subzones for basemap plotting
+
+```
+
+```{r}
+tmap_mode("plot")
+
+tm_shape(sg_outline) +
+  tm_polygons(col = "palegreen3", border.col = NA) +  # unified green Singapore
+tm_shape(hexagon) +
+  tm_borders(col = "grey50", lwd = 0.25) +            # grey hex grid overlay
+tm_shape(BusStop_in_SG) +                             # detailed bus stop distribution
+  tm_dots(col = "red", size = 0.1, fill_alpha = 0.08) +
+tm_compass(type = "8star", size = 2, position = c("right", "bottom")) +
+tm_scalebar(position = c("right", "bottom")) +
+tm_layout(
+  title = "Analytical Hexagon Grid covering Singapore",
+  title.position = c("center", "top"),
+  title.size = 1.2,
+  title.fontface = "bold",  
+  inner.margins = c(0.05, 0.08, 0.20, 0.05),  # adjust bottom margin (0.10) pushes title below frame
+  outer.margins = c(0.05, 0.08, 0.08, 0.05),  # keeps white space around map
+  frame = TRUE,
+  legend.show = FALSE
+)
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

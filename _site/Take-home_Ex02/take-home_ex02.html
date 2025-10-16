@@ -22,6 +22,41 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
 
@@ -141,7 +176,11 @@ ul.task-list li input[type="checkbox"] {
   </li>  
         <li>
     <a class="dropdown-item" href="../In-Class_Ex05/in-class_ex05">
- <span class="dropdown-text">In-class Exercise 5</span></a>
+ <span class="dropdown-text">In-class Exercise 5a</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../In-Class_Ex05/in-class_ex05b">
+ <span class="dropdown-text">In-class Exercise 5b</span></a>
   </li>  
         <li>
     <a class="dropdown-item" href="../In-Class_Ex04/in-class_ex04">
@@ -203,8 +242,18 @@ ul.task-list li input[type="checkbox"] {
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
-        
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction"><span class="header-section-number">1</span> Introduction</a></li>
+  <li><a href="#research-questions" id="toc-research-questions" class="nav-link" data-scroll-target="#research-questions"><span class="header-section-number">2</span> Research Questions</a></li>
+  <li><a href="#the-data" id="toc-the-data" class="nav-link" data-scroll-target="#the-data"><span class="header-section-number">3</span> The Data</a></li>
+  <li><a href="#setup-the-environment" id="toc-setup-the-environment" class="nav-link" data-scroll-target="#setup-the-environment"><span class="header-section-number">4</span> Setup the Environment</a></li>
+  <li><a href="#section" id="toc-section" class="nav-link" data-scroll-target="#section"><span class="header-section-number">5</span> </a></li>
+  </ul>
+</nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
@@ -247,8 +296,140 @@ ul.task-list li input[type="checkbox"] {
 
 
 <p><img src="v2-5srm1-b0hhz.jpg" class="img-fluid"></p>
+<section id="introduction" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="introduction"><span class="header-section-number">1</span> Introduction</h2>
+<p>Public transport is the backbone of Singapore’s urban mobility system, linking homes, workplaces and commercial centres into an integrated city network. Within this system, public buses remain the most extensive and inclusive mode, serving both central and peripheral areas. As Singapore advances toward the Land Transport Master Plan 2040, analysing spatial and temporal variations in bus passenger movement is essential for informed planning. Descriptive statistics and heat maps offer only surface patterns and cannot reveal the deeper spatial relationships among travel zones.</p>
+<p>This study applies Local Measures of Spatial Autocorrelation, including Local Moran I, Local Geary C and Getis Ord Gi Star, to identify clusters and outliers in bus trip intensity across Singapore. These indicators reveal neighbourhoods of consistently high or low ridership and pinpoint areas that diverge from surrounding conditions. To incorporate the temporal dimension, the study employs Emerging Hot Spot Analysis using the Gi Star statistic together with the Mann Kendall trend test to assess how hot and cold spots evolve during morning, evening and weekend periods.</p>
+<p>The results will provide empirical evidence for improving bus network design, enhancing accessibility and promoting a more efficient and equitable transport system that supports sustainable urban development.</p>
+</section>
+<section id="research-questions" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="research-questions"><span class="header-section-number">2</span> Research Questions</h2>
+<p>The present study aims to examine spatial and temporal patterns of public bus mobility in Singapore through the application of local spatial statistical methods. Building upon the objectives outlined in the exercise, the research is guided by four interrelated questions that connect theoretical analysis with practical urban transport planning.</p>
+<p><strong>RQ1 – Spatial Distribution:</strong> Where do bus trips concentrate across the city during weekday morning, weekday evening and weekend periods, and what does this reveal about overall mobility intensity?</p>
+<p><strong>RQ2 – Local Spatial Clustering:</strong> Which areas display statistically significant clusters or outliers of bus trip intensity as detected by Local Moran I, Local Geary C and Getis Ord Gi Star?</p>
+<p><strong>RQ3 – Temporal Evolution:</strong> How do the identified hot and cold spots change over time, and what categories of emerging, intensifying, diminishing or sporadic patterns can be observed through the Mann Kendall trend analysis?</p>
+<p><strong>RQ4 – Policy and Planning Implications:</strong> How can the identified spatial and temporal patterns of bus ridership inform the design of transport policies, allocation of resources and long-term planning for an efficient and inclusive public transport network?</p>
+<p>Together these questions structure the analytical framework and ensure direct alignment between the study objectives and subsequent methods.</p>
+</section>
+<section id="the-data" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="the-data"><span class="header-section-number">3</span> The Data</h2>
+<p>This study uses official datasets from national agencies to analyse spatial and temporal patterns of bus mobility in Singapore. The Land Transport Authority (LTA) DataMall Passenger Volume OD Bus dataset provides detailed records of passenger trips between bus stops, including origin code, destination code, day type, hour and total trip volume. The LTA Bus Stop layer supplies the geographic locations and attributes of all active bus stops, while the Urban Redevelopment Authority (URA) Master Plan 2019 Subzone Boundary defines the official spatial units for aggregation and mapping.</p>
+<p>All spatial data are projected to the Singapore SVY21 coordinate system (EPSG 3414) to preserve distance accuracy. The datasets are cleaned and joined in the R environment to generate analytical hexagonal zones containing at least one bus stop. These integrated data support the computation of local spatial statistics and the identification of emerging patterns in public bus ridership.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># --- 3.1 Create data source table --------------------------------------------</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Load knitr (already part of pacman::p_load in setup)</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>pacman<span class="sc">::</span><span class="fu">p_load</span>(knitr)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a data frame listing all datasets used in the study</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>data_sources <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">Dataset_Name =</span> <span class="fu">c</span>(</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">"LTA Passenger Volume OD Bus"</span>,</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    <span class="st">"LTA Bus Stop Location"</span>,</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    <span class="st">"URA Master Plan 2019 Subzone Boundary"</span>,</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Coordinate Reference System"</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>  ),</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">Description =</span> <span class="fu">c</span>(</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Passenger trips by origin, destination, day type and hour."</span>,</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Geographic location and attributes of all operational bus stops."</span>,</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Official planning boundaries for spatial aggregation and mapping."</span>,</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Projected Singapore SVY21 system ensuring metric distance accuracy."</span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>  ),</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>  <span class="at">Format =</span> <span class="fu">c</span>(<span class="st">"CSV"</span>, <span class="st">"Shapefile"</span>, <span class="st">"KML / GeoJSON"</span>, <span class="st">"EPSG 3414"</span>),</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>  <span class="at">Source =</span> <span class="fu">c</span>(</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>    <span class="st">"LTA DataMall"</span>,</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>    <span class="st">"LTA DataMall"</span>,</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>    <span class="st">"data.gov.sg (URA)"</span>,</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Singapore Land Authority"</span></span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a><span class="co"># Render the table in Quarto / R Markdown output</span></span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(</span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>  data_sources,</span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>  <span class="at">caption =</span> <span class="st">"Table 1: Data Sources for Bus Mobility Analysis in Singapore"</span>,</span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>  <span class="at">align =</span> <span class="st">"llll"</span></span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Table 1: Data Sources for Bus Mobility Analysis in Singapore</caption>
+<colgroup>
+<col style="width: 26%">
+<col style="width: 46%">
+<col style="width: 9%">
+<col style="width: 17%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Dataset_Name</th>
+<th style="text-align: left;">Description</th>
+<th style="text-align: left;">Format</th>
+<th style="text-align: left;">Source</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">LTA Passenger Volume OD Bus</td>
+<td style="text-align: left;">Passenger trips by origin, destination, day type and hour.</td>
+<td style="text-align: left;">CSV</td>
+<td style="text-align: left;">LTA DataMall</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">LTA Bus Stop Location</td>
+<td style="text-align: left;">Geographic location and attributes of all operational bus stops.</td>
+<td style="text-align: left;">Shapefile</td>
+<td style="text-align: left;">LTA DataMall</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">URA Master Plan 2019 Subzone Boundary</td>
+<td style="text-align: left;">Official planning boundaries for spatial aggregation and mapping.</td>
+<td style="text-align: left;">KML / GeoJSON</td>
+<td style="text-align: left;">data.gov.sg (URA)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Coordinate Reference System</td>
+<td style="text-align: left;">Projected Singapore SVY21 system ensuring metric distance accuracy.</td>
+<td style="text-align: left;">EPSG 3414</td>
+<td style="text-align: left;">Singapore Land Authority</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+<section id="setup-the-environment" class="level2" data-number="4">
+<h2 data-number="4" class="anchored" data-anchor-id="setup-the-environment"><span class="header-section-number">4</span> Setup the Environment</h2>
+<p>A consistent analytical environment ensures reproducibility and transparency in spatial data analysis. This section defines the R environment used in the study. All scripts were executed in RStudio using packages that support data wrangling, spatial statistics and visualisation. The <strong>pacman</strong> package is used to automate installation and loading of required libraries. Each library serves a specific purpose within the analytical workflow, and a random seed is set to guarantee consistent statistical outputs across repeated runs.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># --- 4.1 Load and install required packages ----------------------------------</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">require</span>(pacman)) <span class="fu">install.packages</span>(<span class="st">"pacman"</span>)  </span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Checks whether 'pacman' is already installed. </span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co"># If missing, it installs the package so that subsequent commands can run.</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>pacman<span class="sc">::</span><span class="fu">p_load</span>(                           </span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>  sf,              <span class="co"># Handles spatial vector data such as points, lines, and polygons.</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>  sfdep,           <span class="co"># Performs spatial dependence analysis (Moran I, Gi* and related statistics).</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>  tmap,            <span class="co"># Creates static and interactive thematic maps for visualisation.</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>  tidyverse,       <span class="co"># Provides data manipulation and plotting tools (dplyr, ggplot2, readr).</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>  plotly,          <span class="co"># Adds interactivity to ggplot maps and statistical plots.</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>  Kendall,         <span class="co"># Performs the Mann Kendall trend test for temporal trend detection.</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>  knitr,           <span class="co"># Enables dynamic report generation in Quarto or R Markdown.</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>  kableExtra       <span class="co"># Enhances table formatting for publication-quality outputs.</span></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a><span class="co"># --- 4.2 Reproducibility setting ---------------------------------------------</span></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">626</span>)  </span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a><span class="co"># Establishes a fixed random seed so that random processes </span></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a><span class="co"># (for example, simulation-based significance tests) produce identical results on each run.</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="section" class="level2" data-number="5">
+<h2 data-number="5" class="anchored" data-anchor-id="section"><span class="header-section-number">5</span> </h2>
 
 
+</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
