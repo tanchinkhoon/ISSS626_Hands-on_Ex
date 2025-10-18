@@ -620,6 +620,8 @@ In the code chunk below `bw.gwr()` of GWModel package is used to determine the o
 
 There are two possible approaches can be uused to determine the stopping rule, they are: CV cross-validation approach and AIC corrected (AICc) approach. We define the stopping rule using approach agreement.
 
+##### Fixed bandwidth computation via CV
+
 ```{r}
 
 # Search for the optimal fixed bandwidth (in meters) using CV
@@ -637,6 +639,8 @@ adaptive = FALSE, # fixed (distance) bandwidth
 longlat = FALSE) # coordinates are projected (meters)
 
 ```
+
+##### Fixed bandwidth computation via AIC
 
 ```{r}
 
@@ -656,9 +660,11 @@ longlat = FALSE) # coordinates are projected (meters)
 
 ```
 
-#### 13.9.1.2 GWModel method - fixed bandwith (CV; K nearest neighbors)
+####  GWModel method - fixed-bandwith (CV and AIC; K nearest neighbors)
 
 Now we can use the code chunk below to calibrate the gwr model using fixed bandwidth and gaussian kernel.
+
+##### Calibrate fixed-bandwidth using CV
 
 ```{r}
 
@@ -680,6 +686,7 @@ longlat = FALSE)
 gwr.fixed_CV
 
 ```
+##### Calibrate fixed-bandwidth using AIC
 
 ```{r}
 
@@ -702,7 +709,7 @@ gwr.fixed_AIC
 
 ```
 
-#### Insights and interpretation of fixed bandwith using both CV and AIC approached
+#### Insights into fixed bandwidth performance under CV and AIC approaches
 
 The two fixed-bandwidth GWR runs differ in a meaningful way this time. The cross-validated model, gwr.fixed_CV, selects a fixed kernel width of about 971 m and yields AICc ≈ 42,263.6, R² ≈ 0.8099 (adjusted ≈ 0.8430), an effective parameter count of about 438.4, and residual sum of squares around 2.534×10¹⁴. The AICc-tuned model, gwr.fixed_AIC, chooses a larger fixed bandwidth of about 1,386 m, with AICc ≈ 42,254.7, R² ≈ 0.8566 (adjusted ≈ 0.8182), an effective parameter count of about 302.6, and residual sum of squares reported near 3.335×10¹⁴. In practical terms, AICc prefers a smoother spatial surface: a wider bandwidth pools information from more neighbours, which reduces local variance and shrinks the effective complexity by roughly one-third (≈303 vs ≈438 parameters). That parsimony is exactly what AICc rewards, and it explains why the AICc model attains the lower information criterion despite being less “wiggly.” The higher R² from the AICc fit indicates that, at this broader spatial scale, the model explains more variation in prices overall; the CV model’s smaller bandwidth is better at capturing very local idiosyncrasies but at the cost of higher model complexity and potentially noisier local coefficients.
 
@@ -715,6 +722,8 @@ In this section, we will calibrate the gwr-based hedonic pricing model by using 
 #### Computing the adaptive bandwidth
 
 Similar to the earlier section, we will first use `bw.gwr()` to determine the recommended data point to use.
+
+##### Adaptive bandwidth computation via CV
 
 The code chunk used look very similar to the one used to compute the fixed bandwidth except the **adaptive argument** has changed to **TRUE**.
 
@@ -736,6 +745,7 @@ longlat = FALSE)
 
 ```
 
+##### Adaptive bandwidth computation via AIC
 
 ```{r}
 
@@ -754,11 +764,11 @@ adaptive = TRUE, # K‑NN style bandwidth
 longlat = FALSE)
 
 ```
-
-
 #### Constructing the adaptive bandwidth gwr model
 
 Now, we can go ahead to calibrate the gwr-based hedonic pricing model by using adaptive bandwidth and gaussian kernel as shown in the code chunk below.
+
+##### Calibrate adaptive bandwidth using CV
 
 ```{r}
 
@@ -780,6 +790,7 @@ gwr.adaptive_CV
 
 ```
 
+##### Calibrate adaptive bandwidth using AIC
 
 ```{r}
 
@@ -801,7 +812,7 @@ gwr.adaptive_AIC
 
 ```
 
-#### Insights and interpretations of adaptive bandwith using both CV and AIC approached
+#### Insights into adaptive bandwidth performance under CV and AIC approaches
 
 Our two adaptive GWR calibrations use the same data, kernel and metric but settle on different neighbour counts. gwr.adaptive_CV chooses 30 neighbours (CV = prediction-error minimization), whereas gwr.adaptive_AIC prefers a narrower window of 27 neighbours (AICc = fit–parsimony trade-off). The smaller window lets coefficients vary more sharply across space.
 
@@ -840,8 +851,7 @@ summary(gwr.adaptive_AIC$SDF$yhat)
 
 ```
 
-
-## Selecting Tampines planning areas 
+## Subset the dataset to features within the Tampines Planning Are 
 
 ```{r}
 
@@ -888,7 +898,7 @@ tampines_r2_summary
 
 ```
 
-### Insights and intepretation:
+### Insights into Tampines planning area
 
 The adaptive GWR results for Tampines show an exceptionally strong and spatially consistent model fit across condominium resale points. With n = 76, the Local R² ranges from 0.894 to 0.972, a median of 0.965, and a mean of 0.955, indicating that the model explains over 95% of local price variation for most locations. Such high and tightly clustered R² values suggest the explanatory variables—floor area, age, proximity to amenities, accessibility, and tenure—collectively provide a robust representation of spatial price dynamics in Tampines.
 

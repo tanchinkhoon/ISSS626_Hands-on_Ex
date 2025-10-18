@@ -325,20 +325,20 @@ window.Quarto = {
   <li><a href="#building-fixed-bandwidth-gwr-model" id="toc-building-fixed-bandwidth-gwr-model" class="nav-link" data-scroll-target="#building-fixed-bandwidth-gwr-model"><span class="header-section-number">8.1</span> Building Fixed Bandwidth GWR Model</a>
   <ul class="collapse">
   <li><a href="#computing-fixed-bandwith-using-cv-and-aic-approach" id="toc-computing-fixed-bandwith-using-cv-and-aic-approach" class="nav-link" data-scroll-target="#computing-fixed-bandwith-using-cv-and-aic-approach"><span class="header-section-number">8.1.1</span> Computing fixed bandwith using CV and AIC approach</a></li>
-  <li><a href="#gwmodel-method---fixed-bandwith-cv-k-nearest-neighbors" id="toc-gwmodel-method---fixed-bandwith-cv-k-nearest-neighbors" class="nav-link" data-scroll-target="#gwmodel-method---fixed-bandwith-cv-k-nearest-neighbors"><span class="header-section-number">8.1.2</span> 13.9.1.2 GWModel method - fixed bandwith (CV; K nearest neighbors)</a></li>
-  <li><a href="#insights-and-interpretation-of-fixed-bandwith-using-both-cv-and-aic-approached" id="toc-insights-and-interpretation-of-fixed-bandwith-using-both-cv-and-aic-approached" class="nav-link" data-scroll-target="#insights-and-interpretation-of-fixed-bandwith-using-both-cv-and-aic-approached"><span class="header-section-number">8.1.3</span> Insights and interpretation of fixed bandwith using both CV and AIC approached</a></li>
+  <li><a href="#gwmodel-method---fixed-bandwith-cv-and-aic-k-nearest-neighbors" id="toc-gwmodel-method---fixed-bandwith-cv-and-aic-k-nearest-neighbors" class="nav-link" data-scroll-target="#gwmodel-method---fixed-bandwith-cv-and-aic-k-nearest-neighbors"><span class="header-section-number">8.1.2</span> GWModel method - fixed-bandwith (CV and AIC; K nearest neighbors)</a></li>
+  <li><a href="#insights-into-fixed-bandwidth-performance-under-cv-and-aic-approaches" id="toc-insights-into-fixed-bandwidth-performance-under-cv-and-aic-approaches" class="nav-link" data-scroll-target="#insights-into-fixed-bandwidth-performance-under-cv-and-aic-approaches"><span class="header-section-number">8.1.3</span> Insights into fixed bandwidth performance under CV and AIC approaches</a></li>
   </ul></li>
   <li><a href="#building-adaptive-bandwidth-gwr-model" id="toc-building-adaptive-bandwidth-gwr-model" class="nav-link" data-scroll-target="#building-adaptive-bandwidth-gwr-model"><span class="header-section-number">8.2</span> Building Adaptive Bandwidth GWR Model</a>
   <ul class="collapse">
   <li><a href="#computing-the-adaptive-bandwidth" id="toc-computing-the-adaptive-bandwidth" class="nav-link" data-scroll-target="#computing-the-adaptive-bandwidth"><span class="header-section-number">8.2.1</span> Computing the adaptive bandwidth</a></li>
   <li><a href="#constructing-the-adaptive-bandwidth-gwr-model" id="toc-constructing-the-adaptive-bandwidth-gwr-model" class="nav-link" data-scroll-target="#constructing-the-adaptive-bandwidth-gwr-model"><span class="header-section-number">8.2.2</span> Constructing the adaptive bandwidth gwr model</a></li>
-  <li><a href="#insights-and-interpretations-of-adaptive-bandwith-using-both-cv-and-aic-approached" id="toc-insights-and-interpretations-of-adaptive-bandwith-using-both-cv-and-aic-approached" class="nav-link" data-scroll-target="#insights-and-interpretations-of-adaptive-bandwith-using-both-cv-and-aic-approached"><span class="header-section-number">8.2.3</span> Insights and interpretations of adaptive bandwith using both CV and AIC approached</a></li>
+  <li><a href="#insights-into-adaptive-bandwidth-performance-under-cv-and-aic-approaches" id="toc-insights-into-adaptive-bandwidth-performance-under-cv-and-aic-approaches" class="nav-link" data-scroll-target="#insights-into-adaptive-bandwidth-performance-under-cv-and-aic-approaches"><span class="header-section-number">8.2.3</span> Insights into adaptive bandwidth performance under CV and AIC approaches</a></li>
   </ul></li>
   </ul></li>
   <li><a href="#converting-sdf-into-sf-data.frame" id="toc-converting-sdf-into-sf-data.frame" class="nav-link" data-scroll-target="#converting-sdf-into-sf-data.frame"><span class="header-section-number">9</span> Converting SDF into sf data.frame</a></li>
-  <li><a href="#selecting-tampines-planning-areas" id="toc-selecting-tampines-planning-areas" class="nav-link" data-scroll-target="#selecting-tampines-planning-areas"><span class="header-section-number">10</span> Selecting Tampines planning areas</a>
+  <li><a href="#subset-the-dataset-to-features-within-the-tampines-planning-are" id="toc-subset-the-dataset-to-features-within-the-tampines-planning-are" class="nav-link" data-scroll-target="#subset-the-dataset-to-features-within-the-tampines-planning-are"><span class="header-section-number">10</span> Subset the dataset to features within the Tampines Planning Are</a>
   <ul>
-  <li><a href="#insights-and-intepretation" id="toc-insights-and-intepretation" class="nav-link" data-scroll-target="#insights-and-intepretation"><span class="header-section-number">10.1</span> Insights and intepretation:</a></li>
+  <li><a href="#insights-into-tampines-planning-area" id="toc-insights-into-tampines-planning-area" class="nav-link" data-scroll-target="#insights-into-tampines-planning-area"><span class="header-section-number">10.1</span> Insights into Tampines planning area</a></li>
   </ul></li>
   </ul>
 </nav>
@@ -1002,23 +1002,23 @@ F-statistic: 189.1 on 14 and 1421 DF,  p-value: &lt; 2.2e-16</code></pre>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a clean table of coefficients, CIs, and p‑values</span></span>
 <span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a><span class="fu">tbl_regression</span>(condo.mlr1, <span class="at">intercept =</span> <span class="cn">TRUE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
-<div id="jfuasrusqh" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>#jfuasrusqh table {
+<div id="htlssttgjn" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#htlssttgjn table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-#jfuasrusqh thead, #jfuasrusqh tbody, #jfuasrusqh tfoot, #jfuasrusqh tr, #jfuasrusqh td, #jfuasrusqh th {
+#htlssttgjn thead, #htlssttgjn tbody, #htlssttgjn tfoot, #htlssttgjn tr, #htlssttgjn td, #htlssttgjn th {
   border-style: none;
 }
 
-#jfuasrusqh p {
+#htlssttgjn p {
   margin: 0;
   padding: 0;
 }
 
-#jfuasrusqh .gt_table {
+#htlssttgjn .gt_table {
   display: table;
   border-collapse: collapse;
   line-height: normal;
@@ -1044,12 +1044,12 @@ F-statistic: 189.1 on 14 and 1421 DF,  p-value: &lt; 2.2e-16</code></pre>
   border-left-color: #D3D3D3;
 }
 
-#jfuasrusqh .gt_caption {
+#htlssttgjn .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#jfuasrusqh .gt_title {
+#htlssttgjn .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -1061,7 +1061,7 @@ F-statistic: 189.1 on 14 and 1421 DF,  p-value: &lt; 2.2e-16</code></pre>
   border-bottom-width: 0;
 }
 
-#jfuasrusqh .gt_subtitle {
+#htlssttgjn .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -1073,7 +1073,7 @@ F-statistic: 189.1 on 14 and 1421 DF,  p-value: &lt; 2.2e-16</code></pre>
   border-top-width: 0;
 }
 
-#jfuasrusqh .gt_heading {
+#htlssttgjn .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -1085,13 +1085,13 @@ F-statistic: 189.1 on 14 and 1421 DF,  p-value: &lt; 2.2e-16</code></pre>
   border-right-color: #D3D3D3;
 }
 
-#jfuasrusqh .gt_bottom_border {
+#htlssttgjn .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#jfuasrusqh .gt_col_headings {
+#htlssttgjn .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1106,7 +1106,7 @@ F-statistic: 189.1 on 14 and 1421 DF,  p-value: &lt; 2.2e-16</code></pre>
   border-right-color: #D3D3D3;
 }
 
-#jfuasrusqh .gt_col_heading {
+#htlssttgjn .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1126,7 +1126,7 @@ F-statistic: 189.1 on 14 and 1421 DF,  p-value: &lt; 2.2e-16</code></pre>
   overflow-x: hidden;
 }
 
-#jfuasrusqh .gt_column_spanner_outer {
+#htlssttgjn .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1138,15 +1138,15 @@ F-statistic: 189.1 on 14 and 1421 DF,  p-value: &lt; 2.2e-16</code></pre>
   padding-right: 4px;
 }
 
-#jfuasrusqh .gt_column_spanner_outer:first-child {
+#htlssttgjn .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#jfuasrusqh .gt_column_spanner_outer:last-child {
+#htlssttgjn .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#jfuasrusqh .gt_column_spanner {
+#htlssttgjn .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -1158,11 +1158,11 @@ F-statistic: 189.1 on 14 and 1421 DF,  p-value: &lt; 2.2e-16</code></pre>
   width: 100%;
 }
 
-#jfuasrusqh .gt_spanner_row {
+#htlssttgjn .gt_spanner_row {
   border-bottom-style: hidden;
 }
 
-#jfuasrusqh .gt_group_heading {
+#htlssttgjn .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1188,7 +1188,7 @@ F-statistic: 189.1 on 14 and 1421 DF,  p-value: &lt; 2.2e-16</code></pre>
   text-align: left;
 }
 
-#jfuasrusqh .gt_empty_group_heading {
+#htlssttgjn .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -1203,15 +1203,15 @@ F-statistic: 189.1 on 14 and 1421 DF,  p-value: &lt; 2.2e-16</code></pre>
   vertical-align: middle;
 }
 
-#jfuasrusqh .gt_from_md > :first-child {
+#htlssttgjn .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#jfuasrusqh .gt_from_md > :last-child {
+#htlssttgjn .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#jfuasrusqh .gt_row {
+#htlssttgjn .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1230,7 +1230,7 @@ F-statistic: 189.1 on 14 and 1421 DF,  p-value: &lt; 2.2e-16</code></pre>
   overflow-x: hidden;
 }
 
-#jfuasrusqh .gt_stub {
+#htlssttgjn .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1243,7 +1243,7 @@ F-statistic: 189.1 on 14 and 1421 DF,  p-value: &lt; 2.2e-16</code></pre>
   padding-right: 5px;
 }
 
-#jfuasrusqh .gt_stub_row_group {
+#htlssttgjn .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1257,15 +1257,15 @@ F-statistic: 189.1 on 14 and 1421 DF,  p-value: &lt; 2.2e-16</code></pre>
   vertical-align: top;
 }
 
-#jfuasrusqh .gt_row_group_first td {
+#htlssttgjn .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#jfuasrusqh .gt_row_group_first th {
+#htlssttgjn .gt_row_group_first th {
   border-top-width: 2px;
 }
 
-#jfuasrusqh .gt_summary_row {
+#htlssttgjn .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1275,16 +1275,16 @@ F-statistic: 189.1 on 14 and 1421 DF,  p-value: &lt; 2.2e-16</code></pre>
   padding-right: 5px;
 }
 
-#jfuasrusqh .gt_first_summary_row {
+#htlssttgjn .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#jfuasrusqh .gt_first_summary_row.thick {
+#htlssttgjn .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#jfuasrusqh .gt_last_summary_row {
+#htlssttgjn .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1294,7 +1294,7 @@ F-statistic: 189.1 on 14 and 1421 DF,  p-value: &lt; 2.2e-16</code></pre>
   border-bottom-color: #D3D3D3;
 }
 
-#jfuasrusqh .gt_grand_summary_row {
+#htlssttgjn .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1304,7 +1304,7 @@ F-statistic: 189.1 on 14 and 1421 DF,  p-value: &lt; 2.2e-16</code></pre>
   padding-right: 5px;
 }
 
-#jfuasrusqh .gt_first_grand_summary_row {
+#htlssttgjn .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1314,7 +1314,7 @@ F-statistic: 189.1 on 14 and 1421 DF,  p-value: &lt; 2.2e-16</code></pre>
   border-top-color: #D3D3D3;
 }
 
-#jfuasrusqh .gt_last_grand_summary_row_top {
+#htlssttgjn .gt_last_grand_summary_row_top {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1324,11 +1324,11 @@ F-statistic: 189.1 on 14 and 1421 DF,  p-value: &lt; 2.2e-16</code></pre>
   border-bottom-color: #D3D3D3;
 }
 
-#jfuasrusqh .gt_striped {
+#htlssttgjn .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#jfuasrusqh .gt_table_body {
+#htlssttgjn .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1337,7 +1337,7 @@ F-statistic: 189.1 on 14 and 1421 DF,  p-value: &lt; 2.2e-16</code></pre>
   border-bottom-color: #D3D3D3;
 }
 
-#jfuasrusqh .gt_footnotes {
+#htlssttgjn .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1351,7 +1351,7 @@ F-statistic: 189.1 on 14 and 1421 DF,  p-value: &lt; 2.2e-16</code></pre>
   border-right-color: #D3D3D3;
 }
 
-#jfuasrusqh .gt_footnote {
+#htlssttgjn .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-top: 4px;
@@ -1360,7 +1360,7 @@ F-statistic: 189.1 on 14 and 1421 DF,  p-value: &lt; 2.2e-16</code></pre>
   padding-right: 5px;
 }
 
-#jfuasrusqh .gt_sourcenotes {
+#htlssttgjn .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1374,7 +1374,7 @@ F-statistic: 189.1 on 14 and 1421 DF,  p-value: &lt; 2.2e-16</code></pre>
   border-right-color: #D3D3D3;
 }
 
-#jfuasrusqh .gt_sourcenote {
+#htlssttgjn .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -1382,72 +1382,72 @@ F-statistic: 189.1 on 14 and 1421 DF,  p-value: &lt; 2.2e-16</code></pre>
   padding-right: 5px;
 }
 
-#jfuasrusqh .gt_left {
+#htlssttgjn .gt_left {
   text-align: left;
 }
 
-#jfuasrusqh .gt_center {
+#htlssttgjn .gt_center {
   text-align: center;
 }
 
-#jfuasrusqh .gt_right {
+#htlssttgjn .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#jfuasrusqh .gt_font_normal {
+#htlssttgjn .gt_font_normal {
   font-weight: normal;
 }
 
-#jfuasrusqh .gt_font_bold {
+#htlssttgjn .gt_font_bold {
   font-weight: bold;
 }
 
-#jfuasrusqh .gt_font_italic {
+#htlssttgjn .gt_font_italic {
   font-style: italic;
 }
 
-#jfuasrusqh .gt_super {
+#htlssttgjn .gt_super {
   font-size: 65%;
 }
 
-#jfuasrusqh .gt_footnote_marks {
+#htlssttgjn .gt_footnote_marks {
   font-size: 75%;
   vertical-align: 0.4em;
   position: initial;
 }
 
-#jfuasrusqh .gt_asterisk {
+#htlssttgjn .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#jfuasrusqh .gt_indent_1 {
+#htlssttgjn .gt_indent_1 {
   text-indent: 5px;
 }
 
-#jfuasrusqh .gt_indent_2 {
+#htlssttgjn .gt_indent_2 {
   text-indent: 10px;
 }
 
-#jfuasrusqh .gt_indent_3 {
+#htlssttgjn .gt_indent_3 {
   text-indent: 15px;
 }
 
-#jfuasrusqh .gt_indent_4 {
+#htlssttgjn .gt_indent_4 {
   text-indent: 20px;
 }
 
-#jfuasrusqh .gt_indent_5 {
+#htlssttgjn .gt_indent_5 {
   text-indent: 25px;
 }
 
-#jfuasrusqh .katex-display {
+#htlssttgjn .katex-display {
   display: inline-flex !important;
   margin-bottom: 0.75em !important;
 }
 
-#jfuasrusqh div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+#htlssttgjn div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
   height: 0px !important;
 }
 </style>
@@ -1574,23 +1574,23 @@ F-statistic: 189.1 on 14 and 1421 DF,  p-value: &lt; 2.2e-16</code></pre>
 <span id="cb38-7"><a href="#cb38-7" aria-hidden="true" tabindex="-1"></a>AIC, statistic,</span>
 <span id="cb38-8"><a href="#cb38-8" aria-hidden="true" tabindex="-1"></a>p.value, sigma))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
-<div id="fldntucrgg" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>#fldntucrgg table {
+<div id="eyviubkjau" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#eyviubkjau table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-#fldntucrgg thead, #fldntucrgg tbody, #fldntucrgg tfoot, #fldntucrgg tr, #fldntucrgg td, #fldntucrgg th {
+#eyviubkjau thead, #eyviubkjau tbody, #eyviubkjau tfoot, #eyviubkjau tr, #eyviubkjau td, #eyviubkjau th {
   border-style: none;
 }
 
-#fldntucrgg p {
+#eyviubkjau p {
   margin: 0;
   padding: 0;
 }
 
-#fldntucrgg .gt_table {
+#eyviubkjau .gt_table {
   display: table;
   border-collapse: collapse;
   line-height: normal;
@@ -1616,12 +1616,12 @@ F-statistic: 189.1 on 14 and 1421 DF,  p-value: &lt; 2.2e-16</code></pre>
   border-left-color: #D3D3D3;
 }
 
-#fldntucrgg .gt_caption {
+#eyviubkjau .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#fldntucrgg .gt_title {
+#eyviubkjau .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -1633,7 +1633,7 @@ F-statistic: 189.1 on 14 and 1421 DF,  p-value: &lt; 2.2e-16</code></pre>
   border-bottom-width: 0;
 }
 
-#fldntucrgg .gt_subtitle {
+#eyviubkjau .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -1645,7 +1645,7 @@ F-statistic: 189.1 on 14 and 1421 DF,  p-value: &lt; 2.2e-16</code></pre>
   border-top-width: 0;
 }
 
-#fldntucrgg .gt_heading {
+#eyviubkjau .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -1657,13 +1657,13 @@ F-statistic: 189.1 on 14 and 1421 DF,  p-value: &lt; 2.2e-16</code></pre>
   border-right-color: #D3D3D3;
 }
 
-#fldntucrgg .gt_bottom_border {
+#eyviubkjau .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#fldntucrgg .gt_col_headings {
+#eyviubkjau .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1678,7 +1678,7 @@ F-statistic: 189.1 on 14 and 1421 DF,  p-value: &lt; 2.2e-16</code></pre>
   border-right-color: #D3D3D3;
 }
 
-#fldntucrgg .gt_col_heading {
+#eyviubkjau .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1698,7 +1698,7 @@ F-statistic: 189.1 on 14 and 1421 DF,  p-value: &lt; 2.2e-16</code></pre>
   overflow-x: hidden;
 }
 
-#fldntucrgg .gt_column_spanner_outer {
+#eyviubkjau .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1710,15 +1710,15 @@ F-statistic: 189.1 on 14 and 1421 DF,  p-value: &lt; 2.2e-16</code></pre>
   padding-right: 4px;
 }
 
-#fldntucrgg .gt_column_spanner_outer:first-child {
+#eyviubkjau .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#fldntucrgg .gt_column_spanner_outer:last-child {
+#eyviubkjau .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#fldntucrgg .gt_column_spanner {
+#eyviubkjau .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -1730,11 +1730,11 @@ F-statistic: 189.1 on 14 and 1421 DF,  p-value: &lt; 2.2e-16</code></pre>
   width: 100%;
 }
 
-#fldntucrgg .gt_spanner_row {
+#eyviubkjau .gt_spanner_row {
   border-bottom-style: hidden;
 }
 
-#fldntucrgg .gt_group_heading {
+#eyviubkjau .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1760,7 +1760,7 @@ F-statistic: 189.1 on 14 and 1421 DF,  p-value: &lt; 2.2e-16</code></pre>
   text-align: left;
 }
 
-#fldntucrgg .gt_empty_group_heading {
+#eyviubkjau .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -1775,15 +1775,15 @@ F-statistic: 189.1 on 14 and 1421 DF,  p-value: &lt; 2.2e-16</code></pre>
   vertical-align: middle;
 }
 
-#fldntucrgg .gt_from_md > :first-child {
+#eyviubkjau .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#fldntucrgg .gt_from_md > :last-child {
+#eyviubkjau .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#fldntucrgg .gt_row {
+#eyviubkjau .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1802,7 +1802,7 @@ F-statistic: 189.1 on 14 and 1421 DF,  p-value: &lt; 2.2e-16</code></pre>
   overflow-x: hidden;
 }
 
-#fldntucrgg .gt_stub {
+#eyviubkjau .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1815,7 +1815,7 @@ F-statistic: 189.1 on 14 and 1421 DF,  p-value: &lt; 2.2e-16</code></pre>
   padding-right: 5px;
 }
 
-#fldntucrgg .gt_stub_row_group {
+#eyviubkjau .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -1829,15 +1829,15 @@ F-statistic: 189.1 on 14 and 1421 DF,  p-value: &lt; 2.2e-16</code></pre>
   vertical-align: top;
 }
 
-#fldntucrgg .gt_row_group_first td {
+#eyviubkjau .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#fldntucrgg .gt_row_group_first th {
+#eyviubkjau .gt_row_group_first th {
   border-top-width: 2px;
 }
 
-#fldntucrgg .gt_summary_row {
+#eyviubkjau .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1847,16 +1847,16 @@ F-statistic: 189.1 on 14 and 1421 DF,  p-value: &lt; 2.2e-16</code></pre>
   padding-right: 5px;
 }
 
-#fldntucrgg .gt_first_summary_row {
+#eyviubkjau .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#fldntucrgg .gt_first_summary_row.thick {
+#eyviubkjau .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#fldntucrgg .gt_last_summary_row {
+#eyviubkjau .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1866,7 +1866,7 @@ F-statistic: 189.1 on 14 and 1421 DF,  p-value: &lt; 2.2e-16</code></pre>
   border-bottom-color: #D3D3D3;
 }
 
-#fldntucrgg .gt_grand_summary_row {
+#eyviubkjau .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -1876,7 +1876,7 @@ F-statistic: 189.1 on 14 and 1421 DF,  p-value: &lt; 2.2e-16</code></pre>
   padding-right: 5px;
 }
 
-#fldntucrgg .gt_first_grand_summary_row {
+#eyviubkjau .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1886,7 +1886,7 @@ F-statistic: 189.1 on 14 and 1421 DF,  p-value: &lt; 2.2e-16</code></pre>
   border-top-color: #D3D3D3;
 }
 
-#fldntucrgg .gt_last_grand_summary_row_top {
+#eyviubkjau .gt_last_grand_summary_row_top {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -1896,11 +1896,11 @@ F-statistic: 189.1 on 14 and 1421 DF,  p-value: &lt; 2.2e-16</code></pre>
   border-bottom-color: #D3D3D3;
 }
 
-#fldntucrgg .gt_striped {
+#eyviubkjau .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#fldntucrgg .gt_table_body {
+#eyviubkjau .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -1909,7 +1909,7 @@ F-statistic: 189.1 on 14 and 1421 DF,  p-value: &lt; 2.2e-16</code></pre>
   border-bottom-color: #D3D3D3;
 }
 
-#fldntucrgg .gt_footnotes {
+#eyviubkjau .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1923,7 +1923,7 @@ F-statistic: 189.1 on 14 and 1421 DF,  p-value: &lt; 2.2e-16</code></pre>
   border-right-color: #D3D3D3;
 }
 
-#fldntucrgg .gt_footnote {
+#eyviubkjau .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-top: 4px;
@@ -1932,7 +1932,7 @@ F-statistic: 189.1 on 14 and 1421 DF,  p-value: &lt; 2.2e-16</code></pre>
   padding-right: 5px;
 }
 
-#fldntucrgg .gt_sourcenotes {
+#eyviubkjau .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -1946,7 +1946,7 @@ F-statistic: 189.1 on 14 and 1421 DF,  p-value: &lt; 2.2e-16</code></pre>
   border-right-color: #D3D3D3;
 }
 
-#fldntucrgg .gt_sourcenote {
+#eyviubkjau .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -1954,72 +1954,72 @@ F-statistic: 189.1 on 14 and 1421 DF,  p-value: &lt; 2.2e-16</code></pre>
   padding-right: 5px;
 }
 
-#fldntucrgg .gt_left {
+#eyviubkjau .gt_left {
   text-align: left;
 }
 
-#fldntucrgg .gt_center {
+#eyviubkjau .gt_center {
   text-align: center;
 }
 
-#fldntucrgg .gt_right {
+#eyviubkjau .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#fldntucrgg .gt_font_normal {
+#eyviubkjau .gt_font_normal {
   font-weight: normal;
 }
 
-#fldntucrgg .gt_font_bold {
+#eyviubkjau .gt_font_bold {
   font-weight: bold;
 }
 
-#fldntucrgg .gt_font_italic {
+#eyviubkjau .gt_font_italic {
   font-style: italic;
 }
 
-#fldntucrgg .gt_super {
+#eyviubkjau .gt_super {
   font-size: 65%;
 }
 
-#fldntucrgg .gt_footnote_marks {
+#eyviubkjau .gt_footnote_marks {
   font-size: 75%;
   vertical-align: 0.4em;
   position: initial;
 }
 
-#fldntucrgg .gt_asterisk {
+#eyviubkjau .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#fldntucrgg .gt_indent_1 {
+#eyviubkjau .gt_indent_1 {
   text-indent: 5px;
 }
 
-#fldntucrgg .gt_indent_2 {
+#eyviubkjau .gt_indent_2 {
   text-indent: 10px;
 }
 
-#fldntucrgg .gt_indent_3 {
+#eyviubkjau .gt_indent_3 {
   text-indent: 15px;
 }
 
-#fldntucrgg .gt_indent_4 {
+#eyviubkjau .gt_indent_4 {
   text-indent: 20px;
 }
 
-#fldntucrgg .gt_indent_5 {
+#eyviubkjau .gt_indent_5 {
   text-indent: 25px;
 }
 
-#fldntucrgg .katex-display {
+#eyviubkjau .katex-display {
   display: inline-flex !important;
   margin-bottom: 0.75em !important;
 }
 
-#fldntucrgg div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+#eyviubkjau div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
   height: 0px !important;
 }
 </style>
@@ -2398,6 +2398,8 @@ alternative hypothesis: two.sided</code></pre>
 <h4 data-number="8.1.1" class="anchored" data-anchor-id="computing-fixed-bandwith-using-cv-and-aic-approach"><span class="header-section-number">8.1.1</span> Computing fixed bandwith using CV and AIC approach</h4>
 <p>In the code chunk below <code>bw.gwr()</code> of GWModel package is used to determine the optimal fixed bandwidth to use in the model. Notice that the argument **adaptive is set to FALSE indicates that we are interested to compute the fixed bandwidth.</p>
 <p>There are two possible approaches can be uused to determine the stopping rule, they are: CV cross-validation approach and AIC corrected (AICc) approach. We define the stopping rule using approach agreement.</p>
+<section id="fixed-bandwidth-computation-via-cv" class="level5" data-number="8.1.1.1">
+<h5 data-number="8.1.1.1" class="anchored" data-anchor-id="fixed-bandwidth-computation-via-cv"><span class="header-section-number">8.1.1.1</span> Fixed bandwidth computation via CV</h5>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb58"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Search for the optimal fixed bandwidth (in meters) using CV</span></span>
 <span id="cb58-2"><a href="#cb58-2" aria-hidden="true" tabindex="-1"></a>bw.fixed_CV <span class="ot">&lt;-</span> <span class="fu">bw.gwr</span>(</span>
@@ -2457,6 +2459,9 @@ Fixed bandwidth: 971.3399 CV score: 4.721292e+14
 Fixed bandwidth: 971.34 CV score: 4.721292e+14 </code></pre>
 </div>
 </div>
+</section>
+<section id="fixed-bandwidth-computation-via-aic" class="level5" data-number="8.1.1.2">
+<h5 data-number="8.1.1.2" class="anchored" data-anchor-id="fixed-bandwidth-computation-via-aic"><span class="header-section-number">8.1.1.2</span> Fixed bandwidth computation via AIC</h5>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb60"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Search for the optimal fixed bandwidth (in meters) using AIC</span></span>
 <span id="cb60-2"><a href="#cb60-2" aria-hidden="true" tabindex="-1"></a>bw.fixed_AIC <span class="ot">&lt;-</span> <span class="fu">bw.gwr</span>(</span>
@@ -2492,9 +2497,12 @@ Fixed bandwidth: 1391.309 AICc value: 42254.7 </code></pre>
 </div>
 </div>
 </section>
-<section id="gwmodel-method---fixed-bandwith-cv-k-nearest-neighbors" class="level4" data-number="8.1.2">
-<h4 data-number="8.1.2" class="anchored" data-anchor-id="gwmodel-method---fixed-bandwith-cv-k-nearest-neighbors"><span class="header-section-number">8.1.2</span> 13.9.1.2 GWModel method - fixed bandwith (CV; K nearest neighbors)</h4>
+</section>
+<section id="gwmodel-method---fixed-bandwith-cv-and-aic-k-nearest-neighbors" class="level4" data-number="8.1.2">
+<h4 data-number="8.1.2" class="anchored" data-anchor-id="gwmodel-method---fixed-bandwith-cv-and-aic-k-nearest-neighbors"><span class="header-section-number">8.1.2</span> GWModel method - fixed-bandwith (CV and AIC; K nearest neighbors)</h4>
 <p>Now we can use the code chunk below to calibrate the gwr model using fixed bandwidth and gaussian kernel.</p>
+<section id="calibrate-fixed-bandwidth-using-cv" class="level5" data-number="8.1.2.1">
+<h5 data-number="8.1.2.1" class="anchored" data-anchor-id="calibrate-fixed-bandwidth-using-cv"><span class="header-section-number">8.1.2.1</span> Calibrate fixed-bandwidth using CV</h5>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb62"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Calibrate the fixed‑bandwidth GWR model ---------------------------------------</span></span>
 <span id="cb62-2"><a href="#cb62-2" aria-hidden="true" tabindex="-1"></a>gwr.fixed_CV <span class="ot">&lt;-</span> <span class="fu">gwr.basic</span>(</span>
@@ -2516,7 +2524,7 @@ Fixed bandwidth: 1391.309 AICc value: 42254.7 </code></pre>
 <pre><code>   ***********************************************************************
    *                       Package   GWmodel                             *
    ***********************************************************************
-   Program starts at: 2025-10-18 20:13:40.521726 
+   Program starts at: 2025-10-18 22:50:14.593355 
    Call:
    gwr.basic(formula = SELLING_PRICE ~ AREA_SQM + AGE + PROX_CBD + 
     PROX_CHILDCARE + PROX_ELDERLYCARE + PROX_URA_GROWTH_AREA + 
@@ -2624,9 +2632,12 @@ Fixed bandwidth: 1391.309 AICc value: 42254.7 </code></pre>
    Adjusted R-square value:  0.8430418 
 
    ***********************************************************************
-   Program stops at: 2025-10-18 20:13:41.410533 </code></pre>
+   Program stops at: 2025-10-18 22:50:15.74219 </code></pre>
 </div>
 </div>
+</section>
+<section id="calibrate-fixed-bandwidth-using-aic" class="level5" data-number="8.1.2.2">
+<h5 data-number="8.1.2.2" class="anchored" data-anchor-id="calibrate-fixed-bandwidth-using-aic"><span class="header-section-number">8.1.2.2</span> Calibrate fixed-bandwidth using AIC</h5>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb64"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb64-1"><a href="#cb64-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Calibrate the fixed‑bandwidth GWR model ---------------------------------------</span></span>
 <span id="cb64-2"><a href="#cb64-2" aria-hidden="true" tabindex="-1"></a>gwr.fixed_AIC <span class="ot">&lt;-</span> <span class="fu">gwr.basic</span>(</span>
@@ -2648,7 +2659,7 @@ Fixed bandwidth: 1391.309 AICc value: 42254.7 </code></pre>
 <pre><code>   ***********************************************************************
    *                       Package   GWmodel                             *
    ***********************************************************************
-   Program starts at: 2025-10-18 20:13:41.431443 
+   Program starts at: 2025-10-18 22:50:15.756869 
    Call:
    gwr.basic(formula = SELLING_PRICE ~ AREA_SQM + AGE + PROX_CBD + 
     PROX_CHILDCARE + PROX_ELDERLYCARE + PROX_URA_GROWTH_AREA + 
@@ -2756,12 +2767,13 @@ Fixed bandwidth: 1391.309 AICc value: 42254.7 </code></pre>
    Adjusted R-square value:  0.8182339 
 
    ***********************************************************************
-   Program stops at: 2025-10-18 20:13:42.321899 </code></pre>
+   Program stops at: 2025-10-18 22:50:16.656112 </code></pre>
 </div>
 </div>
 </section>
-<section id="insights-and-interpretation-of-fixed-bandwith-using-both-cv-and-aic-approached" class="level4" data-number="8.1.3">
-<h4 data-number="8.1.3" class="anchored" data-anchor-id="insights-and-interpretation-of-fixed-bandwith-using-both-cv-and-aic-approached"><span class="header-section-number">8.1.3</span> Insights and interpretation of fixed bandwith using both CV and AIC approached</h4>
+</section>
+<section id="insights-into-fixed-bandwidth-performance-under-cv-and-aic-approaches" class="level4" data-number="8.1.3">
+<h4 data-number="8.1.3" class="anchored" data-anchor-id="insights-into-fixed-bandwidth-performance-under-cv-and-aic-approaches"><span class="header-section-number">8.1.3</span> Insights into fixed bandwidth performance under CV and AIC approaches</h4>
 <p>The two fixed-bandwidth GWR runs differ in a meaningful way this time. The cross-validated model, gwr.fixed_CV, selects a fixed kernel width of about 971 m and yields AICc ≈ 42,263.6, R² ≈ 0.8099 (adjusted ≈ 0.8430), an effective parameter count of about 438.4, and residual sum of squares around 2.534×10¹⁴. The AICc-tuned model, gwr.fixed_AIC, chooses a larger fixed bandwidth of about 1,386 m, with AICc ≈ 42,254.7, R² ≈ 0.8566 (adjusted ≈ 0.8182), an effective parameter count of about 302.6, and residual sum of squares reported near 3.335×10¹⁴. In practical terms, AICc prefers a smoother spatial surface: a wider bandwidth pools information from more neighbours, which reduces local variance and shrinks the effective complexity by roughly one-third (≈303 vs ≈438 parameters). That parsimony is exactly what AICc rewards, and it explains why the AICc model attains the lower information criterion despite being less “wiggly.” The higher R² from the AICc fit indicates that, at this broader spatial scale, the model explains more variation in prices overall; the CV model’s smaller bandwidth is better at capturing very local idiosyncrasies but at the cost of higher model complexity and potentially noisier local coefficients.</p>
 <p>Substantively, the <strong>AICc model is preferable</strong> if our goal is a defensible, generalizable explanation of price drivers with restrained local volatility and reduced risk of overfitting or local multicollinearity. The <strong>CV model is preferable</strong> if our priority is detecting fine-grained neighbourhood effects and sharp spatial gradients, accepting a more complex surface. Before deciding, inspect side-by-side maps of local coefficients and t-values, compare the stability of signs across space, and check residual spatial autocorrelation. If small-area policy targeting or micro-market storytelling is central, keep the CV bandwidth; if we need a succinct, reliable narrative for the whole city, the AICc bandwidth is the stronger choice.</p>
 </section>
@@ -2772,6 +2784,8 @@ Fixed bandwidth: 1391.309 AICc value: 42254.7 </code></pre>
 <section id="computing-the-adaptive-bandwidth" class="level4" data-number="8.2.1">
 <h4 data-number="8.2.1" class="anchored" data-anchor-id="computing-the-adaptive-bandwidth"><span class="header-section-number">8.2.1</span> Computing the adaptive bandwidth</h4>
 <p>Similar to the earlier section, we will first use <code>bw.gwr()</code> to determine the recommended data point to use.</p>
+<section id="adaptive-bandwidth-computation-via-cv" class="level5" data-number="8.2.1.1">
+<h5 data-number="8.2.1.1" class="anchored" data-anchor-id="adaptive-bandwidth-computation-via-cv"><span class="header-section-number">8.2.1.1</span> Adaptive bandwidth computation via CV</h5>
 <p>The code chunk used look very similar to the one used to compute the fixed bandwidth except the <strong>adaptive argument</strong> has changed to <strong>TRUE</strong>.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb66"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb66-1"><a href="#cb66-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Search for the optimal adaptive bandwidth (K neighbors) using CV</span></span>
@@ -2804,6 +2818,9 @@ Adaptive bandwidth: 27 CV score: 4.462172e+14
 Adaptive bandwidth: 30 CV score: 4.422088e+14 </code></pre>
 </div>
 </div>
+</section>
+<section id="adaptive-bandwidth-computation-via-aic" class="level5" data-number="8.2.1.2">
+<h5 data-number="8.2.1.2" class="anchored" data-anchor-id="adaptive-bandwidth-computation-via-aic"><span class="header-section-number">8.2.1.2</span> Adaptive bandwidth computation via AIC</h5>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb68"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb68-1"><a href="#cb68-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Search for the optimal adaptive bandwidth (K neighbors) using AIC</span></span>
 <span id="cb68-2"><a href="#cb68-2" aria-hidden="true" tabindex="-1"></a>bw.adaptive_AIC <span class="ot">&lt;-</span> <span class="fu">bw.gwr</span>(</span>
@@ -2836,9 +2853,12 @@ Adaptive bandwidth (number of nearest neighbours): 27 AICc value: 41978.63 </cod
 </div>
 </div>
 </section>
+</section>
 <section id="constructing-the-adaptive-bandwidth-gwr-model" class="level4" data-number="8.2.2">
 <h4 data-number="8.2.2" class="anchored" data-anchor-id="constructing-the-adaptive-bandwidth-gwr-model"><span class="header-section-number">8.2.2</span> Constructing the adaptive bandwidth gwr model</h4>
 <p>Now, we can go ahead to calibrate the gwr-based hedonic pricing model by using adaptive bandwidth and gaussian kernel as shown in the code chunk below.</p>
+<section id="calibrate-adaptive-bandwidth-using-cv" class="level5" data-number="8.2.2.1">
+<h5 data-number="8.2.2.1" class="anchored" data-anchor-id="calibrate-adaptive-bandwidth-using-cv"><span class="header-section-number">8.2.2.1</span> Calibrate adaptive bandwidth using CV</h5>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb70"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb70-1"><a href="#cb70-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Calibrate the adaptive‑bandwidth GWR model ------------------------------------</span></span>
 <span id="cb70-2"><a href="#cb70-2" aria-hidden="true" tabindex="-1"></a>gwr.adaptive_CV <span class="ot">&lt;-</span> <span class="fu">gwr.basic</span>(</span>
@@ -2859,7 +2879,7 @@ Adaptive bandwidth (number of nearest neighbours): 27 AICc value: 41978.63 </cod
 <pre><code>   ***********************************************************************
    *                       Package   GWmodel                             *
    ***********************************************************************
-   Program starts at: 2025-10-18 20:14:01.961487 
+   Program starts at: 2025-10-18 22:50:36.424464 
    Call:
    gwr.basic(formula = SELLING_PRICE ~ AREA_SQM + AGE + PROX_CBD + 
     PROX_CHILDCARE + PROX_ELDERLYCARE + PROX_URA_GROWTH_AREA + 
@@ -2967,9 +2987,12 @@ Adaptive bandwidth (number of nearest neighbours): 27 AICc value: 41978.63 </cod
    Adjusted R-square value:  0.8561185 
 
    ***********************************************************************
-   Program stops at: 2025-10-18 20:14:02.969749 </code></pre>
+   Program stops at: 2025-10-18 22:50:37.649116 </code></pre>
 </div>
 </div>
+</section>
+<section id="calibrate-adaptive-bandwidth-using-aic" class="level5" data-number="8.2.2.2">
+<h5 data-number="8.2.2.2" class="anchored" data-anchor-id="calibrate-adaptive-bandwidth-using-aic"><span class="header-section-number">8.2.2.2</span> Calibrate adaptive bandwidth using AIC</h5>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb72"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb72-1"><a href="#cb72-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Calibrate the adaptive‑bandwidth GWR model ------------------------------------</span></span>
 <span id="cb72-2"><a href="#cb72-2" aria-hidden="true" tabindex="-1"></a>gwr.adaptive_AIC <span class="ot">&lt;-</span> <span class="fu">gwr.basic</span>(</span>
@@ -2990,7 +3013,7 @@ Adaptive bandwidth (number of nearest neighbours): 27 AICc value: 41978.63 </cod
 <pre><code>   ***********************************************************************
    *                       Package   GWmodel                             *
    ***********************************************************************
-   Program starts at: 2025-10-18 20:14:02.988539 
+   Program starts at: 2025-10-18 22:50:37.661237 
    Call:
    gwr.basic(formula = SELLING_PRICE ~ AREA_SQM + AGE + PROX_CBD + 
     PROX_CHILDCARE + PROX_ELDERLYCARE + PROX_URA_GROWTH_AREA + 
@@ -3098,12 +3121,13 @@ Adaptive bandwidth (number of nearest neighbours): 27 AICc value: 41978.63 </cod
    Adjusted R-square value:  0.8634199 
 
    ***********************************************************************
-   Program stops at: 2025-10-18 20:14:03.993279 </code></pre>
+   Program stops at: 2025-10-18 22:50:38.659062 </code></pre>
 </div>
 </div>
 </section>
-<section id="insights-and-interpretations-of-adaptive-bandwith-using-both-cv-and-aic-approached" class="level4" data-number="8.2.3">
-<h4 data-number="8.2.3" class="anchored" data-anchor-id="insights-and-interpretations-of-adaptive-bandwith-using-both-cv-and-aic-approached"><span class="header-section-number">8.2.3</span> Insights and interpretations of adaptive bandwith using both CV and AIC approached</h4>
+</section>
+<section id="insights-into-adaptive-bandwidth-performance-under-cv-and-aic-approaches" class="level4" data-number="8.2.3">
+<h4 data-number="8.2.3" class="anchored" data-anchor-id="insights-into-adaptive-bandwidth-performance-under-cv-and-aic-approaches"><span class="header-section-number">8.2.3</span> Insights into adaptive bandwidth performance under CV and AIC approaches</h4>
 <p>Our two adaptive GWR calibrations use the same data, kernel and metric but settle on different neighbour counts. gwr.adaptive_CV chooses 30 neighbours (CV = prediction-error minimization), whereas gwr.adaptive_AIC prefers a narrower window of 27 neighbours (AICc = fit–parsimony trade-off). The smaller window lets coefficients vary more sharply across space.</p>
 <p>That choice shows up in the diagnostics. The AICc model is more flexible (effective parameters ≈ 393.1 vs 350.3; effective d.f. 1042.9 vs 1085.7, which is lower because the model is more complex). With that extra flexibility it achieves lower residual SS (2.305×10¹⁴ vs 2.528×10¹⁴), higher R² (0.9008 vs 0.8912, adjusted 0.8634 vs 0.8561), and a slightly better AICc (41,979 vs 41,982). In short: AICc is telling us the data support a somewhat finer spatial scale of non-stationarity than CV was willing to choose.</p>
 <p>How to read this substantively: the AICc model will draw sharper local contrasts in the effects of the predictors (e.g., accessibility and amenities), which can be useful for micro-market interpretation and targeting. The CV model is slightly smoother, prioritizing out-of-sample error control; its surfaces will be a bit less volatile and may generalize more conservatively.</p>
@@ -3190,8 +3214,8 @@ $ geometry                &lt;POINT [m]&gt; POINT (22085.12 29951.54), POINT (25
 </div>
 </div>
 </section>
-<section id="selecting-tampines-planning-areas" class="level2" data-number="10">
-<h2 data-number="10" class="anchored" data-anchor-id="selecting-tampines-planning-areas"><span class="header-section-number">10</span> Selecting Tampines planning areas</h2>
+<section id="subset-the-dataset-to-features-within-the-tampines-planning-are" class="level2" data-number="10">
+<h2 data-number="10" class="anchored" data-anchor-id="subset-the-dataset-to-features-within-the-tampines-planning-are"><span class="header-section-number">10</span> Subset the dataset to features within the Tampines Planning Are</h2>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb79"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb79-1"><a href="#cb79-1" aria-hidden="true" tabindex="-1"></a><span class="co"># --- 1) Select the Tampines planning area polygon ------------------------------</span></span>
 <span id="cb79-2"><a href="#cb79-2" aria-hidden="true" tabindex="-1"></a><span class="co"># (Common MP14 fields are PLN_AREA_N (planning area) and SUBZONE_N (subzone).)</span></span>
@@ -3247,8 +3271,8 @@ $ geometry                &lt;POINT [m]&gt; POINT (22085.12 29951.54), POINT (25
 1 76 0.8944806 0.9550013 0.9652041 0.9546181 0.9710822 0.9724414</code></pre>
 </div>
 </div>
-<section id="insights-and-intepretation" class="level3" data-number="10.1">
-<h3 data-number="10.1" class="anchored" data-anchor-id="insights-and-intepretation"><span class="header-section-number">10.1</span> Insights and intepretation:</h3>
+<section id="insights-into-tampines-planning-area" class="level3" data-number="10.1">
+<h3 data-number="10.1" class="anchored" data-anchor-id="insights-into-tampines-planning-area"><span class="header-section-number">10.1</span> Insights into Tampines planning area</h3>
 <p>The adaptive GWR results for Tampines show an exceptionally strong and spatially consistent model fit across condominium resale points. With n = 76, the Local R² ranges from 0.894 to 0.972, a median of 0.965, and a mean of 0.955, indicating that the model explains over 95% of local price variation for most locations. Such high and tightly clustered R² values suggest the explanatory variables—floor area, age, proximity to amenities, accessibility, and tenure—collectively provide a robust representation of spatial price dynamics in Tampines.</p>
 <p>Spatially, the map reveals that the dark blue clusters with higher Local R² values are concentrated around Tampines Central, where key amenities such as the MRT interchange, bus interchange, and shopping malls are located. These areas exhibit highly predictable housing prices because accessibility and urban conveniences strongly align with price determinants. Hence, the model performs best in these well-connected and amenity-rich subzones.</p>
 <p>In contrast, lighter blue areas along the western and peripheral edges display slightly lower R² values (around 0.89–0.95). This suggests that local housing prices there are influenced by factors not fully captured by the model, such as road noise, micro-neighbourhood effects, or smaller sample density. Nevertheless, these lower values still represent a high level of explanatory power.</p>
