@@ -255,37 +255,6 @@ ggarrange(AREA_SQM, AGE, PROX_CBD, PROX_CHILDCARE,
 
 ```
 
-### 13.7.3 Interactive statistical point map of prices (tmap)
-
-```{r}
-
-# Switch tmap to interactive (leaflet) mode -------------------------------------
-tmap_mode("view")
-
-# Draw subzones base layer + condo points colored by SELLING_PRICE --------------
-tm_shape(mpsz_svy21) +
-  tm_polygons() +
- tm_shape(condo_resale.sf) +  
-  tm_dots(fill = "SELLING_PRICE",      # color points by price
-          fill_alpha = 0.6,            # semi‑transparent fills
-          size = 0.5,                  # dot size
-          fill.scale = tm_scale_intervals(
-            style = "quantile")) +     # quantile breaks (robust to skew)
-  tm_view(set_zoom_limits = c(11,14))  # limit zoom range for usability
-
-```
-
-`set_zoom_limits` argument of `tm_view()` sets the minimum and maximum zoom level to 11 and 14 respectively.
-
-Before moving on to the next section, the code below will be used to turn R display into `plot` mode.
-
-```{r}
-
-# Switch back to static plotting mode before continuing -------------------------
-tmap_mode("plot")
-
-```
-
 ## 13.8 Hedonic Pricing Modelling in R (OLS)
 
 In this section, we will learn how to building hedonic pricing models for condominium resale units using [`lm()`](https://www.rdocumentation.org/packages/stats/versions/3.5.2/topics/lm) of R base.
