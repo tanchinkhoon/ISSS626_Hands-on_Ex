@@ -2,6 +2,8 @@
 title: "In-class_Ex07: Calibrating Hedonic Pricing Model for Private Highrise Property with GWR Method"
 author: "TAN Chin Khoon"
 date: "18 October 2025"
+date-modified: "last-modified"
+number-sections: true
 ---
 
 ## Overview
