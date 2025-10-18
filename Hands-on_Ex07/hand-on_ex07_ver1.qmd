@@ -1,7 +1,8 @@
 ---
-title: "In-class_Ex07"
+title: "Hands-on Ex07"
 author: "TAN Chin Khoon"
-date: "18 October 2025"
+date: "17 October 2025"
+date-modified: "last-modified"
 ---
 
 # 13 Calibrating Hedonic Pricing Model for Private Highrise Property with GWR Method
@@ -679,12 +680,20 @@ PROX_PRIMARY_SCH + PROX_SHOPPING_MALL +
 PROX_BUS_STOP + NO_Of_UNITS + FAMILY_FRIENDLY +
 FREEHOLD,
 data = condo_resale.sf,
-approach = "AIC", # Chnage from CV to AIC
+approach = "AIC", # cross‑validation criterion
 kernel = "gaussian", # Gaussian kernel
 adaptive = FALSE, # fixed (distance) bandwidth
 longlat = FALSE) # coordinates are projected (meters)
 
 ```
+
+:::{.callout-note icon=false}
+
+#### Do you know why it is in meter?
+
+The reason why the recommended bandwidth (971.3405) is expressed in meters because of the coordinate reference system (CRS) were projected in **SVY21 (EPSG:3414)**, all distances and spatial computations (like buffer, bandwidth, kernel distance, etc.) are measured in meters.
+
+:::
 
 #### 13.9.1.2 GWModel method - fixed bandwith
 
@@ -717,7 +726,7 @@ The report shows that the AICc of the gwr is 42263.61 which is significantly sma
 
 In this section, we will calibrate the gwr-based hedonic pricing model by using adaptive bandwidth approach.
 
-#### 13.9.2.1 Computing the adaptive bandwidth (AIC; K nearest neighbors)
+#### 13.9.2.1 Computing the adaptive bandwidth (CV; K nearest neighbors)
 
 Similar to the earlier section, we will first use `bw.gwr()` to determine the recommended data point to use.
 
@@ -734,7 +743,7 @@ PROX_PRIMARY_SCH + PROX_SHOPPING_MALL +
 PROX_BUS_STOP + NO_Of_UNITS +
 FAMILY_FRIENDLY + FREEHOLD,
 data = condo_resale.sf,
-approach = "AIC", # Change from CV to AIC approach
+approach = "CV",
 kernel = "gaussian",
 adaptive = TRUE, # K‑NN style bandwidth
 longlat = FALSE)
@@ -820,56 +829,65 @@ summary(gwr.adaptive$SDF$yhat)
 
 ```
 
+### 13.9.5 Visualising local R²
 
-
-## Selecting Tampines planning areas 
+The code chunks below is used to create an interactive point symbol map.
 
 ```{r}
 
-# --- 1) Select the Tampines planning area polygon ------------------------------
-# (Common MP14 fields are PLN_AREA_N (planning area) and SUBZONE_N (subzone).)
-tampines_pa <- mpsz_svy21 %>% 
-  filter(PLN_AREA_N == "TAMPINES")
-
-# --- 2) Keep only condo points that fall inside Tampines -----------------------
-# Your GWR results were attached to `condo_resale.sf.adaptive` and include `Local_R2`.
-tampines_pts <- condo_resale.sf.adaptive[tampines_pa, , op = st_within]
-
-# --- 3) Visualise: Tampines boundary + points coloured by Local R² -------------
+# Local R²: where the local model fits well or poorly --------------------------------
 tmap_mode("view")
-tm_shape(tampines_pa) +
-  tm_polygons(fill_alpha = 0.1) +
-tm_shape(tampines_pts) +
-  tm_dots(
-    fill = "Local_R2",           # tmap v4: 'fill' controls symbol fill colour
-    col = "grey30",              # thin outline
-    size = 0.6,
-    fill.scale = tm_scale(
-      n = 7,
-      style = "quantile"         # consistent with the tutorial’s quantile breaks
-    ),
-    fill.legend = tm_legend(title = "Local R²")
-  ) +
-  tm_view(set_zoom_limits = c(11, 14))
 
-# --- 4) Summarise Local R² for Tampines ----------------------------------------
-tampines_r2_summary <- tampines_pts %>%
-  st_drop_geometry() %>%
-  summarise(
-    n      = dplyr::n(),
-    r2_min = min(Local_R2, na.rm = TRUE),
-    r2_q1  = quantile(Local_R2, 0.25, na.rm = TRUE),
-    r2_med = median(Local_R2, na.rm = TRUE),
-    r2_mean= mean(Local_R2, na.rm = TRUE),
-    r2_q3  = quantile(Local_R2, 0.75, na.rm = TRUE),
-    r2_max = max(Local_R2, na.rm = TRUE)
-  )
 
-tampines_r2_summary
+tm_shape(mpsz_svy21) +
+tm_polygons(fill_alpha = 0.1) +
+tm_shape(condo_resale.sf.adaptive) +
+tm_dots(col = "Local_R2",
+border.col = "gray60",
+border.lwd = 1) +
+tm_view(set.zoom.limits = c(11,14))
 
+tmap_mode("plot")
+
+```
+### 13.9.6 Visualising coefficient estimates
+
+The code chunks below is used to create an interactive point symbol map.
+
+```{r}
+
+# Coefficient uncertainty vs strength for AREA_SQM: SE vs t‑value side‑by‑side ----
+tmap_mode("view")
+AREA_SQM_SE <- tm_shape(mpsz_svy21) +
+tm_polygons(alpha = 0.1) +
+tm_shape(condo_resale.sf.adaptive) +
+tm_dots(col = "AREA_SQM_SE",
+border.col = "gray60",
+border.lwd = 1) +
+tm_view(set.zoom.limits = c(11,14))
+
+
+AREA_SQM_TV <- tm_shape(mpsz_svy21) +
+tm_polygons(alpha = 0.1) +
+tm_shape(condo_resale.sf.adaptive) +
+tm_dots(col = "AREA_SQM_TV",
+border.col = "gray60",
+border.lwd = 1) +
+tm_view(set.zoom.limits = c(11,14))
+
+
+# Arrange the two interactive maps in a synchronized layout ----------------------
+tmap_arrange(AREA_SQM_SE, AREA_SQM_TV,
+asp = 1, ncol = 2,
+sync = TRUE)
+
+tmap_mode("plot")
 
 ```
 
-### Insights and intepretation:
+## 13.10 Reference
 
-The Geographically Weighted Regression (GWR) model exhibits an exceptionally strong local fit for the Tampines planning area. Among 76 condominium resale observations, the local coefficient of determination (R²) ranges from 0.894 to 0.972, with a median of 0.965 and a mean of 0.955. These values indicate that approximately 95–97 percent of the variation in resale prices within Tampines is explained by the explanatory variables used in the model, such as floor area, building age, and proximity to amenities or transport nodes. Compared with the global OLS R² of 0.65, the local model captures spatial heterogeneity far more effectively, revealing that relationships between housing price and predictors vary significantly across Singapore. The narrow interquartile range (0.955–0.971) further implies high model stability and uniform explanatory power across all Tampines subzones. This consistency suggests that the selected variables are highly relevant and that the urban environment in Tampines is relatively homogeneous, characterised by systematic town planning and similar access to facilities. The strong local R² values also confirm that GWR is a suitable model for capturing spatially varying relationships in mature, well-developed residential areas, offering reliable insights into how local factors influence property values across different neighbourhood contexts.
+Gollini I, Lu B, Charlton M, Brunsdon C, Harris P (2015) “GWmodel: an R Package for exploring Spatial Heterogeneity using Geographically Weighted Models”. *Journal of Statistical Software, 63(17)*:1-50, http://www.jstatsoft.org/v63/i17/
+
+Lu B, Harris P, Charlton M, Brunsdon C (2014) “The GWmodel R Package: further topics for exploring Spatial Heterogeneity using GeographicallyWeighted Models”. *Geo-spatial Information Science 17(2)*: 85-101, http://www.tandfonline.com/doi/abs/10.1080/1009502.2014.917453
+
