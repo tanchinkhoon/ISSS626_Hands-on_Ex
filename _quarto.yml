@@ -26,12 +26,14 @@ website:
             href: Hands-on_Ex01/Hand-on_Ex01.qmd
       - text: "In-class Exercise"
         menu:
+          - text: "In-class Exercise 7"
+            href: In-Class_Ex07/in-class_ex07   
           - text: "In-class Exercise 6"
             href: In-Class_Ex06/in-class_ex06   
+          - text: "In-class Exercise 5b"
+            href: In-Class_Ex05/in-class_ex05b
           - text: "In-class Exercise 5a"
             href: In-Class_Ex05/in-class_ex05  
-          - text: "In-class Exercise 5b"
-            href: In-Class_Ex05/in-class_ex05b              
           - text: "In-class Exercise 4"
             href: In-Class_Ex04/in-class_ex04 
           - text: "In-class Exercise 3b"

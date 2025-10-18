@@ -93,14 +93,14 @@ if (!require(pacman)) install.packages("pacman")
 # If missing, it installs the package so that subsequent commands can run.
 
 pacman::p_load(                           
-  sf,              # Handles spatial vector data such as points, lines, and polygons.
-  sfdep,           # Performs spatial dependence analysis (Moran I, Gi* and related statistics).
-  tmap,            # Creates static and interactive thematic maps for visualisation.
-  tidyverse,       # Provides data manipulation and plotting tools (dplyr, ggplot2, readr).
-  plotly,          # Adds interactivity to ggplot maps and statistical plots.
-  Kendall,         # Performs the Mann Kendall trend test for temporal trend detection.
-  knitr,           # Enables dynamic report generation in Quarto or R Markdown.
-  kableExtra       # Enhances table formatting for publication-quality outputs.
+  sf,         # Handles spatial vector data such as points, lines, and polygons.
+  sfdep,      # Performs spatial dependence analysis (Moran I, Gi* and related statistics).
+  tmap,       # Creates static and interactive thematic maps for visualisation.
+  tidyverse,  # Provides data manipulation and plotting tools (dplyr, ggplot2, readr).
+  plotly,     # Adds interactivity to ggplot maps and statistical plots.
+  Kendall,    # Performs the Mann Kendall trend test for temporal trend detection.
+  knitr,      # Enables dynamic report generation in Quarto or R Markdown.
+  kableExtra  # Enhances table formatting for publication-quality outputs.
 )
 
 # --- 4.2 Reproducibility setting ---------------------------------------------
@@ -115,112 +115,179 @@ set.seed(626)
 
 This section details the rigorous preparation of both spatial and aspatial datasets to establish a unified analytical foundation for the subsequent spatial and spatio-temporal analyses of Singapore’s bus-mobility patterns.  The procedures convert raw geospatial layers and passenger-volume tables into metrically consistent, quality-assured analytical units capable of supporting Local Moran I, LISA, and Emerging Hot Spot Analysis (EHSA).  All geometries are projected into the Singapore Transverse Mercator coordinate system (EPSG 3414) to maintain measurements in metres.  The workflow proceeds through seven major stages: importing and projecting geospatial layers, constructing a regular hexagonal grid, validating geometric integrity, filtering relevant spatial units, integrating the aspatial passenger data, and building a balanced space–time panel for subsequent statistical modelling.
 
-### Import Bus Stop Layer
+### Import and projection of spatial layers
 
-The Bus Stop layer provides the geographic locations of all active bus stops in Singapore. Importing and projecting this layer to SVY21 ensures consistency with other datasets.
+Accurate spatial statistics require that all geometries share a common projected coordinate system with metre units. This subsection imports the bus stop points and the national planning boundary, removes any third dimension or measure attributes, and projects both layers into SVY21. Using a single projection prevents unit inconsistency and ensures that all subsequent operations such as intersections, buffering, grid construction, and area or distance calculations are correct. The outcome is a pair of clean spatial layers that form the base for mainland filtering and grid creation.
 
 ```{r}
 
-# --- 5.1 Import Bus Stop layer ----------------------------------------------
+# Read bus stop point features from the geospatial folder
+BusStop <- st_read("data/geospatial/BusStop.shp") %>%  # load the point layer
+  st_zm(drop = TRUE, what = "ZM") %>%                  # drop Z and M attributes if present
+  st_transform(crs = 3414)                             # project to SVY21 in metres
 
-BusStop <- st_read(dsn = "/Users/cktan/Desktop/SMU/01_Geospatial Analytics (ISSS626)/Hands-on_Ex/Take-home_Ex02/data/geospatial", layer = "BusStop") %>%
-  st_transform(crs = 3414)
-# Reads the BusStop shapefile and converts its coordinates to Singapore SVY21 (EPSG 3414).
+# Read the planning boundary and set projection to SVY21
+mpsz <- st_read("data/geospatial/MasterPlan2019SubzoneBoundaryNoSeaKML.kml") %>%
+  st_zm(drop = TRUE, what = "ZM") %>%    # drop Z and M for clean polygons
+  st_transform(crs = 3414)               # project to SVY21 in metres
+
+# Quick structural checks
+# st_crs(BusStop)           # should report EPSG 3414
+# st_crs(mpsz)              # should report EPSG 3414
+# st_geometry_type(BusStop) # should be POINT
+# st_geometry_type(mpsz)    # should be MULTIPOLYGON
+
 
 ```
 
-### Import URA Master Plan 2019 Subzone Boundary
+### Mainland mask and mainland only bus stops
 
-The URA Master Plan 2019 Subzone Boundary provides official planning areas and serves as the spatial extent for generating the analytical grid.
+All analysis must reflect activity on the main island. The national boundary is therefore dissolved into a single geometry and decomposed into individual polygons. The polygon with the largest area is taken as the mainland. The bus stop layer is then filtered so that only points inside the mainland polygon are retained. This prevents inclusion of stops that lie on offshore islands or in reclaimed areas outside the main island footprint. The step concludes with a map and a count audit to demonstrate that the retained points agree with the mainland extent.
 
-```{r}
+```{r,fig.width=8,fig.height=6}
 
-# --- 5.2 Import URA Master Plan 2019 Subzone Boundary -----------------------
+# --- 5.2 Mainland mask and mainland only bus stops --------------------------
 
-mpsz <- st_read("/Users/cktan/Desktop/SMU/01_Geospatial Analytics (ISSS626)/Hands-on_Ex/Take-home_Ex02/data/geospatial/MasterPlan2019SubzoneBoundaryNoSeaKML.kml") %>%
-  st_zm(drop = TRUE, what = "ZM") %>%
-  st_transform(crs = 3414)
-# Loads the KML boundary file, removes Z or M dimensions, and reprojects to SVY21.
+sg_union <- st_union(mpsz) %>%   # dissolve all subzones into one geometry
+  st_make_valid()                # ensure the unioned geometry is valid
 
-sg_outline <- st_union(mpsz) # merge subzones for basemap plotting
+polys_sf <- sg_union %>%         # take the unioned geometry
+  st_cast("POLYGON") %>%         # split into single polygon parts
+  st_as_sf()                     # convert to an sf data frame for table ops
 
-```
+sg_main <- polys_sf[             # select the polygon
+  which.max(st_area(polys_sf)),  # with the largest area which is the mainland
+  ,
+  drop = FALSE
+]
 
-### Import Passenger Volume OD Bus Dataset
-
-The Passenger Volume OD Bus dataset from LTA DataMall contains hourly origin and destination passenger volumes, forming the aspatial foundation for mobility intensity.
-
-```{r}
-
-# --- 5.3 Import Passenger Volume OD Bus dataset -----------------------------
-
-odbus <- read_csv("/Users/cktan/Desktop/SMU/01_Geospatial Analytics (ISSS626)/Hands-on_Ex/Take-home_Ex02/data/aspatial/origin_destination_bus_202508.csv")
-# Reads the CSV file containing origin stop code, destination stop code, day type, hour and total trips.
-
-# Inspect the data structure and 
-glimpse(odbus)              # displays data structure
-summary(odbus$TOTAL_TRIPS)  # confirms realistic numeric values
-
-```
-
-```{r}
-
-tm_shape(sg_outline) +
-  tm_polygons(col = "grey95", border.col = "darkgrey") +
-tm_shape(BusStop) +
-  tm_dots(col = "red", size = 0.1, alpha = 0.6) +
-tm_layout(
-  title = "Bus Stop Locations within Singapore Subzones",
-  title.position = c("bottom","right"),
-  title.size = 0.8,
-  frame = TRUE,
-  legend.outside = TRUE
+inside_mainland <- st_within(    # compute point within polygon as a logical matrix
+  BusStop, sg_main, sparse = FALSE
 )
 
+BusStop_in_SG <- BusStop[        # keep only points inside mainland
+  inside_mainland[, 1],
+]
+
+# Audit counts of retained versus removed stops
+c(total = nrow(BusStop),
+  mainland = nrow(BusStop_in_SG),
+  removed = nrow(BusStop) - nrow(BusStop_in_SG))
+
+# Optional visual check of the mainland filter
+tmap_mode("view")
+tm_shape(sg_main) + tm_polygons(col = "white", border.col = "grey50") +
+tm_shape(BusStop_in_SG) + tm_dots(col = "red", size = 0.2, alpha = 0.7) +
+tm_layout(
+  title = "Bus stops retained on the Singapore mainland",
+  title.position = c("center", "top"),
+  title.size = 1.5,
+  title.fontface = "bold",  
+  inner.margins = c(0.05, 0.08, 0.20, 0.05),  # adjust bottom margin pushes title below frame
+  outer.margins = c(0.05, 0.08, 0.08, 0.05),  # keeps white space around map
+  frame = TRUE,
+  legend.show = FALSE
+)
+
+
 ```
 
+### Hexagon grid creation over the mainland
 
+A regular hexagon tessellation is generated to define neutral analytical units across the mainland. Hexagons reduce directional bias and provide a compact neighbourhood structure. The cell size is set to seven hundred metres which corresponds to a three hundred seventy five metre apothem. The grid is created only over the mainland polygon to avoid generating cells over the sea. An outline polygon is also prepared for cartographic composition in subsequent checks and figures. The section ends with a map that shows complete coverage of the mainland by the grid.
 
+```{r,fig.width=8,fig.height=6}
 
-
-
-
-
-### Generate 375 m Hexagonal Traffic Analysis Zone (TAZ) Grid
-
-A uniform hexagonal grid is generated to represent TAZs across Singapore. Hexagons reduce sampling bias due to edge effects of the grid shape, this is related to the low perimeter-to-area ratio of the shape of the hexagon. A circle has the lowest ratio but cannot tessellate to form a continuous grid. Hexagons are the most circular-shaped polygon that can tessellate to form an evenly spaced grid. Each hexagon has an apothem of 375 meters, giving a flat-to-flat width of approximately 750 meters. The grid provides the spatial framework for aggregating bus-trip intensity.
-
-```{r}
-
-# --- 5.4 Generate 375 m hexagonal TAZ grid ----------------------------------
+# --- 5.3 Hexagon grid creation over the mainland ----------------------------
 
 hexagon <- st_make_grid(
-  mpsz,                      # coverage extent from URA boundary
-  cellsize = 750,            # flat-to-flat spacing equals twice the 375 m apothem
-  what = "polygons",         # create polygon geometries
-  square = FALSE             # request hexagons instead of squares
+  sg_main,            # use mainland extent
+  cellsize = 750,     # metres which approximates two times the apothem
+  what = "polygons",  # request polygon output
+  square = FALSE      # request hexagons rather than squares
 ) %>%
-  st_sf()                    # convert the grid to an sf object
+  st_sf()             # convert the grid to an sf object
 
-sg_outline <- st_union(mpsz) # merge subzones for basemap plotting
+sg_outline <- sg_main # keep mainland outline for mapping
+
+# Quick checks and a coverage map
+st_is_longlat(hexagon) # should be FALSE which means metre units
+st_crs(hexagon)        # should be EPSG 3414
+length(hexagon)        # number of cells created
+
+tmap_mode("plot")
+tm_shape(sg_outline) + tm_polygons(col = "palegreen3", border.col = NA) +
+tm_shape(hexagon) + tm_borders(col = "grey60", lwd = 0.25) +
+tm_layout(
+  title = "Hexagon grid covering the Singapore mainland",
+  title.position = c("center", "top"),
+  title.size = 1.5,
+  title.fontface = "bold",  
+  inner.margins = c(0.05, 0.08, 0.20, 0.05),  # adjust bottom margin pushes title below frame
+  outer.margins = c(0.05, 0.08, 0.08, 0.05),  # keeps white space around map
+  frame = TRUE,
+  legend.show = FALSE
+)
+
 
 ```
 
-```{r}
-tmap_mode("plot")
+### Geometric verification of hexagon size
 
+The grid must match the intended resolution. For a regular hexagon with apothem a equal to three hundred seventy five metres, the theoretical flat to flat width is two times a which equals seven hundred fifty metres, and the theoretical area equals two times the square root of three times a squared. Observed values from a sample cell are computed using the cell bounding box and the exact area. Close agreement between observed and theoretical values confirms that the grid represents the desired spatial scale.
+
+```{r}
+
+# --- 5.4 Geometric verification of hexagon size -----------------------------
+
+one_hex   <- hexagon[1, ]                       # select a sample hexagon
+bb        <- st_bbox(one_hex)                   # get its bounding box
+width_obs <- as.numeric(bb["xmax"] - bb["xmin"])# compute flat to flat width
+area_obs  <- as.numeric(st_area(one_hex))       # compute area
+
+a         <- 375                                # apothem in metres
+width_exp <- 2 * a                              # theoretical width
+area_exp  <- 2 * sqrt(3) * a^2                  # theoretical area
+
+c(width_obs = width_obs, width_exp = width_exp,  # print both widths
+  area_obs = area_obs, area_exp = area_exp,      # and both areas
+  ratio_area = area_obs / area_exp)              # ratio should be close to one
+
+
+```
+
+### Keep only mainland hexagons that contain bus stops
+
+Only cells that contain at least one mainland bus stop can originate trips. Cells without bus stops do not contribute information and would degrade the quality of spatial statistics by adding empty units. The number of bus stops within each cell is calculated using topological intersection, and only those with a positive count are retained. The result is a subset that represents the serviced mainland and forms the base for spatial aggregation and later second order analysis.
+
+```{r,fig.width=8,fig.height=6}
+
+# --- 5.5 Retain only cells that contain bus stops ---------------------------
+
+hexagon$busstop_count <- lengths(        # count bus stops per hexagon
+  st_intersects(hexagon, BusStop_in_SG)
+)
+
+hexagon_active <- dplyr::filter(         # keep cells with at least one stop
+  hexagon, busstop_count > 0
+)
+
+# Distribution and a simple map for quality assurance
+summary(hexagon$busstop_count)           # counts before filtering
+min(hexagon_active$busstop_count)        # should be at least one
+nrow(hexagon_active)                     # number of active cells
+
+tmap_mode("plot")
 tm_shape(sg_outline) +
-  tm_polygons(col = "palegreen3", border.col = NA) +  # unified green Singapore
-tm_shape(hexagon) +
-  tm_borders(col = "grey50", lwd = 0.25) +            # grey hex grid overlay
-tm_shape(BusStop_in_SG) +                             # detailed bus stop distribution
-  tm_dots(col = "red", size = 0.1, fill_alpha = 0.08) +
-tm_compass(type = "8star", size = 2, position = c("right", "bottom")) +
-tm_scalebar(position = c("right", "bottom")) +
+  tm_polygons(col = "palegreen3", border.col = NA) +
+tm_shape(hexagon_active) + 
+  tm_borders(col = "white", alpha = 1, border.col = "grey40", lwd = 0.25) +
+  tm_compass(type = "8star", size = 2, position = c("right","bottom")) +
+tm_scalebar(position = c("right","bottom")) +
 tm_layout(
-  title = "Analytical Hexagon Grid covering Singapore",
+  title = "Active mainland hexagons containing bus stops",
   title.position = c("center", "top"),
-  title.size = 1.2,
+  title.size = 1.5,
   title.fontface = "bold",  
   inner.margins = c(0.05, 0.08, 0.20, 0.05),  # adjust bottom margin (0.10) pushes title below frame
   outer.margins = c(0.05, 0.08, 0.08, 0.05),  # keeps white space around map
@@ -230,23 +297,454 @@ tm_layout(
 
 ```
 
+### Assign stable identifiers to active cells
+
+A stable key is required to link spatial cells with aspatial tables and to keep results traceable. Sequential identifiers with leading zeros are created and attached to every active cell. These identifiers are used in all subsequent joins and aggregations. A quick check confirms that there are no duplicate keys and that all values are present.
+
+```{r}
+
+# --- 5.6 Assign stable identifiers ------------------------------------------
+
+hexagon_active <- hexagon_active %>%
+  mutate(HEX_ID = sprintf("H%04d", row_number()))  # create codes H0001 and so on
+
+head(hexagon_active$HEX_ID)              # preview the first few codes
+any(duplicated(hexagon_active$HEX_ID))   # should be FALSE
+
+
+```
+
+### Integrate the passenger table with mainland cells
+
+Passenger volume data report boardings by origin stop code hour and day type. To analyse these counts spatially, each stop must inherit the identifier of the cell that contains it. A lookup from bus stop code to cell identifier is built with a point in polygon intersection restricted to the mainland. The passenger table is then harmonised by renaming and standardising keys and is joined to the lookup. Trip counts are aggregated by cell by day type and by hour to produce an hourly spatial table of passenger intensity across the mainland.
+
+```{r}
+
+# --- 5.7 Integrate passenger table with mainland cells ----------------------
+
+bs_hex <- st_intersection(          # intersect stops with active cells
+  BusStop_in_SG, hexagon_active
+) %>%
+  st_drop_geometry() %>%            # drop geometry to keep a lean table
+  select(BUS_STOP_N, HEX_ID)        # retain stop code and cell id
+
+odbus <- readr::read_csv(           # read passenger origin destination table
+  "/Users/cktan/Desktop/SMU/01_Geospatial Analytics (ISSS626)/Hands-on_Ex/take-home_ex02/data/aspatial/origin_destination_bus_202508.csv"
+)
+
+trips <- odbus %>%
+  select(ORIGIN_PT_CODE, DAY_TYPE, TIME_PER_HOUR, TOTAL_TRIPS) %>% # keep needed fields
+  rename(BUS_STOP_N = ORIGIN_PT_CODE,             # standardise field names
+         HOUR_OF_DAY = TIME_PER_HOUR,
+         TRIPS = TOTAL_TRIPS) %>%
+  mutate(BUS_STOP_N = str_pad(as.character(BUS_STOP_N), 5, pad = "0")) %>% # code format
+  inner_join(bs_hex, by = "BUS_STOP_N") %>%       # attach HEX_ID
+  group_by(HEX_ID, DAY_TYPE, HOUR_OF_DAY) %>%     # group for aggregation
+  summarise(TRIPS = sum(TRIPS), .groups = "drop") # sum trips
+
+kable(head(trips))                                # inspect the structure
+sort(unique(trips$DAY_TYPE))                      # list day types
+range(trips$HOUR_OF_DAY, na.rm = TRUE)            # check hour range
+
+
+```
+
+### Build a balanced space time panel with geometry
+
+A complete space time dataset requires the full set of cells across the full set of hours for each day type. The keys are created from all active cells the two canonical day types and the twenty four hours. The aggregated trips are left joined to this key and missing combinations are zero filled. Geometry from the active cells is attached to every row and a chronological index is created to allow ordering and trend analysis. Strict assertions confirm that the panel is complete and that each cell day combination contributes exactly twenty four hourly rows.
+
+```{r}
+
+# --- 5.8 Balanced space time panel with geometry ----------------------------
+
+key_hex   <- hexagon_active$HEX_ID              # full universe of active cells
+key_days  <- c("WEEKDAY", "WEEKENDS/HOLIDAY")   # canonical day types
+key_hours <- 0:23                               # full set of hours
+
+key_full <- expand_grid(                        # full Cartesian product
+  HEX_ID = key_hex,
+  DAY_TYPE = key_days,
+  HOUR_OF_DAY = key_hours
+)
+
+trips_full <- key_full %>%              # attach trip counts to the key
+  left_join(trips, by = c("HEX_ID", "DAY_TYPE", "HOUR_OF_DAY")) %>%
+  mutate(TRIPS = coalesce(TRIPS, 0L))   # zero fill missing combinations
+
+trips_panel_sf <- hexagon_active %>%    # attach geometry to each row
+  select(HEX_ID, geometry) %>%
+  right_join(trips_full, by = "HEX_ID") %>%
+  mutate(datetime = as.POSIXct(sprintf("2024-05-01 %02d:00:00", HOUR_OF_DAY),
+                               tz = "UTC")) %>%
+  st_as_sf()                            # convert to sf object with geometry
+
+```
+
+Next, we will include a concise tabular preview and completeness summary of the trips_full dataset, inspecting and confirming that all spatial cells, day types, and hourly intervals are represented before geometry is attached. It provides transparent evidence of balanced coverage across time and space for subsequent spatio-temporal analyses.
+
+```{r}
+
+# --- 5.8a Informational tables for trips_full --------------------------------
+# Show a tidy preview of trips_full so the panel content is transparent
+
+# Order rows for human reading then take the first ten per day type
+preview_trips_full <- trips_full %>%
+  dplyr::arrange(HEX_ID, DAY_TYPE, HOUR_OF_DAY) %>%
+  dplyr::group_by(DAY_TYPE) %>%
+  dplyr::slice_head(n = 10) %>%
+  dplyr::ungroup()
+
+knitr::kable(
+  preview_trips_full,
+  caption = "Preview of trips_full ordered by cell day and hour"
+)
+
+# Compact completeness summary to accompany the preview
+summary_trips_full <- dplyr::summarise(
+  trips_full,
+  n_rows       = dplyr::n(),
+  n_hex        = dplyr::n_distinct(HEX_ID),
+  n_day_types  = dplyr::n_distinct(DAY_TYPE),
+  n_hours      = dplyr::n_distinct(HOUR_OF_DAY),
+  min_hour     = min(HOUR_OF_DAY, na.rm = TRUE),
+  max_hour     = max(HOUR_OF_DAY, na.rm = TRUE),
+  zeros_in_TRIPS = sum(TRIPS == 0, na.rm = TRUE)
+)
+
+knitr::kable(
+  summary_trips_full,
+  caption = "Completeness summary of trips_full"
+)
+
+# Optional distribution by hour and day to verify balanced coverage
+by_hour_day <- trips_full %>%
+  dplyr::count(DAY_TYPE, HOUR_OF_DAY, name = "n_records") %>%
+  dplyr::arrange(DAY_TYPE, HOUR_OF_DAY)
+
+knitr::kable(
+  by_hour_day,
+  caption = "Record count in trips_full by day type and hour"
+)
+
+```
+
+
+```{r}
+
+# --- Validation: Balanced space–time panel completeness ---------------------
+
+expected_n <- length(key_hex) * length(key_days) * length(key_hours)
+
+# Actual number of rows in the panel
+actual_n <- nrow(trips_panel_sf)
+
+cat("\nValidation Summary for trips_panel_sf\n")
+cat("---------------------------------------\n")
+cat("Expected number of rows : ", expected_n, "\n")
+cat("Actual number of rows   : ", actual_n, "\n")
+
+# Check that each HEX_ID × DAY_TYPE combination has exactly 24 rows
+chk <- trips_panel_sf %>%
+  count(HEX_ID, DAY_TYPE, name = "n_rows")
+
+rows_ok   <- all(chk$n_rows == 24)
+rows_fail <- chk %>% filter(n_rows != 24)
+
+cat("\nPer-cell/day completeness check:\n")
+cat("  All HEX_ID × DAY_TYPE combinations have 24 rows?  ",
+    ifelse(rows_ok, "✅ YES", "❌ NO"), "\n")
+if (!rows_ok) {
+  cat("  HEX_IDs failing completeness:\n")
+  print(rows_fail)
+}
+
+# Ensure uniqueness per HEX_ID × DAY_TYPE × HOUR_OF_DAY
+dup <- trips_panel_sf %>%
+  count(HEX_ID, DAY_TYPE, HOUR_OF_DAY, name = "n") %>%
+  filter(n != 1)
+
+dup_ok <- nrow(dup) == 0
+cat("\nUniqueness check for HEX_ID × DAY_TYPE × HOUR_OF_DAY:\n")
+cat("  Duplicates present? ", ifelse(dup_ok, "✅ NO", "❌ YES"), "\n")
+if (!dup_ok) {
+  cat("  Duplicated keys:\n")
+  print(dup)
+}
+
+# Check for missing keys or invalid geometry
+na_hex   <- sum(is.na(trips_panel_sf$HEX_ID))
+na_day   <- sum(is.na(trips_panel_sf$DAY_TYPE))
+na_hour  <- sum(is.na(trips_panel_sf$HOUR_OF_DAY))
+geom_val <- all(st_is_valid(trips_panel_sf))
+
+cat("\nKey and geometry diagnostics:\n")
+cat("  Missing HEX_ID values  : ", na_hex, "\n")
+cat("  Missing DAY_TYPE values: ", na_day, "\n")
+cat("  Missing HOUR_OF_DAY    : ", na_hour, "\n")
+cat("  Geometry validity OK?  : ", ifelse(geom_val, "✅ YES", "❌ NO"), "\n")
+
+# Simple assertion guards (keep them for safety)
+stopifnot(actual_n == expected_n)
+stopifnot(rows_ok)
+stopifnot(dup_ok)
+stopifnot(na_hex == 0, na_day == 0, na_hour == 0)
+stopifnot(geom_val)
+
+cat("\n✅  Validation completed successfully — trips_panel_sf is fully balanced, unique, and geometrically valid.\n")
+
+
+```
+
+
+
+
+```{r}
+
+
+
+
+```
+
+
+
+
+```{r}
+
+
+
+
+```
+
+
+
+
+```{r}
+
+
+
+
+```
 
 
 
 
 
+```{r}
+
+
+
+
+```
+
+
+
+
+```{r}
+
+
+
+
+```
 
 
 
 
 
+```{r}
+
+
+
+
+```
+
+
+
+
+```{r}
+
+
+
+
+```
+
+
+
+
+```{r}
+
+
+
+
+```
+
+
+
+
+```{r}
+
+
+
+
+```
+
+
+
+
+```{r}
+
+
+
+
+```
 
 
 
 
 
+```{r}
 
 
+
+
+```
+
+
+
+
+```{r}
+
+
+
+
+```
+
+
+
+
+
+```{r}
+
+
+
+
+```
+
+
+
+
+```{r}
+
+
+
+
+```
+
+
+
+
+
+```{r}
+
+
+
+
+```
+
+
+
+
+
+```{r}
+
+
+
+
+```
+
+
+
+
+
+```{r}
+
+
+
+
+```
+
+
+
+
+
+```{r}
+
+
+
+
+```
+
+
+
+
+
+```{r}
+
+
+
+
+```
+
+
+
+
+```{r}
+
+
+
+
+```
+
+
+
+
+```{r}
+
+
+
+
+```
+
+
+
+
+```{r}
+
+
+
+
+```
+
+
+
+
+
+```{r}
+
+
+
+
+```
+
+
+
+
+
+```{r}
+
+
+
+
+```
 
 
 
