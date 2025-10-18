@@ -805,7 +805,7 @@ tampines_pa <- mpsz_svy21 %>%
 tampines_pts <- condo_resale.sf.adaptive[tampines_pa, , op = st_within]
 
 # --- 3) Visualise: Tampines boundary + points coloured by Local R² -------------
-tmap_mode("view")
+tmap_mode("plot")
 tm_shape(tampines_pa) +
   tm_polygons(fill_alpha = 0.1) +
 tm_shape(tampines_pts) +
