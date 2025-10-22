@@ -1,0 +1,333 @@
+---
+title: "Hands-on_Ex03"
+author: "TAN Chin Khoon"
+date: "12 September 2025"
+date-modified: "last-modified"
+toc: true
+toc-location: right
+toc-depth: 3
+number-sections: false
+---
+
+# 6 Spatio-Temporal Point Patterns Analysis
+
+## 6.1 Overview
+
+A spatio-temporal point process is a random collection of events identified by both time and location, such as disease cases, species sightings, or natural disasters. With the rise of geographically and temporally indexed data, analyzing these patterns has become increasingly important across many fields. In the past decade, several R methods and packages have been developed to support such analyses. This hands-on exercise demonstrates how these tools can be combined in a guided way, using forest fire events in Kepulauan Bangka Belitung, Indonesia (from 1 January to 31 December 2023) as a real-world case study to illustrate the procedures and interpretations.
+
+## 6.2 Learning Outcome
+
+### 6.2.1 The research question
+
+The specific questions we would like to answer are:
+
+-   Are the locations of forest fire in Kepulauan Bangka Belitung spatial and spatio-temporally independent?
+-   If the answer is NO, where and when the observed forest fire locations tend to cluster?
+
+A detailed discussion of the results, together with explicit insights and implications, is provided in Section [6.11 Discussion of Results (Answer to the Research Question)].
+
+## 6.3 The data
+
+Know what files you'll use and where they come from.
+
+-   forestfires.csv: point events (each row = a fire). Has longitude, latitude, and date/time fields from MODIS.
+-   Kepulauan_Bangka_Belitung shapefile: the study region polygon (administrative boundary). We'll read only the Kepulauan Bangka Belitung subset for 2023 analyses.
+
+## 6.4 Installing and Loading the R packages
+
+Load all libraries used in this hands-on exercise.
+
+```{r}
+pacman::p_load(sf,        # read, write, and transform spatial vector data
+               terra,      
+               spatstat,  # used for performing Spatial Point Patterns Analysis such as kcross, Lcross, etc
+               sparr,     # spatio-temporal kernel density estimation (STKDE)
+               tmap,      # cartographic visualisation for quick maps
+               tidyverse  # readr (CSV), dplyr (mutate/select), ggplot, etc.
+               )
+
+```
+
+## 6.5 Importing and Preparing Study Area
+
+### 6.5.1 Importing study area
+
+First. read the Kepulauan Bangka Belitung boundary, clean geometry, and set projected CRS.
+
+```{r}
+# Read the shapefile from the data folder -----------------------------------------------------
+kbb_sf <- st_read(dsn = "data/rds/BATAS_DESA_DESEMBER_2019_DUKCAPIL_BANGKA_BELITUNG",    # folder containing the shapefile
+                  layer = "BATAS_DESA_DESEMBER_2019_DUKCAPIL_BANGKA_BELITUNG") %>%       # shapefile base name (no .shp)
+  st_union() %>%                       # dissolve internal boundaries into one polygon
+  st_zm(drop = TRUE, what = "ZM") %>%  # drop Z/M dimensions if present (keeps 2D)
+  st_transform(crs = 32748)            # reproject to EPSG:32748 (UTM Zone 48S in meters)
+
+```
+
+### 6.5.2 Converting OWIN
+
+Next, convert the polygon (***kb***) to an observation window (owin) for point-pattern analysis.
+
+```{r}
+# Convert the sf polygon to an 'owin' (spatstat window) 
+kbb_owin <- as.owin(kbb_sf)      # turns the sf polygon into a spatstat window for ppp usage
+kbb_owin                         
+
+```
+
+```{r}
+# Quick check that conversion succeeded
+class(kbb_owin) 
+
+```
+
+## 6.6 Importing and Preparing Forest Fire data
+
+Next read the CSV, make it spatial, reproject to meters, and build helpful time fields.
+
+```{r}
+fire_sf <- read_csv("data/rds/modis_2023_Indonesia.csv")    %>%  # load the event table
+  st_as_sf(coords = c("longitude", "latitude"), crs = 4326) %>%  # turn lon/lat cols into points (WGS84)
+  st_transform(crs = 32748)   # project to meters to match the study area
+
+```
+
+```{r}
+# Add day-of-year and month fields used later
+fire_sf <- fire_sf %>% 
+  mutate(DayofYear = yday(acq_date)) %>%     # numeric day 1..365 from acquisition date
+  mutate(Month_num = month(acq_date)) %>%    # numeric month 1..12
+  mutate(Month_fac = month(acq_date, label = TRUE, abbr = FALSE))  # factor month with full names (Jan..Dec)
+
+```
+
+## 6.7 Visualising the Fire Points
+
+### 6.7.1 Overall plot
+
+Plot one map with all 2023 fires over the study region
+
+```{r, fig.width=12, fig.height=7}
+# Bigger figure when rendering (Quarto/knitr)
+
+# Clip fire points so only those inside kbb_sf remain 
+fire_sf <- sf::st_intersection(fire_sf, kbb_sf)
+
+# Build a quick overall point map with tmap 
+tmap_mode("plot")                                         # use static plotting mode
+tm_shape(kbb_sf) +                                        # add study area polygon layer
+  tm_polygons(col = "grey85", border.col = "grey40") +    # light fill, subtle border
+  tm_shape(fire_sf) +                                     # add fire points
+  tm_symbols(size = 0.5, col = "red") +                   # small red dots
+  tm_credits(
+    "Forest Fire Points in 2023 (Kepulauan Bangka Belitung)",
+    position = c("center", "top"),    # center horizontally, top vertically
+    size = 1.2,                       # enlarge title text
+    fontface = 2                      # bold
+  ) +
+  tm_layout(
+    frame = TRUE,
+    # outer.margins = c(0.1, 0.05, 0.1, 0.05) # top, right, bottom, left (gives space for title)
+    inner.margins = 0.05                      # uncomment to maximize map area even more
+  )
+
+
+```
+
+### 6.7.2 Visualising geographic distribution of forest fires by month
+
+Next, 12 small multiples (one map per month) like the practical guide.
+
+```{r, fig.width=14, fig.height=9}
+# Faceted monthly point maps 
+tm_shape(kbb_sf) +
+  tm_polygons(col = "grey85", border.col = "grey50") +
+  tm_shape(fire_sf) +
+  tm_symbols(size = 0.1, col = "red") +
+  tm_facets(by = "Month_fac", ncol = 4) +                          # 4 columns x 3 rows facet layout
+  tm_layout(
+            frame = TRUE)
+
+
+```
+
+## 6.8 Computing STKDE by Month
+
+In this section, we will learn how to compute STKDE by using `spattemp.density()` of **sparr** package.
+
+### 6.8.1 Extracting forest fires by month
+
+We need to keep only the **mark** (month) needed by `ppp()` and the geometry.
+
+```{r}
+# Keep only the monthly mark and geometry for ppp creation 
+fire_month <- fire_sf %>% 
+  dplyr::select(Month_num)     # ppp requires a numeric/character mark column and geometry
+
+```
+
+### 6.8.2 Creating ppp
+
+Next, we need to convert to a spatstat **ppp** (planar point pattern) object.
+
+```{r}
+# Convert sf points to ppp (planar point pattern) 
+fire_month_ppp <- as.ppp(fire_month)   # create ppp with coordinates and 'Month_num' as the mark
+fire_month_ppp   # print basic info to confirm number of points/window box
+
+
+```
+
+```{r}
+# Sanity checks on the ppp 
+summary(fire_month_ppp)   # detailed summary (intensity, mark stats, window box)
+any(duplicated(fire_month_ppp)) # TRUE if any exact duplicate point events; expect FALSE per notes
+
+```
+
+```{r}
+# Check if there are duplicated point events by using the code chunk below.
+any(duplicated(fire_month_ppp))
+
+```
+
+### 6.8.3 Including Owin object
+
+Next, we need to clip/assign the point pattern to the **study window**.
+
+```{r}
+# Attach/clip the ppp to our study-area window 
+fire_month_owin <- fire_month_ppp[kbb_owin]  # ensure points are analysed within the polygon boundary
+summary(fire_month_owin)   # verify marks, counts, window area
+
+
+```
+
+```{r, fig.width=20, fig.height=10}
+# Visual check that points and window align
+plot(fire_month_owin)   # base plot; circles show mark values (here: months 1..12)
+
+```
+
+### 6.8.4 Computing Spatio-temporal KDE
+
+Subsequently, we will estimate spatio-temporal kernel density over space (meters) and discrete time (months).
+
+```{r}
+# Compute STKDE using sparr::spattemp.density 
+st_kde <- sparr::spattemp.density(fire_month_owin)  # uses default bandwidths; time is Month_num (1..12)
+summary(st_kde)                                     # see chosen bandwidths h (space) and lambda (time), bounds, range
+
+```
+
+### 6.8.5 Plotting the spatio-temporal KDE object
+
+Thereafter, we will reproduce month-specific density maps for July--December example.
+
+```{r, fig.width=14, fig.height=9}
+# Plot a subset of months (e.g., 7..12) with a fixed legend range for comparability 
+tims <- c(7,8,9,10,11,12)      # months to display (Jul..Dec), matches the sample figure
+par(mfcol = c(2,3))            # 2 rows x 3 columns panel
+for(i in tims){                # loop through the selected months
+  plot(st_kde, i,              # draw the STKDE slice at month 'i'
+       override.par = FALSE,   # keep mfcol settings
+       fix.range = TRUE,       # use common color scale across panels for fair comparison
+       main = paste("KDE at month", i))  # panel title
+}
+
+```
+
+## 6.9 Computing STKDE by Day of Year
+
+In this section, we will repeat the workflow but using **Day of Year** (1..365) as the temporal mark.
+
+### 6.9.1 Creating ppp object
+
+```{r}
+# Create a ppp whose mark is DayofYear (1..365) ----------------------------------------------
+fire_yday_ppp <- fire_sf %>% 
+  dplyr::select(DayofYear) %>%     # keep only the DOY mark and geometry
+  as.ppp()                         # convert to ppp object
+
+```
+
+### 6.9.2 Including Owin object
+
+```{r}
+# Attach the owin (study window) to the DayofYear ppp 
+fire_yday_owin <- fire_yday_ppp[kbb_owin] # ensure points are constrained to study polygon
+summary(fire_yday_owin)    # confirm counts, mark summary, window stats
+
+```
+
+### 6.9.3
+
+We aim to compute STKDE with default bandwidths and plot.
+
+```{r}
+# Compute STKDE using default bandwidth selection (gives baseline) 
+kde_yday <- spattemp.density(
+  fire_yday_owin        # ppp with DayofYear marks and study window
+)
+summary(kde_yday)       # examine space/time bandwidths (h, lambda) and density range
+
+```
+
+```{r}
+# Visualise the density surface aggregated over time (default plot) 
+plot(kde_yday)     # continuous surface over the region with legend
+
+```
+
+## 6.10 Computing STKDE by Day of Year: Improved method
+
+**Why this step?** Default bandwidths are generic. In this section, want to improve them by **bootstrap MISE** using `BOOT.spattemp()`, which estimates a **scalar spatial bandwidth (h, meters) and a scalar temporal bandwidth (lambda, in DOY units)** suited to our data.
+
+```{r}
+# For reproducibility of the bootstrap selection 
+set.seed(1234)    # fixed seed so results are repeatable in class
+
+# Run bootstrap bandwidth selection (may take some time) 
+BOOT.spattemp(fire_yday_owin)   # prints many trial (h, lambda) and the final pair at bottom
+# Note the final recommended h and lambda reported by the function output.
+
+```
+
+### 6.10.1 Computing spatio-temporal KDE
+
+We will re-run STKDE using the recommended bandwidths.
+
+```{r}
+# Refit STKDE using the bootstrap MISE recommended bandwidths 
+kde_yday <- spattemp.density(
+  fire_yday_owin,     # the DayofYear ppp constrained by the study window
+  h      = 45000,     # spatial bandwidth in meters (per improved selection)
+  lambda = 19         # temporal bandwidth in days-of-year (per improved selection)
+)
+summary(kde_yday)     # verify the bandwidths and evaluation grid
+
+```
+
+### 6.10.2 Plotting the output spatio-temporal KDE
+
+Finally, we display the final improved surface.
+
+```{r}
+# Plot the improved STKDE surface
+plot(kde_yday)   # shows the density surface with color bar; higher values = higher intensity
+
+```
+
+## 6.11 Discussion of Results (Answer to the Research Question)
+
+The spatio-temporal kernel density estimation (STKDE) provides clear evidence that the locations of forest fires in Kepulauan Bangka Belitung are **not spatially or spatio-temporally independent**. If the events were independent, the density surfaces would be flat and homogeneous across space and time. Instead, the STKDE outputs reveal distinct peaks, rejecting the null hypothesis of independence.
+
+The bootstrap-based bandwidth selection process identified an optimal smoothing window of **h ≈ 44.7 km (spatial)** and **λ ≈ 19.4 days (temporal)**. These parameters indicate that fire events tend to cluster within a radius of \~45 km and persist across approximately three-week periods. The density range produced, from very low background values (\~1.2e-39) to sharp peaks (\~6.4e-10), confirms substantial clustering intensity.
+
+The spatial clustering is most pronounced in **southern and central Bangka** and in **eastern Belitung**, where the STKDE consistently highlights hotspots of higher fire intensity. These locations repeatedly emerge in the density surfaces, showing that fire events are concentrated in specific sub-regions rather than being uniformly distributed.
+
+Temporally, clustering is most evident during the **July--October period**, corresponding to the dry season. The monthly KDE plots demonstrate that fire intensity builds steadily in July, peaks in September, and declines toward the year's end. This seasonality shows that fire occurrence is not equally likely throughout the year but is instead conditioned by climatic and land-surface factors linked to the dry months.
+
+The implications of these findings are important for both science and policy. Spatial dependence means that fire risk is **localized**, and mitigation resources should be concentrated in the fire-prone regions identified by the STKDE. Temporal dependence means that efforts should be **time-targeted**, with enhanced monitoring and preventive measures deployed during the critical dry-season window. This combination of spatial and temporal clustering suggests that forest fires in Bangka Belitung are shaped by systematic environmental drivers, not by random chance.
+
+In summary, the STKDE results demonstrate that forest fire events are **spatially and spatio-temporally dependent**. They cluster within \~45 km regions and persist across \~3-week intervals, with the highest concentrations observed in southern/central Bangka and eastern Belitung during the July--October dry season.

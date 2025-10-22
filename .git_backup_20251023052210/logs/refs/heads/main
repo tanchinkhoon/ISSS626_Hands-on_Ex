@@ -1,0 +1,148 @@
+0000000000000000000000000000000000000000 7886da8a64723386fdad22a6c5c27bfc73e41a0c tanchinkhoon <surftck@gmail.com> 1756315710 +0800	commit (initial): ISSS626 home page initial commit
+7886da8a64723386fdad22a6c5c27bfc73e41a0c 6d1b35b259aaef32b662b3d1b859458f5f2e6bdc tanchinkhoon <surftck@gmail.com> 1756316187 +0800	commit: Commit for initial changes
+6d1b35b259aaef32b662b3d1b859458f5f2e6bdc 59b7e62bc2e4debfe25fbaee92bf26ea38680a1e tanchinkhoon <surftck@gmail.com> 1756316250 +0800	commit: Commit for initial changes.
+59b7e62bc2e4debfe25fbaee92bf26ea38680a1e 7b0f3a0730bd9537bda608d3b4b61deac4524869 tanchinkhoon <surftck@gmail.com> 1756321754 +0800	commit: Initial site: Quarto sources + rendered _site/ (data ignored)
+7b0f3a0730bd9537bda608d3b4b61deac4524869 94b2020e2183d0e90b50ed1c53c2644b777d9ddc tanchinkhoon <surftck@gmail.com> 1756327007 +0800	commit: Fix navbar + quick link paths for Ex01; re-render
+94b2020e2183d0e90b50ed1c53c2644b777d9ddc d9cbc275e4475c0944c9f9f152755c03ecc31a28 tanchinkhoon <surftck@gmail.com> 1756327428 +0800	commit: Move Hands-on_Ex01.qmd to root directory.
+d9cbc275e4475c0944c9f9f152755c03ecc31a28 c40a4253af4f5b4363a124691124dcf3c0cf5cf9 tanchinkhoon <surftck@gmail.com> 1756327585 +0800	commit: Fix publishing of Hands-on_Ex01.
+c40a4253af4f5b4363a124691124dcf3c0cf5cf9 65230ea2e4332cd1f9a17cd763fbfd7c115f7734 tanchinkhoon <surftck@gmail.com> 1756328092 +0800	commit: Fixing the publishing of Hand-on Exercise 1.
+65230ea2e4332cd1f9a17cd763fbfd7c115f7734 9d1faade6570ea66eb7653e7386b15a57723182b tanchinkhoon <surftck@gmail.com> 1756328694 +0800	commit: Fixing Hands-on Exercise 1 publishing on Netlify.
+9d1faade6570ea66eb7653e7386b15a57723182b 74f171e7238ab36262b509cdd45e7d40e4375e23 tanchinkhoon <surftck@gmail.com> 1756328784 +0800	commit: Fixing Hand-on Exercise 1 publishing on Netlify.
+74f171e7238ab36262b509cdd45e7d40e4375e23 306d8d0526fca14622900921ef90e8bde2146956 tanchinkhoon <surftck@gmail.com> 1756329439 +0800	commit: Fixing the path name for Hands-on Exercise 1
+306d8d0526fca14622900921ef90e8bde2146956 d5e405e7b2fec1318c420910160fe22b6a44fe63 tanchinkhoon <surftck@gmail.com> 1756329585 +0800	commit: Fixing the path used for Hand-on Exercise 1
+d5e405e7b2fec1318c420910160fe22b6a44fe63 319c5bf28a9914728db4dd27e81448072508593a tanchinkhoon <surftck@gmail.com> 1756330263 +0800	commit: Insert student profile at 'About'.
+319c5bf28a9914728db4dd27e81448072508593a 258413565b9596c602abd27fe54585ab1df8c8fc tanchinkhoon <surftck@gmail.com> 1756331307 +0800	commit: Insert CKTAN Profile at About.
+258413565b9596c602abd27fe54585ab1df8c8fc 9f7bf1777b76d7972c52fa87d1aecdc76f0621f2 tanchinkhoon <surftck@gmail.com> 1756331684 +0800	commit: Update the Index homepage.
+9f7bf1777b76d7972c52fa87d1aecdc76f0621f2 cd2df8f240744600698f999e732e5a9f2d92b7eb tanchinkhoon <surftck@gmail.com> 1756333047 +0800	commit: Fixing the publisging of Hands-on Exercise 1 to Netlify.
+cd2df8f240744600698f999e732e5a9f2d92b7eb 4988e8e6770172aeb105a6216e3cc65be98be587 tanchinkhoon <surftck@gmail.com> 1756333422 +0800	commit: Fixing the Hands-on Exercise 1 publishing at Netlify.
+4988e8e6770172aeb105a6216e3cc65be98be587 c840e95292d8f20e3a31241a576de251fecca9fd tanchinkhoon <surftck@gmail.com> 1756334683 +0800	commit: Fixing Hands-on Exercise 1 publishing
+c840e95292d8f20e3a31241a576de251fecca9fd 37582fa7aff69aba69a5713c42f4a7c884fe019d tanchinkhoon <surftck@gmail.com> 1756335317 +0800	commit: Fix index quick link to point to rendered HTML
+37582fa7aff69aba69a5713c42f4a7c884fe019d 3821839378a84da1342892f1d3015f80fee8a9a1 tanchinkhoon <surftck@gmail.com> 1756358572 +0800	commit: Fixing the link within the menu navigation bar.
+3821839378a84da1342892f1d3015f80fee8a9a1 6ebf16d39cb7220094e2f2272d2d14cec2f79a08 tanchinkhoon <surftck@gmail.com> 1756359089 +0800	commit: Fixing the publishing on menu bar.
+6ebf16d39cb7220094e2f2272d2d14cec2f79a08 647226b0277ed6899590136888a66f4bff30ae7a tanchinkhoon <surftck@gmail.com> 1756971526 +0800	commit: Commit for first initial
+647226b0277ed6899590136888a66f4bff30ae7a 167d356e8ac17f1a3d7d267de914ae8a83507399 tanchinkhoon <surftck@gmail.com> 1757008532 +0800	commit: Commit for Ex02(a)
+167d356e8ac17f1a3d7d267de914ae8a83507399 add1f45327708cb0105bf9932b267456e21dae30 tanchinkhoon <surftck@gmail.com> 1757008817 +0800	commit: Commit the change of date.
+add1f45327708cb0105bf9932b267456e21dae30 74d863f1e41fb8e339fe954b9118cfa9a2f76bdf tanchinkhoon <surftck@gmail.com> 1757009041 +0800	commit: Commit change of date.
+74d863f1e41fb8e339fe954b9118cfa9a2f76bdf 68f33cf67c430433b053c02f5e3a28c69b2072c1 tanchinkhoon <surftck@gmail.com> 1757011497 +0800	commit: Commit to include overview of the exercise.
+68f33cf67c430433b053c02f5e3a28c69b2072c1 25eab8225b968eb697c5b356c5ed53fa9950a762 tanchinkhoon <surftck@gmail.com> 1757011936 +0800	commit: Commit the inclusion of overview section.
+25eab8225b968eb697c5b356c5ed53fa9950a762 800b890ecabe1c8a2528d95463f847e17de69422 tanchinkhoon <surftck@gmail.com> 1757012274 +0800	commit: Commit first initial for Ex02-_b
+800b890ecabe1c8a2528d95463f847e17de69422 3ef0449af914fbf0f8bde1d1577ef1d3f54dcb64 tanchinkhoon <surftck@gmail.com> 1757020574 +0800	commit: Commit Ex02
+3ef0449af914fbf0f8bde1d1577ef1d3f54dcb64 960eaddb606a308c187322814b593b94ee5f4a0d tanchinkhoon <surftck@gmail.com> 1757020908 +0800	commit: Commit Hands-on Ex02
+960eaddb606a308c187322814b593b94ee5f4a0d c3ff3151663f7ef782d13d83d14985a0c323d417 tanchinkhoon <surftck@gmail.com> 1757021013 +0800	commit: Commit Hands-on Ex02
+c3ff3151663f7ef782d13d83d14985a0c323d417 844a5b8b66f6e77921d1020c3e0fa29195db47d2 tanchinkhoon <surftck@gmail.com> 1757021517 +0800	commit: Commit for Hands-on Ex02
+844a5b8b66f6e77921d1020c3e0fa29195db47d2 f1c065dc0d31da1f5e5b18d32a5c811f2855120e tanchinkhoon <surftck@gmail.com> 1757025222 +0800	commit: Coomit for Hand-on Ex02
+f1c065dc0d31da1f5e5b18d32a5c811f2855120e 14b1856cb6442f6eca77ad697299736b399cfdbd tanchinkhoon <surftck@gmail.com> 1757030589 +0800	commit: Commit for Hand-on Ex02
+14b1856cb6442f6eca77ad697299736b399cfdbd 4e18e9a0581c1fb05c947a79f598fdae9f9587f9 tanchinkhoon <surftck@gmail.com> 1757031067 +0800	commit: Commit for Hands-on Ex02
+4e18e9a0581c1fb05c947a79f598fdae9f9587f9 169c61b92ff34bc717bf4bb8151e0abbb3348ba2 tanchinkhoon <surftck@gmail.com> 1757031298 +0800	commit: Commit for Hands-on Ex02
+169c61b92ff34bc717bf4bb8151e0abbb3348ba2 28f565337fa25bb5c6b0c166a844fb951c691b24 tanchinkhoon <surftck@gmail.com> 1757031573 +0800	commit: Commit for Hands-on Ex02
+28f565337fa25bb5c6b0c166a844fb951c691b24 c2750a65e51d8d33e3b319193df1f45d243b79e2 tanchinkhoon <surftck@gmail.com> 1757031932 +0800	commit: Commmit for Hands-on Ex02
+c2750a65e51d8d33e3b319193df1f45d243b79e2 9025c335dcb0ffec9c07ae38647f3712990839a0 tanchinkhoon <surftck@gmail.com> 1757032536 +0800	commit: Commet for Hands-on Ex02
+9025c335dcb0ffec9c07ae38647f3712990839a0 2b01a999ef05fc19f64bf06b4ef583435b75e868 tanchinkhoon <surftck@gmail.com> 1757038714 +0800	commit: Commit for ISSS626 Hands-on Ex02
+2b01a999ef05fc19f64bf06b4ef583435b75e868 0850652092bb9a7f9f56f0700d476970dcae49a5 tanchinkhoon <surftck@gmail.com> 1757038936 +0800	commit: Commit for ISSS626 Hands-on Ex02
+0850652092bb9a7f9f56f0700d476970dcae49a5 5cf9c7441da59cea09c3bf0463429c866b621ebf tanchinkhoon <surftck@gmail.com> 1757477726 +0800	commit: Commit for intial of Hands-on Ex03
+5cf9c7441da59cea09c3bf0463429c866b621ebf 15fdc3cf9eb3e4571790a472e3fb063c28831094 tanchinkhoon <surftck@gmail.com> 1757478323 +0800	commit: Commit for Profile
+15fdc3cf9eb3e4571790a472e3fb063c28831094 a69d4455d86ff7b8aca16c7fb9157819a15ed6dc tanchinkhoon <surftck@gmail.com> 1757478357 +0800	commit: Commit for profile of student
+a69d4455d86ff7b8aca16c7fb9157819a15ed6dc 7b12803bf4e2f4bb1ec05c88b6e4a307992c9382 tanchinkhoon <surftck@gmail.com> 1757479045 +0800	commit: Commit for the student profile
+7b12803bf4e2f4bb1ec05c88b6e4a307992c9382 c926aa84d1fc73e9b784a274c7692fcb59982c7f tanchinkhoon <surftck@gmail.com> 1757479172 +0800	commit: Enlarge the image for the student profile
+c926aa84d1fc73e9b784a274c7692fcb59982c7f e757b7c80502ea7cebab8bf77c52f11c8caa8df4 tanchinkhoon <surftck@gmail.com> 1757479283 +0800	commit: Commit to enlarge the image of the student profile to 175%
+e757b7c80502ea7cebab8bf77c52f11c8caa8df4 0bfe61b5e2c427b91b99bc5c7fa4704d149e1eef tanchinkhoon <surftck@gmail.com> 1757479425 +0800	commit: Commit to enlarge the image of the student profile to 150%
+0bfe61b5e2c427b91b99bc5c7fa4704d149e1eef 73f22700da08ce079d470660d17cc431618add75 tanchinkhoon <surftck@gmail.com> 1757480075 +0800	commit: Commit to include outline into each exercise
+73f22700da08ce079d470660d17cc431618add75 cb0fa5871a7acbb061616df76f64de5bfca14c8f tanchinkhoon <surftck@gmail.com> 1757481218 +0800	commit: Commit the outline for Hands-on-Ex01
+cb0fa5871a7acbb061616df76f64de5bfca14c8f fc084a4e7da97bde3fcd4c9c6d835fbd834e85f0 tanchinkhoon <surftck@gmail.com> 1757481766 +0800	commit: Commit to include outline for Hands-on Ex02
+fc084a4e7da97bde3fcd4c9c6d835fbd834e85f0 0938a99f2a46e0c753fe6b0797b28ec8ac9e48d9 tanchinkhoon <surftck@gmail.com> 1757481916 +0800	commit: Commit for the initial of Hands-on Ex03
+0938a99f2a46e0c753fe6b0797b28ec8ac9e48d9 445ec3072f967b2045ab28bd276e552c0534a47c tanchinkhoon <surftck@gmail.com> 1757482187 +0800	commit: Commit for the initial of Hand-on Ex03
+445ec3072f967b2045ab28bd276e552c0534a47c 2393480824b507fe25f2e7766621e30ebdcbbd01 tanchinkhoon <surftck@gmail.com> 1757482383 +0800	commit: Commit the typo for Hands-on Ex03 in quarto.yml
+2393480824b507fe25f2e7766621e30ebdcbbd01 9a3d46e54b3ee2da118dcabf7df4aedeeb34f8ac tanchinkhoon <surftck@gmail.com> 1757482686 +0800	commit: Commit the intital for Hand-on Ex03
+9a3d46e54b3ee2da118dcabf7df4aedeeb34f8ac 808e1d08d2ec58918caba3ef4db231ec846ff13a tanchinkhoon <surftck@gmail.com> 1757483160 +0800	commit: Commit change for Hand-on Ex03
+808e1d08d2ec58918caba3ef4db231ec846ff13a f6968b0d0de7fd218f6e40327add2d28f268bed0 tanchinkhoon <surftck@gmail.com> 1757483548 +0800	commit: Commit for Hand-on Ex03
+f6968b0d0de7fd218f6e40327add2d28f268bed0 0b00189edb05100397aee5e7a91d4b597b496d74 tanchinkhoon <surftck@gmail.com> 1757501253 +0800	commit: Commit for initial Hand-on Ex03
+0b00189edb05100397aee5e7a91d4b597b496d74 f074d08b05490e1ccb0c45680e45af3d62abfcb1 tanchinkhoon <surftck@gmail.com> 1757511654 +0800	commit: Commit for rebuilding the HTNL links in Quarto
+f074d08b05490e1ccb0c45680e45af3d62abfcb1 bf74a14dc24f5ebce347a54fdf43b741a6553e98 tanchinkhoon <surftck@gmail.com> 1757511871 +0800	commit: Commit to fix the index.html
+bf74a14dc24f5ebce347a54fdf43b741a6553e98 0d71b8437fef52298ef8e41465af84857b6e9480 tanchinkhoon <surftck@gmail.com> 1757524327 +0800	commit: Commit for initial Hands-on Ex03
+0d71b8437fef52298ef8e41465af84857b6e9480 2646c91c9aaaebf9c5f474c5b091e34c02b260c0 tanchinkhoon <surftck@gmail.com> 1757603290 +0800	commit: Commit for Hands-on Ex03
+2646c91c9aaaebf9c5f474c5b091e34c02b260c0 cdb3e023cfcdda86e8308998939cc476cfa4460b tanchinkhoon <surftck@gmail.com> 1757605656 +0800	commit: Commit Hands-on Ex03 for submission
+cdb3e023cfcdda86e8308998939cc476cfa4460b 3c514dde79548cc2f01860884dffcac31a0ab8c6 tanchinkhoon <surftck@gmail.com> 1757650421 +0800	commit: Commit for submitting Hands-on Exercise 3
+3c514dde79548cc2f01860884dffcac31a0ab8c6 e895b84e3baa4b06491ba1aca08271855e83f268 tanchinkhoon <surftck@gmail.com> 1757653293 +0800	commit: Commit for minor touch up on Section 6.2.1 of Hands-on Ex03
+e895b84e3baa4b06491ba1aca08271855e83f268 9ae300e244ffe22c77ab1e02edf573f5f0d9d0bf tanchinkhoon <surftck@gmail.com> 1757653878 +0800	commit: Commit to Hands-on Ex03
+9ae300e244ffe22c77ab1e02edf573f5f0d9d0bf a46ecdda1ddb8e800a691959ae1897f23948e1f8 tanchinkhoon <surftck@gmail.com> 1757656102 +0800	commit: Commit for Hands-on Ex03
+a46ecdda1ddb8e800a691959ae1897f23948e1f8 be8c8ff339a3285904e6dcf8e9c34fc66488fccc tanchinkhoon <surftck@gmail.com> 1757742975 +0800	commit: Commit for initial In-Class Exercise
+be8c8ff339a3285904e6dcf8e9c34fc66488fccc 4fcb676f86eb224abc26fe1c50d29d625a32597b tanchinkhoon <surftck@gmail.com> 1757744480 +0800	commit: Commit for In-Class Exercise
+4fcb676f86eb224abc26fe1c50d29d625a32597b fc90829291dc30ad4c2cbbb59c4c2eb332013b6d tanchinkhoon <surftck@gmail.com> 1757751952 +0800	commit: Commit for In-Class_Ex3a
+fc90829291dc30ad4c2cbbb59c4c2eb332013b6d 4c149513b402b314f9520729e22b64bbc20f9aa0 tanchinkhoon <surftck@gmail.com> 1757752063 +0800	commit: Commit for In-Class_Ex3a
+4c149513b402b314f9520729e22b64bbc20f9aa0 064993435d50f8c0f4c059cac11ce94622194298 tanchinkhoon <surftck@gmail.com> 1757752693 +0800	commit: Fix the In-Class Exercise3a link on the index.html
+064993435d50f8c0f4c059cac11ce94622194298 1041c9f58076b74a0e0c52a53b1f0dd9cc97f8f0 tanchinkhoon <surftck@gmail.com> 1757779737 +0800	commit: Commit for initial In-class Ex03b
+1041c9f58076b74a0e0c52a53b1f0dd9cc97f8f0 e3e714052b9330ea0f0221c2c937b447290b7ff9 tanchinkhoon <surftck@gmail.com> 1757779833 +0800	commit: Commit for intial In-class Exercise 3b
+e3e714052b9330ea0f0221c2c937b447290b7ff9 e0c99858fed2ad4292c8f9dc7fde085af9fa0d3d tanchinkhoon <surftck@gmail.com> 1757779929 +0800	commit: Commit for intial In-class Exercise 3b
+e0c99858fed2ad4292c8f9dc7fde085af9fa0d3d afb20495746d8edccb312ca312ce3555fc34d9b4 tanchinkhoon <surftck@gmail.com> 1757782968 +0800	commit: Commit to amend the title of the In-class_Ex03a
+afb20495746d8edccb312ca312ce3555fc34d9b4 a14f08cbf97498adb90da6ed2919169408642c56 tanchinkhoon <surftck@gmail.com> 1757783985 +0800	commit: Commit to amend the content of the index.html
+a14f08cbf97498adb90da6ed2919169408642c56 213fedb0554e620be5ad5288a1c553d67e8f237b tanchinkhoon <surftck@gmail.com> 1757931989 +0800	commit: Commit for initial Hands-on_Ex04
+213fedb0554e620be5ad5288a1c553d67e8f237b 17690b00435ea6bdcce8c0611e3773c37513b3cf tanchinkhoon <surftck@gmail.com> 1757932138 +0800	commit: Commit for initial Hands-on_Ex04
+17690b00435ea6bdcce8c0611e3773c37513b3cf eaae458664e859dbc30a343eafe17c873b6ed923 tanchinkhoon <surftck@gmail.com> 1757932258 +0800	commit: Commit changes in index.html for Hands-on_Ex04
+eaae458664e859dbc30a343eafe17c873b6ed923 6bdeade9191438b14a96234f732a049d5437aad8 tanchinkhoon <surftck@gmail.com> 1757970412 +0800	commit: Commit for initial of Hands-on_Ex04
+6bdeade9191438b14a96234f732a049d5437aad8 a4aa4573ae4d7e0df91af0593f38a30a4c330940 tanchinkhoon <surftck@gmail.com> 1757971817 +0800	commit: Initial commit for Hands-on_Ex04
+a4aa4573ae4d7e0df91af0593f38a30a4c330940 6be58dd199e338a058eb34eab29a9dd48e223daa tanchinkhoon <surftck@gmail.com> 1758143413 +0800	commit: Commit for homepahe enhancement
+6be58dd199e338a058eb34eab29a9dd48e223daa 523444eadd884024b8b36732440b0cac50dc152b tanchinkhoon <surftck@gmail.com> 1758205209 +0800	commit: Commit for Hands-on Exercise 04
+523444eadd884024b8b36732440b0cac50dc152b 68b22d0c41e795b3bdfc0b980906e450d194789c tanchinkhoon <surftck@gmail.com> 1758215700 +0800	commit: Commit for all updates!!!
+68b22d0c41e795b3bdfc0b980906e450d194789c ef9c49f8baa3703a39d4c6d839a4e7ba19695bd1 tanchinkhoon <surftck@gmail.com> 1758215727 +0800	commit: Commit for all updates!!!
+ef9c49f8baa3703a39d4c6d839a4e7ba19695bd1 8d3ce238f8afe36804f8d51718369f7ff3b39b25 tanchinkhoon <surftck@gmail.com> 1758216200 +0800	commit: Commit for all updated
+8d3ce238f8afe36804f8d51718369f7ff3b39b25 cd2595ad00520404e76381c7406155fb97ebd536 tanchinkhoon <surftck@gmail.com> 1758216415 +0800	commit: Commit for all updates!
+cd2595ad00520404e76381c7406155fb97ebd536 c036f3987285dfea02c062f5a1e1cc5919b6c804 tanchinkhoon <surftck@gmail.com> 1758217079 +0800	commit: Commit for Hands-on Ex04 submission
+c036f3987285dfea02c062f5a1e1cc5919b6c804 4eb6cbe140ebcad443eb76dda09ee7431f77e984 tanchinkhoon <surftck@gmail.com> 1758366703 +0800	commit: Commit for In-class Exercise 4 submission
+4eb6cbe140ebcad443eb76dda09ee7431f77e984 82e99bd6fdd5163fd88bfc3997200ee4d2fe6020 tanchinkhoon <surftck@gmail.com> 1758366816 +0800	commit: Commit for In-Class Ex04
+82e99bd6fdd5163fd88bfc3997200ee4d2fe6020 74b956908ad401c8e8e1c8d898bfbafe3d15a6a7 tanchinkhoon <surftck@gmail.com> 1758367177 +0800	commit: Commit for In-class Ex04
+74b956908ad401c8e8e1c8d898bfbafe3d15a6a7 78e3778356742884d16654a0f2106424274b5618 tanchinkhoon <surftck@gmail.com> 1758367353 +0800	commit: Commit for In-Class Ex04
+78e3778356742884d16654a0f2106424274b5618 081792558de0d5dd54a34fb77ba502a8e7c6f61c tanchinkhoon <surftck@gmail.com> 1758367756 +0800	commit: Commit for In-class Ex04
+081792558de0d5dd54a34fb77ba502a8e7c6f61c 419fbee5f36959d6ed5f56606347fd333f86ed8c tanchinkhoon <surftck@gmail.com> 1758368002 +0800	commit: Commit for In-class Ex04 submission
+419fbee5f36959d6ed5f56606347fd333f86ed8c bcb5e7eb57b9e5659fd1b11bbbea8e86287459e1 tanchinkhoon <surftck@gmail.com> 1758382777 +0800	commit: Commit for initial Take-home Ex1
+bcb5e7eb57b9e5659fd1b11bbbea8e86287459e1 2a0c831645440feff9c6d90eedeae8f18afe9be8 tanchinkhoon <surftck@gmail.com> 1758383483 +0800	commit: Initial commit for Take-home Exercise 1
+2a0c831645440feff9c6d90eedeae8f18afe9be8 0ec0f3068eabefddb1543f15843e132dce214c7b tanchinkhoon <surftck@gmail.com> 1758582246 +0800	commit: Commit to update
+0ec0f3068eabefddb1543f15843e132dce214c7b 3f175cd1d62eda8db2e04a839e99fdec29df721b tanchinkhoon <surftck@gmail.com> 1758585712 +0800	commit: Commit for all
+3f175cd1d62eda8db2e04a839e99fdec29df721b 090f5cf13fe4e11befec39712e3009afbc2eb483 tanchinkhoon <surftck@gmail.com> 1758586417 +0800	commit (merge): Merge origin/main, prefer local versions
+090f5cf13fe4e11befec39712e3009afbc2eb483 9adc023793b75ede0e263ce59d02b67bb5c1eedd tanchinkhoon <surftck@gmail.com> 1758586693 +0800	commit: commit for all
+9adc023793b75ede0e263ce59d02b67bb5c1eedd 8cc114d04754c859fabdeacdfc5c625742d7f4c3 tanchinkhoon <surftck@gmail.com> 1758587147 +0800	commit: Commit for all
+8cc114d04754c859fabdeacdfc5c625742d7f4c3 09f4872eb9c85a0346c7c79800db4534e7662a20 tanchinkhoon <surftck@gmail.com> 1758587192 +0800	commit: Commit for all
+09f4872eb9c85a0346c7c79800db4534e7662a20 303a37db39e2085028b02e407da5cc2d91db9f1d tanchinkhoon <surftck@gmail.com> 1758628755 +0800	commit: Commit for Take-home Exercise 01
+303a37db39e2085028b02e407da5cc2d91db9f1d 57c150d125a66782822b58056c773b9f81a9aa27 tanchinkhoon <surftck@gmail.com> 1758629704 +0800	commit: Commit for Take-home Exercise 01
+57c150d125a66782822b58056c773b9f81a9aa27 b7b480a1b48d8e55cd0a23e415df2d4fd7d7493b tanchinkhoon <surftck@gmail.com> 1758647781 +0800	commit: Commit to Take-home Exercise 01
+b7b480a1b48d8e55cd0a23e415df2d4fd7d7493b 0164ed6748eea39d64fd4f7e168de5ad3d7ebca7 tanchinkhoon <surftck@gmail.com> 1758647823 +0800	commit: Commit to Take-home Exercise 01
+0164ed6748eea39d64fd4f7e168de5ad3d7ebca7 0982df26bd3fa6d3381358cdce3673d73cb4097d tanchinkhoon <surftck@gmail.com> 1758649860 +0800	commit: Commit for Take-home Exercise 01
+0982df26bd3fa6d3381358cdce3673d73cb4097d a5a6f9fbdf29e208998dc385dffca00171d861d1 tanchinkhoon <surftck@gmail.com> 1758666168 +0800	commit: Commit for Take-home Exercise 01
+a5a6f9fbdf29e208998dc385dffca00171d861d1 f6469c4d98e1d753cd10ba2a6e146c7bbe58e852 tanchinkhoon <surftck@gmail.com> 1758667466 +0800	commit: Commit for Take-home Exercise 01
+f6469c4d98e1d753cd10ba2a6e146c7bbe58e852 6e30113c7779fa2fad18d5e6abde487ca007200b tanchinkhoon <surftck@gmail.com> 1758698374 +0800	commit: Commit for Take-home Exercise 01
+6e30113c7779fa2fad18d5e6abde487ca007200b e0f59a79dee083bdcc877fc4e1f8b1c4739fe52d tanchinkhoon <surftck@gmail.com> 1758699277 +0800	commit: Commit for Take-home Exercise 01
+e0f59a79dee083bdcc877fc4e1f8b1c4739fe52d 099700e15b7e40b474d1b34845bcd6b117cf7e8e tanchinkhoon <surftck@gmail.com> 1758708725 +0800	commit: Commit for Take-home Exercise 01
+099700e15b7e40b474d1b34845bcd6b117cf7e8e 2b0a8f0fc936333c7b296d4eb70c9f4d13e90556 tanchinkhoon <surftck@gmail.com> 1758719547 +0800	commit: Commit for Take-home Exercise 01
+2b0a8f0fc936333c7b296d4eb70c9f4d13e90556 2b0a0a01b3db60bcbae9ec0d7117ba96a414ea59 tanchinkhoon <surftck@gmail.com> 1758722176 +0800	commit: Commit for Take-home Exercise 01
+2b0a0a01b3db60bcbae9ec0d7117ba96a414ea59 90e99d6eb40200c89bdeab49a8eb06e12530ea1b tanchinkhoon <surftck@gmail.com> 1758723753 +0800	commit: Commit for Take-home Exercise 01
+90e99d6eb40200c89bdeab49a8eb06e12530ea1b b81d4d3df849bbdd296d9248942ebdbcd8211c43 tanchinkhoon <surftck@gmail.com> 1758724790 +0800	commit: Commit for Take-home Exercise 01
+b81d4d3df849bbdd296d9248942ebdbcd8211c43 75535ce433ff4be4fa34e266472493a53b28c7a2 tanchinkhoon <surftck@gmail.com> 1758771436 +0800	commit: Commit for Take-home Exercise 01: Inserting STIKhat plot that is failed to be rendered by Quarto.
+75535ce433ff4be4fa34e266472493a53b28c7a2 47d225612d9b53503cf33a4819ec4d768458d90c tanchinkhoon <surftck@gmail.com> 1758796433 +0800	commit: Initial commit for Hands-on Exercise 05
+47d225612d9b53503cf33a4819ec4d768458d90c fc45a8a39b9a78e784c1892f0f67f5888f1d55ce tanchinkhoon <surftck@gmail.com> 1758796579 +0800	commit: Initial commit for Hands-on Exercise 05
+fc45a8a39b9a78e784c1892f0f67f5888f1d55ce 75fd76da72fdd51ddc64bf318b892c3ad0c89fae tanchinkhoon <surftck@gmail.com> 1758837509 +0800	commit: Initial commit for Hands-on EX05a
+75fd76da72fdd51ddc64bf318b892c3ad0c89fae c0b66276aadabfab53bd0bf50e536726726192b0 tanchinkhoon <surftck@gmail.com> 1758837703 +0800	commit: Initial commit for Hands-on Ex5a
+c0b66276aadabfab53bd0bf50e536726726192b0 0df0820a6b0c03c5c81ea811ecbce049ffe50ea7 tanchinkhoon <surftck@gmail.com> 1758849131 +0800	commit: Initial commit for Hands-on Ex5b
+0df0820a6b0c03c5c81ea811ecbce049ffe50ea7 4e7f59591b435c7a1b39f8602e8e39ae569787c3 tanchinkhoon <surftck@gmail.com> 1758856887 +0800	commit: Commit for Hands-on Exercise 5b
+4e7f59591b435c7a1b39f8602e8e39ae569787c3 aa9f40448e5f3e8ec139e6192b8b22e7b6b03f25 tanchinkhoon <surftck@gmail.com> 1758857125 +0800	commit: Commit for Hands-on Exercise 05
+aa9f40448e5f3e8ec139e6192b8b22e7b6b03f25 d157792378949419ecd84fd6719eb67c58fa7758 tanchinkhoon <surftck@gmail.com> 1758961682 +0800	commit: Commit for In-class Exercise 05
+d157792378949419ecd84fd6719eb67c58fa7758 6d7c5c67b707cb4135636bd88699d4d958f19108 tanchinkhoon <surftck@gmail.com> 1758961882 +0800	commit: Commit In-class Exercise 05
+6d7c5c67b707cb4135636bd88699d4d958f19108 302bb9bd721deb456a7db46a9520f4f0f2780bd0 tanchinkhoon <surftck@gmail.com> 1758990671 +0800	commit: Commit for update on In-class Ex04
+302bb9bd721deb456a7db46a9520f4f0f2780bd0 38e1a5ddec071dd61dd25e181090aeccf90ce397 tanchinkhoon <surftck@gmail.com> 1758991349 +0800	commit: Commit to update all
+38e1a5ddec071dd61dd25e181090aeccf90ce397 2b1a0091b76b355a6a72b7b967d495fd03d5055b tanchinkhoon <surftck@gmail.com> 1758991996 +0800	commit: Commit to update all
+2b1a0091b76b355a6a72b7b967d495fd03d5055b f3c5e9dd1df21c1bd39c95e1ca98bb8f40a0e15c tanchinkhoon <surftck@gmail.com> 1759067268 +0800	commit: Commit to update all
+f3c5e9dd1df21c1bd39c95e1ca98bb8f40a0e15c e3bf0d3a74e637dad32b86f0b16e6a0217b95a29 tanchinkhoon <surftck@gmail.com> 1759259321 +0800	commit: Initial commit for Hands-on Exercise 06
+e3bf0d3a74e637dad32b86f0b16e6a0217b95a29 6049bfd01304da36e343b5cf5df432370187aa10 tanchinkhoon <surftck@gmail.com> 1759259597 +0800	commit: Initial commit for Hands-on Exercise 06
+6049bfd01304da36e343b5cf5df432370187aa10 55710db0d4ea25ef14b78e2e1b6ef7f5c82c9622 tanchinkhoon <surftck@gmail.com> 1759320291 +0800	commit: Initial commit for Hands-on Exercise 06
+55710db0d4ea25ef14b78e2e1b6ef7f5c82c9622 a11d209f589f46b30c84c8e619894bbc459c020d tanchinkhoon <surftck@gmail.com> 1759324100 +0800	commit: Commit .yml for Quarto
+a11d209f589f46b30c84c8e619894bbc459c020d 701659add0d432bd9ec0ce2f7ba17c4e59540b03 tanchinkhoon <surftck@gmail.com> 1759324747 +0800	commit: Commit for .yml for Quarto
+701659add0d432bd9ec0ce2f7ba17c4e59540b03 c755c9bc7fa10f3bfce95fb21b9dce9b3642d8fc tanchinkhoon <surftck@gmail.com> 1759325458 +0800	commit: Commit for .yml for Quarto
+c755c9bc7fa10f3bfce95fb21b9dce9b3642d8fc 3d9285bf4945b5ac8ef62a0fcb00edb906050185 tanchinkhoon <surftck@gmail.com> 1759325674 +0800	commit: Commit to fix the .yml for Quarto
+3d9285bf4945b5ac8ef62a0fcb00edb906050185 b818fda72a35d45b3be980f26b5617d5a654a138 tanchinkhoon <surftck@gmail.com> 1759325824 +0800	commit: Commit to fix the .yml for Quarto
+b818fda72a35d45b3be980f26b5617d5a654a138 4a638d487d746ee75b5ff8a729bc4e99bb9dd456 tanchinkhoon <surftck@gmail.com> 1759326031 +0800	commit: Commit to fix .yml for Quarto
+4a638d487d746ee75b5ff8a729bc4e99bb9dd456 e14e23ebf2b408240b17f460880ce76f0788e4a8 tanchinkhoon <surftck@gmail.com> 1759354923 +0800	commit: Commit for Hands-on Exercise 06
+e14e23ebf2b408240b17f460880ce76f0788e4a8 8503eb4ae1b096ddadd6d5bf38fea1c24620bb00 tanchinkhoon <surftck@gmail.com> 1759553343 +0800	commit: Initial commit for In-class Exercise 06
+8503eb4ae1b096ddadd6d5bf38fea1c24620bb00 8b76a195dc6f1c6f49ca9bf361f0109212f499ef tanchinkhoon <surftck@gmail.com> 1759914593 +0800	commit: Commit for In-class Exercise 06
+8b76a195dc6f1c6f49ca9bf361f0109212f499ef 658276aadb7990e1141fcfbd77c728fd9cac37eb tanchinkhoon <surftck@gmail.com> 1759921952 +0800	commit: Commit for In-class Exercise 6
+658276aadb7990e1141fcfbd77c728fd9cac37eb 3f32b0b82c69b57c898459c9647357247995e8d6 tanchinkhoon <surftck@gmail.com> 1760008577 +0800	commit: Initial commit for Take-home Exercise 2
+3f32b0b82c69b57c898459c9647357247995e8d6 67412552660c603e1b07dd6275a03b9da4d1d702 tanchinkhoon <surftck@gmail.com> 1760059634 +0800	commit: Commit for Take-home Exercise 02
+67412552660c603e1b07dd6275a03b9da4d1d702 0db1dae5a669d687e8850ce74ca81c7d7535ad00 tanchinkhoon <surftck@gmail.com> 1760266027 +0800	commit: Commit for In-class Ex05b: Global and Local Measures of Spatial Autocorrelation using sfdep method
+0db1dae5a669d687e8850ce74ca81c7d7535ad00 78b6c6e761fce37f2437840d5ec09c3c2d2b2cd2 tanchinkhoon <surftck@gmail.com> 1760266623 +0800	commit: Commit for In-class Exercise 5b

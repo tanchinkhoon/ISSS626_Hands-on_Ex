@@ -1,0 +1,920 @@
+---
+title: "Hands-on_Ex01"
+author: "TAN Chin Khoon"
+date: "28 August 2025"
+---
+
+# 1 Geospatial Data Science with R
+
+## 1.3 Getting Started
+
+```{r}
+# Load R packages.
+# "pacman" automatically installs and loads packages if not already installed.
+pacman::p_load(
+  sf,         # "sf" = simple features, used for geospatial data (maps, polygons, points)
+  tidyverse)  # "tidyverse" = set of packages (dplyr, ggplot2 etc.) for data wrangling and plotting.
+
+```
+
+## 1.4 Importing Geospatial Data
+
+```{r}
+# "mpsz" is the variable that stores the subzone polygons.
+mpsz = st_read(dsn = "data/geospatial/MasterPlan2014SubzoneBoundaryWebSHP",  # dsn = file path to the geospatial folder. 
+                  layer = "MP14_SUBZONE_WEB_PL")                             # layer = which dataset (layer) to load; here the subzone boundary of Singapore.
+
+head(mpsz)
+```
+
+```{r}
+# Read another spatial dataset: Singapore’s cycling path lines.
+# Stored into "cyclingpath".
+cyclingpath = st_read(dsn = "data/geospatial/CyclingPath_Apr2025", 
+                         layer = "CyclingPathGazette")
+
+```
+
+```{r}
+# Read preschool point locations from a KML file.
+# Stored into "preschool".
+preschool = st_read("data/geospatial/PreSchoolsLocation.kml")
+
+```
+
+## 1.5 Checking the Content
+
+```{r}
+# Show the geometric shapes inside "mpsz".
+# "mpsz" is polygons of planning subzones.
+# This displays geometry metadata (not a plot).
+st_geometry(mpsz)
+
+```
+
+```{r}
+# Shows columns like subzone name, region, and geometry.
+# Easier than "head()" because it also shows column types.
+glimpse(mpsz)   # Glimpse the first few rows of "mpsz".
+
+```
+
+```{r}
+# Useful to confirm structure and values (like subzone names).
+head(mpsz, n=5)   # Show the first 5 rows of the dataset.
+
+```
+
+## 1.6 Plotting the Geospatial Data (quick base plot)
+
+```{r}
+# Quick plot of the whole dataset.
+plot(mpsz)    # Since "mpsz" is polygons, this shows the Singapore subzone map.
+
+```
+
+```{r}
+plot(st_geometry(mpsz))   # Alternative: explicitly plot only the geometry (no attributes).
+
+```
+
+```{r}
+# Shows regions in different colors.
+plot(mpsz["PLN_AREA_N"])    # Plot subzones colored by attribute "PLN_AREA_N" (planning area name).
+
+
+```
+
+```{r}
+plot(st_geometry(mpsz))   # Base plot of subzones.
+
+plot(st_geometry(preschool), # Overlay preschool locations on top of subzones.
+     add = TRUE)             # "add=TRUE" = plot on top of existing map. 
+
+```
+
+> **Quiz:** Note that the preschool point objects failed to plot ontop of the mpsz layer. Do you know why? The preschool points didn't plot on top because the KML is in **WGS84** while the subzones are in **SVY21**; transforming the preschool layer to `st_crs(mpsz)` fixes it.
+
+## 1.7 Working with Projection
+
+```{r}
+st_crs(mpsz)    # Check CRS of subzones (should be EPSG:3414 = SVY21).    
+
+```
+
+```{r}
+preschool <- st_transform(preschool, crs = 3414)     # Force preschool into EPSG:3414.
+
+```
+
+```{r}
+plot(st_geometry(mpsz))                     # Draw polygons.
+plot(st_geometry(preschool), add = TRUE)    # Overlay preschool points.
+
+```
+
+## 1.8 Importing and Converting An Aspatial Data
+
+### 1.8.1 Importing the aspatial data
+
+```{r}
+# Load Airbnb listings dataset (aspatial = not geospatial yet).
+listings <- read_csv("data/aspatial/listings.csv")
+
+```
+
+```{r}
+# Print contents of the listings data.
+list(listings)
+
+```
+
+### 1.8.2 Creating a simple feature data frame from an aspatial data frame
+
+```{r}
+listings_sf <- st_as_sf(listings, 
+                       coords = c("longitude", "latitude"),       # Use longitude/latitude columns for geometry.
+                       crs=4326) %>%                              # CRS=4326 = WGS84, global lat/long system.
+  st_transform(crs = 3414)                                        # Convert into Singapore’s SVY21 system (EPSG:3414).
+
+```
+
+```{r}
+# Preview the new spatial dataset with geometry column.
+glimpse(listings_sf)  
+
+```
+
+```{r}
+plot(st_geometry(mpsz), reset = FALSE)    # Draw subzone polygons; keep device open for overlays
+plot(st_geometry(listings_sf),            # Draw listing points (now in SVY21) - Add Airbnb listings on top.
+     pch = 16,                            # Plot character: solid circle
+     cex = 0.4,                           # Circle size small (0.4)
+     col = "red",                         # Circle color red
+     add = TRUE)                          # Overlay on the existing polygon plot
+
+```
+
+### tmap version (with borders + dots)
+
+```{r}
+library(tmap)                                           # Load tmap again (for thematic mapping).
+tmap_mode("plot")                                       # Ensure "plot" mode = static maps (not int
+
+tm_shape(mpsz) +                                        # Add subzone layer
+  tm_borders(col = "black", lwd = 0.6) +                # Only plot black boarders, thin lines
+tm_shape(listings_sf) +                                 # Add listing dataset
+  tm_symbols(shape = 16,                                # Filled circle (like base pch=16)
+             col = "red",                               # Red color
+             palette = NULL,                            # No palette (single color only)
+             size = 0.4,                                # Dot size (mm)
+             border.col = NA,                           # No outline around dots
+             legend.show = FALSE) +                     # Hide legend (cleaner)
+tm_layout(frame = TRUE,                                 # Draw frame around map.
+          inner.margins = 0.04)                         # Small margins, fills panel.
+
+```
+
+## 1.9 Geoprocessing with sf package
+
+### 1.9.1 Use case 1: Land acquisition (buffers around cycling paths)
+
+**The scenario:** The authority is planning to upgrade the exiting cycling path. To do so, they need to acquire 5 metres of reserved land on the both sides of the existing cycling path. You are tasked to determine the extend of the land need to be acquired and their total area.
+
+```{r}
+# Create buffer polygons 5m around cycling paths.
+buffer_cycling <- st_buffer(        
+  cyclingpath, dist=5,              # dist=5 = 5m buffer,
+              nQuadSegs = 30)       # nQuadSegs=30 makes circles smoother. 
+                                
+```
+
+```{r}
+# Calculate area of each buffer polygon and store as new column AREA.
+buffer_cycling$AREA <- st_area(buffer_cycling)
+
+```
+
+```{r}
+# Same as above but tidyverse style.
+buffer_cycling <- buffer_cycling %>%
+  mutate(AREA = st_area(geometry))
+
+```
+
+```{r}
+# Sum all buffer areas to get total land needed (land acquisition).
+sum(buffer_cycling$AREA)
+
+```
+
+```{r}
+# Select only the polygon of Tampines West subzone from mpsz.
+mpsz_selected <- mpsz %>%
+  filter(SUBZONE_N == "TAMPINES WEST") 
+
+```
+
+```{r}
+# Clip buffer polygons so only those inside Tampines West remain.
+buffer_cycling_selected <- st_intersection(
+  buffer_cycling, mpsz_selected)
+
+```
+
+```{r}
+plot(sf::st_geometry(buffer_cycling_selected), # draw only the geometry of the clipped buffer polygons
+     col = NA,                                 # no interior fill (hollow polygons)
+     border = "black",                         # black outlines
+     lwd = 1.2)                                # slightly thicker stroke so the network shows clearly
+
+```
+
+### 1.9.2 Use case 2: Count pre-schools by subzone, then density
+
+**The scenario:** The authority requires a count of pre-schools for each planning subzone to support forward planning. Using R and the sf package, perform the necessary geoprocessing to compute these counts and present the results clearly.
+
+```{r}
+# 1. Make sure both layers use the SAME CRS
+preschool = st_transform(preschool, st_crs(mpsz))   
+# This reprojects preschool points from WGS84 (lat/long) to SVY21 (metres)
+
+# 2. Now count preschool points inside each subzone
+mpsz$`PreSch Count` = lengths(       # add a new column 'PreSch Count'
+  st_intersects(mpsz, preschool)     # check which preschools fall inside each subzone
+)
+```
+
+```{r}
+ # Summary statistics (min, median, mean, max)
+summary(mpsz$`PreSch Count`)   
+
+```
+
+```{r}
+# Returns the subzone with maximum preschool count
+top_n(mpsz, 1, `PreSch Count`)
+
+```
+
+```{r}
+# Compute area of each subzone polygon and store as "Area".
+mpsz$Area <- mpsz %>% st_area()
+
+```
+
+```{r}
+# Calculate preschool density = number per km².
+# Area is in m², so multiply by 1,000,000 to scale to per km².
+mpsz <- mpsz %>%
+  mutate(`PreSch Density` = `PreSch Count`/Area * 1000000)
+
+```
+
+```{r}
+# Quick histogram of preschool density distribution.
+hist(mpsz$`PreSch Density`)
+
+```
+
+```{r}
+# Plot histogram with ggplot2 for better visuals.
+# bins=20 means divide data range into 20 bars.
+ggplot(data=mpsz, 
+       aes(x= as.numeric(`PreSch Density`)))+
+  geom_histogram(bins=20, 
+                 color="black", 
+                 fill="light blue") +
+  labs(title = "Are pre-school even distributed in Singapore?",
+       subtitle= "There are many planning subzones with a single pre-school, on the other hand, \nthere are seven planning subzones with at least 30 or more pre-schools",
+      x = "Pre-school density (per km sq)",
+      y = "Frequency")
+
+```
+
+```{r}
+ggplot(data=mpsz, 
+       aes(y = `PreSch Count`, 
+           x= as.numeric(`PreSch Density`)))+
+  geom_point(color="black", 
+             fill="light blue") +
+  xlim(0, 40) +
+  ylim(0, 40) +
+  labs(title = "",
+      x = "Pre-school density (per km sq)",
+      y = "Pre-school count")
+
+```
+
+# 2 Geospatial Data Science with R
+
+## 2.2 Getting Started
+
+We first make sure our computer has the packages we need. A "package" is a box of ready-made functions. We then load those packages so we can use the functions in this exercise.
+
+```{r}
+# Install a helper package named "pacman" (this helper can install and load other packages in one go)
+if (!require(pacman)) install.packages("pacman")        # If "pacman" is not available, install it; otherwise do nothing
+
+# Load the packages needed for this exercise in one line using the helper
+pacman::p_load(
+  sf,        # Package "sf": stores and reads geographic shapes such as polygons in a data-frame-like object
+  tmap,      # Package "tmap": draws thematic maps (both static images and interactive web maps)
+  tidyverse, # Package "tidyverse": a family of tools for reading files and transforming tables
+  rvest      # Package "rvest": reads and parses text written in Hyper Text Markup Language, used here to extract fields from the KML file
+)
+
+```
+
+## 2.3 Importing Data into R
+
+### 2.3.1 The Data
+
+```{r}
+# Define file paths to the two input datasets.
+# KML = Keyhole Markup Language (geospatial polygons of subzones)
+# CSV = Comma-Separated Values (population by age groups)
+kml_path <- "data/geospatial/MasterPlan2019SubzoneBoundaryNoSeaKML.kml"  # <-- edit if needed
+csv_path <- "data/aspatial/respopagesextod2024.csv"                      # <-- edit if needed
+
+```
+
+### 2.3.2 Importing Geospatial Data into R
+
+We read the boundary file of planning subzones into memory. The result is a table where one column holds the polygon shapes for each subzone.
+
+```{r}
+# Read the Keyhole Markup Language boundary file into an "sf" spatial table (each row is a subzone polygon)
+mpsz <- st_read("data/geospatial/MasterPlan2019SubzoneBoundaryNoSeaKML.kml")  # "st_read" means "simple features read"; it loads the file as a spatial object
+
+```
+
+#### 2.3.2.1 Tidying data (extracting fields from the KML "Description")
+
+The boundary file contains a text column named Description. Inside that text is a small Hyper Text Markup Language table. We write a tiny helper that opens that text and pulls out one value (for example the region name) when we give it a field label.
+
+```{r}
+# Create a helper function that receives (1) some Hyper Text Markup Language text and (2) the field label we want,
+# then returns the matching value from the same table row
+extract_kml_field <- function(html_text, field_name) {                             # Begin helper function
+  if (is.na(html_text) || html_text == "") return(NA_character_)                   # If the text is missing or empty, return "Not Available"
+  page <- rvest::read_html(html_text)                                              # Turn the raw text into a parsed Hyper Text Markup Language document
+  rows <- rvest::html_elements(page, "tr")                                         # Select every table row element named <tr>
+
+  # Keep only the table row whose header cell <th> equals the field label we asked for,
+  # then take the text from the data cell <td> in that same row
+  value <- rows %>%
+    purrr::keep(~ rvest::html_text2(rvest::html_element(.x, "th")) == field_name) %>% # Filter to the matching header
+    rvest::html_element("td") %>%                                                      # From that row, select the data cell element <td>
+    rvest::html_text2()                                                                # Extract the text content from that data cell
+
+  if (length(value) == 0) NA_character_ else value      # If nothing found, return "Not Available"; otherwise return the text
+}                                                       # End helper function
+
+```
+
+```{r}
+# Use the helper to create clean columns out of the "Description" text, then tidy the table layout
+mpsz <- mpsz %>%                                                                      # Start with the spatial table of subzones
+  dplyr::mutate(                                                                      # Add new columns created from the Description field
+    REGION_N   = purrr::map_chr(Description, extract_kml_field, "REGION_N"),          # Region name (kept exactly as in the professor's code)
+    PLN_AREA_N = purrr::map_chr(Description, extract_kml_field, "PLN_AREA_N"),        # Planning area name (exact original field name)
+    SUBZONE_N  = purrr::map_chr(Description, extract_kml_field, "SUBZONE_N"),         # Subzone name (exact original field name)
+    SUBZONE_C  = purrr::map_chr(Description, extract_kml_field, "SUBZONE_C")          # Subzone code (exact original field name)
+  ) %>%
+  dplyr::select(-Name, -Description) %>%                                              # Remove original KML columns no longer needed
+  dplyr::relocate(geometry, .after = dplyr::last_col())                               # Move the geometry column to the end for cleaner viewing
+
+```
+
+```{r}
+# Print the spatial table so you can see the first rows and structure in the console
+mpsz
+```
+
+### 2.3.3 Importing Attribute Data into R
+
+We load the population table into memory. This table contains tallies by **planning area**, **subzone**, **age group**, and **count**.
+
+```{r}
+# Read the Comma Separated Values population table into a data frame named "popdata"
+popdata <- readr::read_csv(csv_path)  # This creates columns such as PA (planning area), SZ (subzone), AG (age group), and Pop (population count)
+
+```
+
+##### 2.3.4.1 Data wrangling
+
+We reshape and sum the population table so that we can calculate five indicators: - YOUNG = population in ages from zero to twenty-four - ECONOMY ACTIVE = population in ages from twenty-five to sixty-four - AGED = population in ages sixty-five and above - TOTAL = population across all ages - DEPENDENCY = (YOUNG + AGED) divided by ECONOMY ACTIVE
+
+```{r}
+# Build the summary table used for mapping, exactly as in the professor's code
+popdata2024 <- popdata %>%                                           # Start from the original population table
+  group_by(PA, SZ, AG) %>%                                           # Group rows by planning area (PA), subzone (SZ), and age group (AG)
+  summarise(`POP` = sum(`Pop`)) %>%                                  # For each group, sum the counts into a new column named POP
+  ungroup() %>%                                                      # Drop the grouping so the next steps treat the table as normal
+  pivot_wider(                                                       # Reshape so each age group becomes its own column
+    names_from = AG,                                                 # New column names come from the age group values
+    values_from = POP                                                # New cell values are the summed population counts
+  ) %>%
+  mutate(                                                            # Create indicator columns using the exact column ranges from class
+    YOUNG = rowSums(.[3:6]) +                                        # Sum the columns that represent ages from zero to twenty-four (columns three to six)
+            rowSums(.[12]),                                          # Also include the column twelve group that the professor included
+    `ECONOMY ACTIVE` = rowSums(.[7:11]) + rowSums(.[13:15]),         # Sum ages twenty-five to sixty-four as shown (columns seven to eleven and thirteen to fifteen)
+    `AGED` = rowSums(.[16:21]),                                      # Sum ages sixty-five and above (columns sixteen to twenty-one)
+    `TOTAL` = rowSums(.[3:21])                                       # Sum all age columns from three through twenty-one
+  ) %>%
+  mutate(`DEPENDENCY` = (`YOUNG` + `AGED`) / `ECONOMY ACTIVE`) %>%   # Compute dependency ratio as instructed
+  select(`PA`, `SZ`, `YOUNG`, `ECONOMY ACTIVE`, `AGED`, `TOTAL`, `DEPENDENCY`)   # Keep only the columns needed later
+
+```
+
+#### 2.3.4.2 Joining the attribute data and geospatial data
+
+We make sure the matching columns use the same letter case, we remove rows that would cause division by zero, and then we attach the population indicators to the subzone polygons.
+
+```{r}
+# Make both matching name columns upper case and remove rows that could cause division by zero
+popdata2024 <- popdata2024 %>%                                                      # Start from the prepared population table
+  mutate_at(.vars = dplyr::vars(PA, SZ), .funs = list(toupper)) %>%          # Convert both planning area and subzone text to upper case
+  filter(`ECONOMY ACTIVE` > 0)                                               # Keep only rows with a positive economically active population
+```
+
+```{r}
+# Join the indicators to the subzone polygons, keeping every polygon even if it has no matching row
+mpsz_pop2024 <- left_join(          # Left join keeps all rows from the polygon table
+  mpsz,                             # Left table: spatial polygons of subzones
+  popdata2024,                      # Right table: population indicators
+  by = c("SUBZONE_N" = "SZ")        # Match rows where polygon column SUBZONE_N equals table column SZ
+)
+
+```
+
+```{r}
+# Save the joined object to a fast single-object file so you can reuse it later without reprocessing
+write_rds(mpsz_pop2024, "data/rds/mpsz_pop2024.rds")        # Writes a file named mpsz_pop2024.rds in the data/rds folder
+
+```
+
+## 2.4 Choropleth Mapping Geospatial Data Using tmap
+
+### 2.4.1 Plotting a choropleth map quickly by using qtm()
+
+We draw a very quick first map to check that everything looks sensible.
+
+```{r}
+# Tell the mapping package to produce static images rather than interactive maps
+tmap::tmap_mode("plot")                           # "plot" produces a static image inside RStudio or the R plotting window
+
+# Draw a fast default thematic map that colors each subzone by the dependency ratio
+qtm(shp = mpsz_pop2024, fill = "DEPENDENCY")      # "qtm" stands for quick thematic map
+
+```
+
+### 2.4.2 Creating a choropleth map by using tmap's elements
+
+```{r}
+tm_shape(mpsz_pop2024) +
+  tm_polygons(fill = "DEPENDENCY",
+              fill.scale = tm_scale_intervals(
+                style = "quantile", 
+                n = 5,
+                values = "brewer.blues"),
+              fill.legend = tm_legend(
+                title = "Dependency ratio")) +
+  tm_title("Distribution of Dependency Ratio by planning subzone") +
+  tm_layout(frame = TRUE) +
+  tm_borders(fill_alpha = 0.5) +
+  tm_compass(type="8star", size = 2) +
+  tm_scalebar() +
+  tm_grid(alpha =0.2) +
+  tm_credits("Source: Planning Sub-zone boundary from Urban Redevelopment Authorithy (URA)\n and Population data from Department of Statistics DOS", 
+             position = c("left", "bottom"))
+
+```
+
+#### 2.4.2.1 Drawing a base map
+
+We rebuild the map piece by piece so you can see how layers stack.
+
+```{r}
+# Start with just the shapes (no attribute fill yet)
+tm_shape(mpsz_pop2024) +          # Declare which spatial data we want to draw
+  tm_polygons()                   # Draw subzone polygons using default grey fill
+
+```
+
+```{r}
+# Fill polygons by the dependency ratio attribute
+tm_shape(mpsz_pop2024) +              # Use the same spatial data
+  tm_polygons(fill = "DEPENDENCY")    # Color each polygon by the value in column DEPENDENCY
+
+```
+
+```{r}
+# Draw only fills first (borders will be added next)
+tm_shape(mpsz_pop2024) +        # Choose the spatial data
+  tm_fill("DEPENDENCY")         # Add a colored fill based on the dependency ratio
+
+```
+
+```{r}
+# Add borders on top of the fills so the subzone outlines are visible
+tm_shape(mpsz_pop2024) +        # Choose the spatial data
+  tm_fill("DEPENDENCY") +       # Add colored fill
+  tm_borders()                  # Draw black outlines along polygon edges
+
+```
+
+```{r}
+# Customize the borders: lighter color, thin width, and dashed line style
+tm_shape(mpsz_pop2024) +                                    # Choose the spatial data
+  tm_fill("DEPENDENCY") +                                   # Add colored fill
+  tm_borders(col = "grey60", lwd = 0.1, lty = "dashed")     # Change outline color, line width, and line type
+```
+
+### 2.4.3 Data classification methods of tmap
+
+We control how numeric values are grouped into classes (for example five bins). We will see two built-in styles and later a custom set of edges.
+
+#### 2.4.3.1 Plotting choropleth maps with built-in classification methods
+
+```{r}
+# Use "quantile" classification so each class holds about the same number of subzones
+tm_shape(mpsz_pop2024) +                       # Choose the spatial data
+  tm_polygons(                                 # Draw polygons with controlled classification
+    fill = "DEPENDENCY",                       # Color is based on the dependency ratio
+    fill.scale = tm_scale_intervals(           # Control how numeric values are split into bins
+      style = "quantile",                      # Quantile style: balanced counts per class
+      n = 5                                    # Request five classes
+    )
+  ) +
+  tm_borders(fill_alpha = 0.5)                 # Keep outlines visible while letting fills show through
+
+```
+
+```{r}
+# Use "equal" classification so class ranges have equal numeric width
+tm_shape(mpsz_pop2024) +                          # Choose the spatial data
+  tm_polygons(
+    fill = "DEPENDENCY",                          # Color is based on the dependency ratio
+    fill.scale = tm_scale_intervals(              # Control classing method
+      style = "equal",                            # Equal style: equal numeric width per class
+      n = 5                                       # Five classes
+    )
+  ) +
+  tm_borders(fill_alpha = 0.5)                    # Keep outlines visible
+
+```
+
+#### 2.4.3.2 Plotting choropleth map with custom breaks
+
+We override the automatic classing and explicitly set the class edges used in the legend.
+
+```{r}
+# Look at the basic statistics of the dependency ratio to help choose useful custom breakpoints later
+summary(mpsz_pop2024$DEPENDENCY)        # Prints minimum, quartiles, mean, maximum, and missing count
+
+```
+
+```{r}
+# Apply custom breakpoints exactly as used by the professor: six edges create five classes
+tm_shape(mpsz_pop2024) +                              # Choose the spatial data
+  tm_polygons(
+    fill = "DEPENDENCY",                              # Color is based on the dependency ratio
+    fill.scale = tm_scale_intervals(                  # Override automatic classing
+      breaks = c(0, 0.60, 0.70, 0.80, 0.90, 1.00)     # Exact numeric edges for the five classes
+    )
+  ) +
+  tm_borders(fill_alpha = 0.5)                        # Keep outlines visible
+
+```
+
+### 2.4.4 Colour Scheme
+
+#### 2.4.4.1 Using ColourBrewer palette
+
+We change the color ramp used to paint the classes, and we also show how to reverse the ramp.
+
+```{r}
+# Use a ColorBrewer "Greens" ramp for the same five quantile classes
+tm_shape(mpsz_pop2024) +                   # Choose the spatial data
+  tm_polygons(
+    fill = "DEPENDENCY",                   # Color by dependency ratio
+    fill.scale = tm_scale_intervals(
+      style = "quantile",                  # Keep quantile classing
+      n = 5,                               # Five classes
+      values = "brewer.greens"             # Choose a green color ramp
+    )
+  ) +
+  tm_borders(fill_alpha = 0.5)             # Keep outlines visible
+
+```
+
+```{r}
+# Reverse that same green color ramp by adding a minus sign in front of the ramp name
+tm_shape(mpsz_pop2024) +                # Choose the spatial data
+  tm_polygons(
+    fill = "DEPENDENCY",                # Color by dependency ratio
+    fill.scale = tm_scale_intervals(
+      style = "quantile",               # Keep quantile classing
+      n = 5,                            # Five classes
+      values = "-brewer.greens"         # Reverse the green color ramp
+    )
+  ) +
+  tm_borders(fill_alpha = 0.5)          # Keep outlines visible
+
+```
+
+```{r}
+tm_shape(mpsz_pop2024) +
+  tm_polygons(fill = "DEPENDENCY",
+              fill.scale = tm_scale_intervals(
+                style = "quantile",
+                n = 5)) +
+  tm_borders(fill_alpha = 0.5) +
+  tm_compass(type="8star", size = 2) +
+  tm_scalebar() +
+  tm_grid(lwd = 0.1, alpha = 0.2) +
+  tm_credits("Source: data.gov.sg & singstat",
+             position = c("left", "bottom"))
+
+```
+
+#### 2.4.4.2 Cartographic Furniture
+
+We add visual furniture: a north arrow, a distance scale bar, a light grid, and a data source line.
+
+```{r}
+# Add cartographic furniture exactly as shown in class
+tm_shape(mpsz_pop2024) +                                         # Choose the spatial data
+  tm_polygons(
+    fill = "DEPENDENCY",                                         # Color by dependency ratio
+    fill.scale = tm_scale_intervals(style = "quantile", n = 5)   # Five quantile classes
+  ) +
+  tm_borders(fill_alpha = 0.5) +                                 # Keep outlines visible
+  tm_compass(type = "8star", size = 2) +                         # Add a north arrow with eight-point star design (Compass)
+  tm_scalebar() +                                                # Add a distance scale bar (Scale bar)
+  tm_grid(lwd = 0.1, alpha = 0.2) +                                                 # Add a light grid (line width 0.1, transparency 0.2)
+  tm_credits("Source: data.gov.sg & singstat", position = c("left", "bottom"))      # Add a source line in the lower left corner
+
+```
+
+### 2.4.5 Map Layout
+
+#### 2.4.5.1 Map Legend
+
+We change the legend's title and where the legend is placed.
+
+```{r}
+# Customize legend title and automatic inset placement; keep the other furniture
+tm_shape(mpsz_pop2024) +                                                            # Choose the spatial data
+  tm_polygons(
+    fill = "DEPENDENCY",                                                            # Color by dependency ratio
+    fill.scale = tm_scale_intervals(style = "quantile", n = 5),                     # Five quantile classes
+    fill.legend = tm_legend(title = "Dependency ratio")                              # Give the legend a clear title
+  ) +
+  tm_pos_auto_in() +                                                                 # Allow automatic smart placement of the legend as an inset
+  tm_borders(fill_alpha = 0.5) +                                                     # Keep outlines visible
+  tm_compass(type = "8star", size = 2) +                                             # Keep the north arrow
+  tm_scalebar() +                                                                    # Keep the scale bar
+  tm_grid(lwd = 0.1, alpha = 0.2) +                                                  # Keep the grid
+  tm_credits("Source: data.gov.sg & singstat", position = c("left", "bottom"))      # Keep the source line
+
+```
+
+#### 2.4.5.2 Map style
+
+We switch the overall look of the map to a built-in style and then reset to the default.
+
+```{r}
+# Apply the built-in "natural" visual style to the current map
+tm_shape(mpsz_pop2024) +               # Choose the spatial data
+  tm_polygons(
+    fill = "DEPENDENCY",               # Color by dependency ratio
+    fill.scale = tm_scale_intervals(style = "quantile", n = 5, values = "-brewer.greens")   # Use reversed green ramp
+  ) +
+  tm_borders(fill_alpha = 0.5) +       # Keep outlines visible
+  tmap::tmap_style("natural")          # Switch to the "natural" visual style
+
+```
+
+```{r}
+# Return to the default white background style so future plots are consistent
+tmap::tmap_style("white")     # Reset the global style to "white"
+
+```
+
+## 2.5 Drawing Small Multiple Choropleth Maps
+
+### 2.5.1 By assigning multiple values to at least one of the aesthetic arguments
+
+We make two panels in one figure, one panel colored by YOUNG and the other by AGED.
+
+```{r}
+# Create a two-panel figure by mapping two different columns to the fill color
+tm_shape(mpsz_pop2024) +                   # Choose the spatial data
+  tm_polygons(
+    fill = c("YOUNG", "AGED"),             # First panel uses YOUNG; second panel uses AGED
+    fill.legend = tm_legend(position = tm_pos_in("right", "bottom")),               # Place legend at right, bottom
+    fill.scale  = tm_scale_intervals(style = "equal", n = 5, values = "brewer.blues") # Use equal-width classes and a blue ramp
+  ) +
+  tm_borders(fill_alpha = 0.5) +           # Keep outlines visible
+  tmap::tmap_style("natural")              # Apply the "natural" style for this figure
+
+```
+
+### 2.5.2 By arranging multiple choropleth maps in a grid layout
+
+We build two separate map objects and then place them side by side in a grid.
+
+```{r}
+# Build the first map object for the YOUNG column
+youngmap <- tm_shape(mpsz_pop2024)+                # Choose the spatial data
+  tm_polygons(
+    fill = "YOUNG",                                # Color by YOUNG population count
+    fill.legend = tm_legend(                       # Customize legend placement and size
+      position = tm_pos_in("right", "bottom"),
+      item.height = 0.8
+    ),
+    fill.scale = tm_scale_intervals(style = "quantile", values = "brewer.blues")    # Use quantile classing with a blue ramp
+  ) +
+  tm_borders(fill_alpha = 0.5) +                   # Keep outlines visible
+  tm_title("Distribution of young population")     # Give this map a descriptive title
+
+# Build the second map object for the AGED column
+agedmap <- tm_shape(mpsz_pop2024)+                 # Choose the spatial data
+  tm_polygons(
+    fill = "AGED",                                 # Color by AGED population count
+    fill.legend = tm_legend(                       # Same legend adjustments
+      position = tm_pos_in("right", "bottom"),
+      item.height = 0.8
+    ),
+    fill.scale = tm_scale_intervals(style = "quantile", values = "brewer.blues")    # Use quantile classing with a blue ramp
+  ) +
+  tm_borders(fill_alpha = 0.5) +                   # Keep outlines visible
+  tm_title("Distribution of aged population")      # Give this map a descriptive title
+
+# Place the two maps next to each other with equal aspect ratio
+tmap_arrange(youngmap, agedmap, asp = 1, ncol = 2) # Two columns, aspect ratio equal to one
+```
+
+### 2.5.3 By defining a group-by variable in tm_facets()
+
+We split the map into several panels by the REGION_N column so each region appears in its own panel.
+
+```{r}
+# Create a faceted map where each region is drawn in its own panel
+tm_shape(mpsz_pop2024) +                                                                    # Choose the spatial data
+  tm_fill(
+    fill = "DEPENDENCY",                                                                    # Color by dependency ratio
+    fill.scale = tm_scale_intervals(style = "quantile", values = "brewer.blues")            # Quantile classing with a blue ramp
+  ) +
+  tm_facets(by = "REGION_N", nrow = 2, ncols = 3, free.coords = TRUE, drop.units = TRUE) +  # Two rows by three columns of panels
+  tm_layout(legend.show = TRUE, title.position = c("center", "center"), title.size = 20) +  # Show legend and center titles
+  tm_borders(fill_alpha = 0.5)                                                              # Keep outlines visible
+
+```
+
+## 2.6 Mapping Spatial Object Meeting a Selection Criterion
+
+We keep only the subzones in the Central Region and map them with a green ramp.
+
+```{r}
+# Filter the spatial table to include only the Central Region, then draw a map for that subset
+mpsz_pop2024 %>%                                        # Start from the full joined spatial table
+  dplyr::filter(REGION_N == "CENTRAL REGION") %>%       # Keep rows where REGION_N equals "CENTRAL REGION"
+  tm_shape() +                                          # Use that filtered spatial data
+  tm_polygons(
+    fill = "DEPENDENCY",                                # Color by dependency ratio
+    fill.scale = tm_scale_intervals(                    # Keep quantile classing as before
+      style = "quantile",
+      values = "brewer.greens"                          # Use a green color ramp
+    ),
+    fill.legend = tm_legend()                           # Keep the automatic legend
+  ) +
+  tm_borders(fill_alpha = 0.5)                          # Keep outlines visible
+
+```
+
+## 2.7 Complementing Thematic Map with Statistical Chart
+
+We keep the Central Region focus, and we add a box plot (a simple statistical summary) to the legend area.
+
+```{r}
+# Filter to the Central Region and add a box plot summary of the dependency ratio inside the legend area
+mpsz_pop2024 %>%                                      # Start from the full joined spatial table
+  dplyr::filter(REGION_N == "CENTRAL REGION") %>%     # Keep only the Central Region
+  tm_shape() +                                        # Use the filtered spatial data
+  tm_polygons(
+    fill = "DEPENDENCY",                              # Color by dependency ratio
+    fill.scale = tm_scale_intervals(
+      style = "quantile",
+      values = "brewer.greens"                        # Use a green color ramp
+    ),
+    fill.legend = tm_legend(),                        # Keep automatic legend
+    fill.chart = tm_chart_box()                       # Draw a box plot for the fill variable in the legend area
+  ) +
+  tm_borders() +                                      # Draw polygon outlines
+  tm_layout(asp = 0.8)                                # Control the aspect ratio for a pleasing shape
+
+```
+
+**Highlight and label statistical outliers in the Central Region**
+
+```{r}
+# Create a separate table that includes only the Central Region subzones
+mpsz_selected <- mpsz_pop2024 %>%                    # Start from the full joined spatial table
+  dplyr::filter(REGION_N == "CENTRAL REGION")        # Keep only rows from the Central Region
+
+# Compute box plot statistics for the dependency ratio in the Central Region
+stats <- boxplot.stats(mpsz_selected$DEPENDENCY)     # Get standard box plot statistics including outlier values
+
+# Pull out the outlier values from those statistics
+outlier_vals <- stats$out                            # Save the list of numeric outlier values
+
+# Create a spatial table that contains only the polygons whose dependency ratio is an outlier
+outlier_sf <- mpsz_selected[mpsz_selected$DEPENDENCY %in% outlier_vals, ]           # Filter rows whose values appear in the outlier list
+
+# Draw the Central Region map with outliers emphasized and labeled
+tm_shape(mpsz_selected) +                            # Use the Central Region spatial data
+  tm_polygons(
+    fill = "DEPENDENCY",                             # Color by dependency ratio
+    fill.scale = tm_scale_intervals(
+      style = "quantile",
+      values = "brewer.blues"                        # Use a blue ramp for contrast
+    ),
+    fill.legend = tm_legend(),                       # Keep the legend
+    fill.chart = tm_chart_box()                      # Show a box plot summary in the legend
+  ) +
+  tm_borders(fill_alpha = 0.5) +                     # Keep outlines visible
+  tm_shape(outlier_sf) +                             # Start a new layer for only the outlier polygons
+  tm_borders(col = "red", lwd = 2) +                 # Outline those outlier polygons in thick red lines
+  tm_text("SUBZONE_N", col = "red", size = 0.7) +    # Label the outlier polygons with their subzone names in red
+  tm_layout(asp = 0.8)                               # Keep a pleasing aspect ratio
+
+```
+
+## 2.8 Creating Interactive Map
+
+We switch from static images to an interactive map. You can pan and zoom, click a subzone to read its name and dependency value, and we keep the same outlier highlighting. We also restrict how far a person can zoom to keep the view sensible.
+
+```{r}
+region_selected <- mpsz_pop2024 %>%
+  filter(REGION_N == "CENTRAL REGION")
+region_bbox <- st_bbox(region_selected)
+
+stats <- boxplot.stats(region_selected$DEPENDENCY)
+outlier_vals <- stats$out
+outlier_sf <- region_selected[region_selected$DEPENDENCY %in% outlier_vals, ]
+
+```
+
+```{r}
+tmap_mode("view")
+tm_shape(region_selected, 
+         bbox = region_bbox) +
+  tm_fill("DEPENDENCY",
+          id = "SUBZONE_N",
+          popup.vars = c(
+            "Name" = "SUBZONE_N", 
+            "Dependency" = "DEPENDENCY")) +
+  tm_borders() +
+  tm_shape(outlier_sf) +
+  tm_borders(col = "red", lwd = 2)
+
+```
+
+```{r}
+# Switch mapping back to static image mode so later plots will be pictures again
+tmap::tmap_mode("plot")            # Return to static plotting mode
+```
+
+```{r}
+# Rebuild the same interactive map but also limit how far a person can zoom in or out
+region_selected <- mpsz_pop2024 %>%                                                  # Recreate the region subset (as in professor's order)
+  dplyr::filter(REGION_N == "CENTRAL REGION")                                        # Keep only the Central Region
+region_bbox <- sf::st_bbox(region_selected)                                          # Compute the bounding box again
+
+stats <- boxplot.stats(region_selected$DEPENDENCY)                                   # Compute box plot statistics again
+outlier_vals <- stats$out                                                            # Extract outlier list again
+outlier_sf <- region_selected[region_selected$DEPENDENCY %in% outlier_vals, ]        # Build the outlier spatial table again
+
+tmap::tmap_mode("view")                                                              # Ensure we are in interactive mode
+
+tm_shape(region_selected, bbox = region_bbox) +                                      # Use the shapes and view box
+  tm_fill(
+    "DEPENDENCY",                                                                    # Color by dependency ratio
+    id = "SUBZONE_N",                                                                # Use subzone name for popup identification
+    popup.vars = c("Name" = "SUBZONE_N", "Dependency" = "DEPENDENCY")                # Show name and dependency in the popup
+  ) +
+  tm_borders() +                                                                     # Draw outlines
+  tm_shape(outlier_sf) +                                                             # Layer for the outliers
+  tm_borders(col = "red", lwd = 2) +                                                 # Red outlines for outliers
+  tm_view(set_zoom_limits = c(12, 14))                                               # Limit zoom levels to keep the map readable
+
+```
+
+```{r}
+# Switch mapping back to static image mode so later plots will be pictures again
+tmap::tmap_mode("plot")                                                              # Return to static plotting mode
+```

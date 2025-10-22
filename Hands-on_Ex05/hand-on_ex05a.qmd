@@ -1,0 +1,519 @@
+---
+title: "Hands-on Ex5a"
+author: "TAN Chin Khoon"
+date: "26 September 2025"
+date-modified: "last-modified"
+---
+
+# 9 Global Measures of Spatial Autocorrelation
+
+##  9.1 Overview
+
+In this hands-on exercise, we compute **Global Measures of Spatial Autocorrelation (GMSA)** using the spdep package. We will: import a county-level shapefile of Hunan, read a CSV of indicators (e.g., GDP per capita), join attributes to geometry, visualise choropleths, build Queen contiguity neighbours, convert them into a row-standardised spatial-weights matrix, and then run Moran’s I and Geary’s C—including Monte-Carlo permutation tests and histograms of simulated statistics. Finally, we will create **spatial correlograms** for Moran’s I and Geary’s C across multiple lags.
+
+## 9.2 Getting started
+
+### 9.2.1 The analytical question
+
+In spatial policy, one of the main development objective of the local government and planners is to ensure equal distribution of development in the province. Our task in this study, hence, is to apply appropriate spatial statistical methods to discover if development are even distributed geographically. If the answer is **No**. Then, our next question will be “is there sign of spatial clustering?”. And, if the answer for this question is yes, then our next question will be “where are these clusters?”
+
+In this case study, we are interested to examine the spatial pattern of a selected development indicator (i.e. GDP per capita) of Hunan Provice, People Republic of China.
+
+### 9.2.2 The Study Area and Data
+
+Two data sets will be used in this hands-on exercise, they are:  
+
+- Hunan province administrative boundary layer at county level. This is a geospatial data set in ESRI shapefile format.  
+- Hunan_2012.csv: This csv file contains selected Hunan’s local development indicators in 2012.
+
+### 9.2.3 Setting the Analytical Tools
+
+```{r}
+# Load required packages exactly as in the professor's notes -------------------
+
+# pacman::p_load() creates a package list, installs any missing packages,
+# and then loads them into the session.
+pacman::p_load(sf, spdep, tmap, tidyverse)
+
+```
+
+## 9.3 Getting the Data Into R Environment
+
+### 9.3.1 Import shapefile into R environment
+
+```{r}
+# Read the Hunan county-level shapefile as an sf object -----------------------
+
+# st_read() reads vector geospatial data. Here we pass:
+# - dsn: the directory containing the shapefile set
+# - layer: the base name of the shapefile (without .shp)
+hunan <- st_read(dsn = "data/geospatial",
+                 layer = "Hunan")
+
+
+```
+The result hunan is an sf object: a normal data frame with an extra geometry column. Each row is a county polygon. 
+
+### 9.3.2 Import csv file into R environment
+
+```{r}
+
+# Read attribute data (development indicators) from CSV -----------------------
+
+# read_csv() reads a comma-separated file into a tibble (tidyverse data frame).
+hunan2012 <- read_csv("data/aspatial/Hunan_2012.csv")
+
+```
+This table holds numeric attributes (e.g., GDPPC) keyed by a county identifier that matches the shapefile.
+
+### 9.3.3 Performing relational join
+
+```{r}
+
+# Join attributes from the CSV to the sf polygons --------------------------------
+
+# left_join() keeps all rows from the left table (hunan),
+# matching rows from hunan2012 by a common key (assumed identical field names).
+# The select() keeps the same columns as the professor's example for clarity.
+hunan <- left_join(hunan, hunan2012) %>%
+  select(1:4, 7, 15)
+
+```
+
+After the join, hunan contains both geometry and the indicator columns we need (e.g., GDPPC). The select(1:4, 7, 15) mirrors to column picking for a tidy attribute table.
+
+### 9.3.4 Visualising Regional Development Indicator
+
+```{r}
+
+# Build two comparable choropleths: Equal-interval and Quantile -----------------
+
+# Map using equal-interval classification (n = 5 classes).
+equal <- tm_shape(hunan) +
+  tm_polygons(fill = "GDPPC",
+              fill.scale = tm_scale_intervals(style = "equal",  # equal intervals
+                                             n = 5),            # 5 classes
+              ) +
+  tm_borders(fill_alpha = 0.5) +                                # faint fill if any
+  tm_layout(legend.position = c("left", "bottom"),
+           main.title = "Equal interval classification")
+
+# Map using quantile classification (n = 5 quantiles).
+quantile <- tm_shape(hunan) +
+  tm_polygons(fill = "GDPPC",
+              fill.scale = tm_scale_intervals(style = "quantile",  # quantiles
+                                             n = 5),
+              ) +
+  tm_borders(fill_alpha = 0.5) +
+  tm_layout(legend.position = c("left", "bottom"),
+           main.title = "Quantile classification")
+
+# Arrange the two maps side-by-side for comparison.
+tmap_arrange(equal, quantile, asp = 1, ncol = 2)
+
+```
+::: {.callout-note icon=false}
+
+### Observation:
+
+Equal intervals emphasise absolute differences; quantiles emphasise rank (each class has roughly the same number of counties). These visuals are descriptive only — they do not test spatial autocorrelation. 
+
+:::
+
+## 9.4 Global Measures of Spatial Autocorrelation
+
+### 9.4.1 Computing Contiguity Spatial Weights
+
+```{r}
+
+# Build Queen contiguity neighbours ------------------------------------------------
+
+# poly2nb() finds neighbours by shared edges OR vertices (Queen criterion).
+# Setting queen = TRUE is explicit (it is also the default).
+wm_q <- poly2nb(hunan, queen = TRUE)
+
+# Summarise the neighbour structure: counts and distribution.
+summary(wm_q)
+
+```
+::: {.callout-note icon=false}
+
+### Explanations:
+
+Each county gets a list of neighbouring counties. Queen contiguity is inclusive (corner-touching counts). The summary shows the number of regions, links, and the distribution of neighbour counts. The summary report above shows that there are 88 area units in Hunan. The most connected area unit has 11 neighbours. There are two area units with only one neighbours.
+
+:::
+
+### 9.4.2 Row-standardised weights matrix
+
+```{r}
+
+# Convert the neighbour list to a spatial-weights list object ---------------------
+
+# nb2listw() turns neighbours into weights.
+# style = "W" creates row-standardised weights: each county's neighbour weights sum to 1.
+# zero.policy = TRUE avoids errors for islands (if any) by allowing zero-neighbour rows.
+rswm_q <- nb2listw(wm_q,
+                   style = "W",
+                   zero.policy = TRUE)
+
+# Print the weights object to view constants (S0, S1, S2) and summary.
+rswm_q
+
+```
+::: {.callout-note icon=false}
+
+### What can we learn from the code chunk above?
+
+- The input of `nb2listw()` must be an object of class nb. The syntax of the function has two major arguments, namely style and zero.poly.  
+- *style* can take values “W”, “B”, “C”, “U”, “minmax” and “S”. B is the basic binary coding, W is row standardised (sums over all links to n), C is globally standardised (sums over all links to n), U is equal to C divided by the number of neighbours (sums over all links to unity), while S is the variance-stabilizing coding scheme proposed by Tiefelsdorf et al. 1999, p. 167-168 (sums over all links to n).  
+- If zero policy is set to TRUE, weights vectors of zero length are inserted for regions without neighbour in the neighbours list. These will in turn generate lag values of zero, equivalent to the sum of products of the zero row t(rep(0, length=length(neighbours))) %*% x, for arbitrary numerical vector x of length length(neighbours). The spatially lagged value of x for the zero-neighbour region will then be zero, which may (or may not) be a sensible choice.
+
+:::
+
+## 9.5 Global Measures of Spatial Autocorrelation: Moran’s I
+
+### 9.5.1 Moran’s I test
+
+```{r}
+
+# Run Moran's I test for spatial autocorrelation ----------------------------------
+
+# moran.test() computes Moran's I using the specified weights.
+# zero.policy = TRUE handles any isolates gracefully.
+# na.action = na.omit removes missing values for a valid test.
+moran.test(hunan$GDPPC,
+           listw = rswm_q,
+           zero.policy = TRUE,
+           na.action = na.omit)
+
+```
+::: {.callout-note icon=false}
+
+### Interpretation guide:  
+
+- $I > 0$ with small $p$-value $\rightarrow$ similar values cluster (positive spatial autocorrelation).
+- $I < 0$ with small $p$-value $\rightarrow$ neighbours are dissimilar (spatial dispersion).
+- $I ≈ 0$ $\rightarrow$ no global spatial autocorrelation.
+	
+:::
+
+::: {.callout-note icon=false}
+
+### Question: What statistical conclusion can you draw from the output above?
+
+**Output Recap:**  
+
+- **Moran’s I statistic** = 0.3007  
+- **Expected value under randomness** = -0.0115  
+- **$p$-value** = 1.095e-06 (≈ 0.000001, very small)  
+- **Alternative hypothesis** = greater (testing positive autocorrelation)  
+
+**Statistical conclusion:** The observed Moran’s I (0.3007) is **much higher than the expected value under complete spatial randomness (-0.0115)**. The $p$-value is extremely small (< 0.001), so we reject the null hypothesis of spatial randomness. This means **GDP per capita across Hunan counties exhibits statistically significant positive spatial autocorrelation**. In other words, counties with high GDP per capita tend to be located near other high-GDPPC counties, and low values cluster near low values, instead of being randomly scattered.
+	
+:::
+
+### 9.5.2 Computing Monte Carlo Moran’s I
+
+```{r}
+
+# Monte-Carlo permutation test for Moran's I --------------------------------------
+
+# set.seed() ensures reproducibility of the random permutations.
+set.seed(1234)
+
+# moran.mc() performs nsim random permutations of the data relative to the weights.
+# We mirror the professor's nsim = 999.
+bperm <- moran.mc(hunan$GDPPC,
+                  listw = rswm_q,
+                  nsim = 999,
+                  zero.policy = TRUE,
+                  na.action = na.omit)
+
+# Display the Monte-Carlo test result (statistic, rank, p-value).
+bperm
+
+```
+::: {.callout-note icon=false}
+
+### Question: What statistical conclustion can you draw from the output above?
+
+**Output Recap::**  
+
+- **Statistic (observed Moran’s I)** = 0.30075
+- **Observed rank** = 1000 (the largest in the simulated distribution)
+- **$p$-value** = 0.001 (based on 999 permutations + observed value)
+- **Alternative hypothesis** = greater (testing positive autocorrelation)
+
+**Statistical conclusion:** The Monte Carlo test confirms that the observed Moran’s I is **much larger than nearly all permuted values**. With a **$p$-value of 0.001**, we strongly reject the null hypothesis of complete spatial randomness. This provides robust evidence that **GDP per capita in Hunan is positively spatially autocorrelated:** counties with similar development levels tend to cluster together.
+	
+:::
+
+### 9.5.3 Visualising Monte Carlo Moran’s I
+
+```{r}
+
+# Summaries of the simulated statistics (first 999 values are the permutations) ---
+
+# mean() of the simulated distribution (excludes the observed value).
+mean(bperm$res[1:999])
+
+# var() of the simulated distribution.
+var(bperm$res[1:999])
+
+# summary() of the simulated distribution for a quick five-number overview.
+summary(bperm$res[1:999])
+
+# Plot histogram of simulated Moran's I values with a vertical line at 0 ----------
+hist(bperm$res,
+     freq = TRUE,
+     breaks = 20,
+     xlab = "Simulated Moran's I")
+
+# abline() adds a reference line at 0 (null expectation under randomness).
+abline(v = 0, col = "red")
+
+```
+::: {.callout-note icon=false}
+
+### Question: What statistical observation can you draw from the output above?
+
+**Output Recap:**  
+
+- **Mean of simulated distribution** $=$ -0.0150
+- **Variance** = 0.00437
+- **Summary range of simulated Moran’s I values** $=$ -0.183 to 0.276
+- **Histogram** shows the distribution of 999 simulated Moran’s I values under spatial randomness, with a red line at 0 (expected value).
+- **Observed Moran’s I** from the test $=$ 0.3007 (from Section 9.5.1/9.5.2).
+
+**Statistical conclusion:** The histogram shows that most simulated Moran’s I values cluster around zero, confirming the expectation under complete spatial randomness. However, the **observed Moran’s I (0.3007) lies far to the right of this simulated distribution**, outside its upper bound. This means the observed value is **extreme and highly unlikely to occur by chance**. Therefore, we conclude that there is **strong evidence of positive spatial autocorrelation** in GDP per capita across Hunan counties.
+	
+:::
+
+> Challenge: Instead of using Base Graph to plot the values, plot the values by using ggplot2 package.
+
+```{r}
+
+# Load ggplot2 (already included in tidyverse, but ensure it's active)
+library(ggplot2)
+
+# Convert the permutation results into a data frame for ggplot
+bperm_df <- data.frame(res = bperm$res)
+
+# Plot histogram with ggplot2 -------------------------------------------------
+ggplot(bperm_df, aes(x = res)) +
+  # Histogram of simulated Moran's I values
+  geom_histogram(binwidth = 0.02, fill = "grey70", color = "black") +
+  
+  # Add vertical reference line at 0 (null expectation)
+  geom_vline(xintercept = 0, color = "red", size = 1) +
+  
+  # Add vertical line for observed Moran’s I statistic (≈ 0.3007)
+  geom_vline(xintercept = 0.3007, color = "blue", linetype = "dashed", size = 1) +
+  
+  # Labels for clarity
+  labs(title = "Histogram of Simulated Moran's I (Monte Carlo)",
+       x = "Simulated Moran's I",
+       y = "Frequency") +
+  
+  # Minimal theme for clean look
+  theme_minimal()
+
+```
+
+## 9.6 Global Measures of Spatial Autocorrelation: Geary’s C
+
+### 9.6.1 Geary’s C test
+
+```{r}
+
+# Run Geary's C test for spatial autocorrelation ----------------------------------
+
+# geary.test() computes Geary's C using the same row-standardised weights.
+geary.test(hunan$GDPPC,
+           listw = rswm_q)
+
+```
+::: {.callout-note icon=false}
+
+### Interpretation guide:
+
+- $C < 1 ⇒$ positive spatial autocorrelation (neighbours are similar).  
+- $C > 1 ⇒$ negative spatial autocorrelation (neighbours are dissimilar).  
+- $C ≈ 1 ⇒$ no global spatial autocorrelation.  
+	
+:::
+
+::: {.callout-note icon=false}
+
+### What statistical conclusion can you draw from the output above?
+
+**Output Recap:**  
+
+- **Geary’s C statistic** $=$ 0.6907  
+- **Expected value under randomness** $=$ 1.0  
+- **$p$-value** $=$ 0.0001526 (very small)  
+- **Alternative hypothesis** $=$ statistic $<$ expectation (since expectation > statistic)
+
+**Statistical Conclusion:** The observed Geary’s C (0.6907) is **significantly smaller than the expected value of 1.0**, with a p-value well below 0.001. This indicates strong evidence of **positive spatial autocorrelation:** neighbouring counties in Hunan tend to have **similar GDP per capita values** rather than differing randomly. In other words, the Geary’s C test supports the same conclusion as Moran’s I — **development levels cluster spatially instead of being evenly or randomly spread**.
+	
+:::
+
+### 9.6.2 Computing Monte Carlo Geary’s C
+
+```{r}
+
+# Monte-Carlo permutation test for Geary's C --------------------------------------
+
+# Re-seed for reproducibility (matches professor's style).
+set.seed(1234)
+
+# geary.mc() performs nsim random permutations (999 here).
+bperm <- geary.mc(hunan$GDPPC,
+                  listw = rswm_q,
+                  nsim = 999)
+
+# Show the Monte-Carlo result (statistic, rank, p-value).
+bperm
+
+```
+
+::: {.callout-note icon=false}
+
+### What statistical conclusion can you draw from the output above?
+
+**Output Recap:**  
+
+- **Statistic (observed Geary’s C)** $=$ 0.6907  
+- **Expected value under randomness** $=$ 1.0  
+- **Observed rank** $=$ 1 (extreme lower tail of the simulated distribution)  
+- **$p$-value** $=$ 0.001 (very small)  
+- **Alternative hypothesis** $=$ expectation greater than statistic (tests for positive spatial autocorrelation)
+
+**Statistical Conclusion:** The observed Geary’s C value (0.6907) is **much smaller than the expected value of 1.0**, and its extreme position in the permutation distribution (rank = 1) produces a highly significant $p$-value (0.001). This strongly rejects the null hypothesis of spatial randomness and confirms that **GDP per capita across Hunan counties is positively spatially autocorrelated**. In other words, neighbouring counties tend to have **similar development levels** rather than being randomly distributed.
+	
+:::
+
+### 9.6.3 Visualising the Monte Carlo Geary’s C
+
+```{r}
+
+# Descriptive statistics for the simulated Geary's C values -----------------------
+
+# mean() of the simulated distribution (first 999 permutation values).
+mean(bperm$res[1:999])
+
+# var() of the simulated distribution.
+var(bperm$res[1:999])
+
+# summary() provides quartiles and range for quick inspection.
+summary(bperm$res[1:999])
+
+# Plot histogram of simulated Geary's C with reference line at 1 ------------------
+hist(bperm$res,
+     freq = TRUE,
+     breaks = 20,
+     xlab = "Simulated Geary c")
+
+# Under the null, Geary's C is expected near 1, so we draw a line at 1.
+abline(v = 1, col = "red")
+
+```
+
+::: {.callout-note icon=false}
+
+### What statistical conclusion can you draw from the output above?
+
+**Output Recap:**  
+
+- **Mean of simulated distribution** $≈$ 1.004
+- **Variance** $≈$ 0.0074
+- **Range of** simulated values $=$ 0.714 – 1.272
+- **Expected value under null (CSR)** $=$ 1 (red line on histogram)
+- **Observed Geary’s C (from test)** $=$ 0.6907 (from Section 9.6.1 / 9.6.2)
+
+**Statistical Observation:** The histogram shows that most simulated Geary’s C values are distributed around 1.0, consistent with the null hypothesis of spatial randomness. However, the observed Geary’s C value (0.6907) lies well below this distribution and does not overlap with the bulk of simulated values. This confirms that the observed result is highly unlikely to occur by chance and provides strong evidence of **positive spatial autocorrelation** in GDP per capita across Hunan counties.
+	
+:::
+
+## 9.7 Spatial Correlogram
+
+Correlograms display how the autocorrelation statistic behaves as the **lag order** increases (e.g., from immediate neighbours to neighbours-of-neighbours). We will compute and plot both Moran’s I and Geary’s C correlograms with **six lags**, then print the tabular results to inspect which lags are statistically significant.
+
+### 9.7.1 Compute Moran’s I correlogram
+
+```{r}
+
+# Build a 6-lag spatial correlogram for Moran's I ---------------------------------
+
+# sp.correlogram() computes the statistic by lag order using the base neighbour list
+# 'wm_q' and the chosen method (here "I" for Moran's I) and weight style "W".
+MI_corr <- sp.correlogram(wm_q,
+                          hunan$GDPPC,
+                          order  = 6,     # up to 6 lags
+                          method = "I",   # Moran's I
+                          style  = "W")   # row-standardised
+
+# Plot the correlogram using base graphics (as in the professor's notes).
+plot(MI_corr)
+
+# Print the full correlogram table (estimates, expectations, p-values).
+print(MI_corr)
+
+
+```
+
+::: {.callout-note icon=false}
+
+### What statistical conclusion can you draw from the plot above?
+
+From the correlogram table:  
+  
+- Lag 1: Moran’s I = 0.3007, $p$ < 0.001 $→$ strong positive autocorrelation.  
+- Lag 2: Moran’s I = 0.2061, $p$ < 0.001 $→$ positive autocorrelation remains significant.  
+- Lag 3: Moran’s I = 0.0668, $p$ = 0.0404 $→$ weak but still significant positive autocorrelation.  
+- Lag 4: Moran’s I = 0.0299, $p$ = 0.2260 $→$ positive but not significant.  
+- Lag 5: Moran’s I = -0.1530, $p$ < 0.001 $→$ significant negative autocorrelation.  
+- Lag 6: Moran’s I = -0.1181, $p$ = 0.0089 $→$ significant negative autocorrelation.  
+
+**Statistical Observation:** The correlogram shows that GDP per capita values in Hunan exhibit strong positive spatial autocorrelation among immediate and second-order neighbours (lags 1 and 2), which weakens by lag 3 and disappears at lag 4. Beyond this, negative spatial autocorrelation emerges at lags 5 and 6, indicating that more distant counties tend to display contrasting development levels. In short: clustering dominates at short distances, but dissimilarity appears across longer spatial lags.
+	
+:::
+
+### 9.7.2 Compute Geary’s C correlogram and plot
+
+```{r}
+
+# Build a 6-lag spatial correlogram for Geary's C ---------------------------------
+
+# Same function, but method = "C" for Geary's C; style remains "W".
+GC_corr <- sp.correlogram(wm_q,
+                          hunan$GDPPC,
+                          order  = 6,     # up to 6 lags
+                          method = "C",   # Geary's C
+                          style  = "W")   # row-standardised
+
+# Plot the correlogram for Geary's C.
+plot(GC_corr)
+
+# Print the full table to review estimates and significance by lag.
+print(GC_corr)
+
+```
+::: {.callout-note icon=false}
+
+### What statistical conclusion can you draw from the plot above?
+
+**Output Recap (from correlogram table):**
+
+- **Lag 1:** Geary’s $C$ = 0.6907, $p < 0.001$ $→$ strong positive spatial autocorrelation.
+- **Lag 2:** Geary’s $C$ = 0.7630, $p < 0.001$ $→$ positive spatial autocorrelation remains strong.
+- **Lag 3:** Geary’s $C$ = 0.9397, $p = 0.389$ $→$ no significant autocorrelation (close to random).
+- **Lag 4:** Geary’s $C$ = 1.0098, $p = 0.876$ $→$ essentially random.
+- **Lag 5:** Geary’s $C$ = 1.2008, $p < 0.001$ $→$ significant negative autocorrelation.
+- **Lag 6:** Geary’s $C$ = 1.0773, $p = 0.310$ $→$ not significant.
+
+**Statistical Observation:** TThe correlogram indicates that GDP per capita values in Hunan show strong and significant positive spatial autocorrelation at short distances (lags 1 and 2), but this effect weakens and becomes insignificant at intermediate lags (3 and 4). At lag 5, significant negative autocorrelation appears, suggesting that more distant counties tend to have contrasting development levels. By lag 6, the relationship returns to random. In summary: **local clustering dominates at short distances, while dissimilarity emerges across wider spatial separations**.
+	
+:::
+

@@ -1,0 +1,955 @@
+---
+title: "Hands-on_Ex02"
+author: "TAN Chin Khoon"
+date: "5 September 2025"
+toc: true
+toc-location: right
+toc-depth: 3
+number-sections: false
+---
+
+# 4. 1st Order Spatial Point Patterns Analysis Methods
+
+## 4.1 Overview
+
+The specific questions we would like to answer are as follows:
+
+-   Are the childcare centres in Singapore randomly distributed throughout the country?
+-   If the answer is not, then the next logical question is where are the locations with higher concentration of childcare centres?
+
+## 4.3 Installing and Loading the R packagesn
+
+```{r,}
+# Install 'pacman' once if you do not have it (uncomment next line and run only once)
+# install.packages("pacman")
+
+# Use pacman::p_load() to install (if needed) and then load the listed packages automatically
+pacman::p_load(
+  sf,            # modern vector geospatial data handling (Simple Features)
+  terra,         # modern raster + vector geospatial data handling
+  spatstat,      # meta‑package: tools for spatial point pattern analysis (SPPA)
+  tmap,          # cartographic and interactive mapping
+  rvest,         # web‑scraping helper used here to parse HTML inside KML attributes
+  tidyverse      # data wrangling helpers (dplyr, purrr, stringr, readr, etc.)
+)
+
+```
+
+## 4.4 Importing and Wrangling Geospatial Data Sets
+
+Import the Master Plan 2019 Subzone (No Sea) polygons as sf and set projection to EPSG:3414 (SVY21 / Singapore TM)
+
+```{r}
+# Read the subzone boundary KML into an sf object named 'mpsz_sf'
+mpsz_sf <- sf::st_read("data/geospatial/MasterPlan2019SubzoneBoundaryNoSeaKML.kml") %>%
+  sf::st_zm(drop = TRUE, what = "ZM") %>%  # remove Z (elevation) and M (measure) dimensions to keep 2D only
+  sf::st_transform(crs = 3414)   
+
+```
+
+> **Why remove Z/M?** Our analysis is purely 2D on a planar map. Extra dimensions are unnecessary and can break some operations.\
+> **Why EPSG:3414?** This is the standard projected system for Singapore. Distances/areas become meaningful (meters) instead of degrees.
+
+Extract REGION_N, PLN_AREA_N, SUBZONE_N, SUBZONE_C from the Description field (HTML inside KML) (as in the guidance helper function)
+
+```{r}
+# Define a small helper function to pull one named item from the HTML table stored in the 'Description' field
+extract_kml_field <- function(html_text, field_name) {
+  if (is.na(html_text) || html_text == "") return(NA_character_) # if Description is empty, return NA immediately
+
+  page <- rvest::read_html(html_text)       # parse the HTML string
+  rows <- rvest::html_elements(page, "tr")  # get all table rows (<tr>)
+
+  # Find the row whose header cell (<th>) equals the field_name, then take the value in its <td>
+  value <- rows %>%
+    purrr::keep(~ rvest::html_text2(rvest::html_element(.x, "th")) == field_name) %>%
+    rvest::html_element("td") %>%
+    rvest::html_text2()
+
+  if (length(value) == 0) NA_character_ else value    # if not found, return NA
+}
+
+```
+
+```{r}
+# Apply the function to build clean attributes from 'Description'
+mpsz_sf <- mpsz_sf %>%
+  dplyr::mutate(
+    REGION_N   = purrr::map_chr(Description, extract_kml_field, "REGION_N"),   # region name
+    PLN_AREA_N = purrr::map_chr(Description, extract_kml_field, "PLN_AREA_N"), # planning area name
+    SUBZONE_N  = purrr::map_chr(Description, extract_kml_field, "SUBZONE_N"),  # subzone name
+    SUBZONE_C  = purrr::map_chr(Description, extract_kml_field, "SUBZONE_C")   # subzone code
+  ) %>%
+  dplyr::select(-Name, -Description) %>%     # drop original noisy fields
+  dplyr::relocate(geometry, .after = dplyr::last_col())  # move geometry column to the end for readability
+
+```
+
+> **Checkpoint:** You now have clean polygon attributes and the proper CRS.
+
+(Optional) Filter out offshore/irrelevant areas exactly like in the slides
+
+```{r}
+# Create a cleaned version that excludes southern group, western islands, and north‑eastern islands (as per slides)
+mpsz_cl <- mpsz_sf %>%
+  dplyr::filter(
+    SUBZONE_N != "SOUTHERN GROUP",
+    PLN_AREA_N != "WESTERN ISLANDS",
+    PLN_AREA_N != "NORTH-EASTERN ISLANDS"
+  )
+
+# Save a small RDS for repeatability (optional)
+# readr::write_rds(mpsz_cl, "chap04/data/mpsz_cl.rds")
+
+```
+
+Import Child Care Services points as sf, drop Z/M, and project to EPSG:3414
+
+```{r}
+# Read childcare locations KML into an sf object named 'childcare_sf'
+childcare_sf <- sf::st_read("data/geospatial/ChildCareServices.kml") %>%
+  sf::st_zm(drop = TRUE, what = "ZM") %>%     # keep 2D only
+  sf::st_transform(crs = 3414)         
+
+```
+
+### 4.4.1 Mapping the Geospatial Data Sets
+
+```{r}
+# Quick mapping of both layers to verify alignment (childcare points inside planning subzones)
+tmap::tmap_mode("plot")  # ensure static plotting mode
+
+# Plot subzones with childcare points overlaid
+tmap::tm_shape(mpsz_cl) +
+  tmap::tm_polygons(col = "grey85", border.col = "black") +
+  tmap::tm_shape(childcare_sf) +
+  tmap::tm_dots(size = 0.2, col = "red")
+
+```
+
+> **What to check:** All childcare centres (black dots) fall neatly inside Singapore's subzones (grey polygons). If not, check CRS and transformations.
+
+Interactive mapping with tmap + leaflet
+
+```{r}
+# Switch tmap into interactive mode (internally uses the leaflet library)
+tmap::tmap_mode("view")                # enable pan/zoom and feature popups
+
+# Draw an interactive point map on top of a web basemap
+# - Click a point to see its attributes
+# - Use the layer control to change basemaps (e.g., ESRI.WorldGrayCanvas, OpenStreetMap)
+tmap::tm_shape(childcare_sf) +         # select the childcare sf layer
+  tmap::tm_dots()                      # render as clickable points
+
+# IMPORTANT: After exploring, switch back to static plotting for the rest of the workflow
+# This avoids keeping too many active web-map connections during knitting/deployment
+tmap::tmap_mode("plot")               # restore static plotting mode
+
+```
+
+```{r}
+# Switch to interactive mode for web-map style exploration
+# tmap::tmap_mode("view")
+# 
+# # Create an interactive map where you can zoom and click points
+# tmap::tm_shape(mpsz_cl) +
+#   tmap::tm_polygons(col = "lightgrey", border.col = "white") +
+#   tmap::tm_shape(childcare_sf) +
+#   tmap::tm_dots(col = "blue", size = 0.5)
+# 
+# # Always switch back to static plotting when done
+# tmap::tmap_mode("plot")
+
+```
+
+> **Notes:** In interactive mode you can zoom, pan, and click childcare points to view their attributes. Remember to switch back to plot mode before continuing with static maps.
+
+## 4.5 Geospatial Data Wrangling
+
+### 4.5.1 Convert sf Point Data to ppp (planar point pattern)
+
+```{r}
+# Convert the sf point layer to spatstat's planar point pattern (ppp) object
+childcare_ppp <- spatstat.geom::as.ppp(childcare_sf)  # now suitable for SPPA functions
+
+```
+
+```{r}
+# Verify the class
+class(childcare_ppp)  # expect: "ppp"
+
+```
+
+```{r}
+# Peek at summary to understand the point pattern and its window
+summary(childcare_ppp)  # quick glance (number of points, intensity, window size)
+
+```
+
+### 4.5.2 Create an Owin (observation window) from the Singapore Boundary
+
+```{r}
+# Convert the cleaned subzones into a single observation window (owin) for clipping/analysis
+sg_owin <- spatstat.geom::as.owin(mpsz_cl)
+
+```
+
+```{r}
+# Verify the class
+class(sg_owin)  # expect: "owin"
+
+```
+
+```{r}
+# Visualize the boundary to confirm it looks right
+plot(sg_owin, main = "sg_owin — Singapore Observation Window")
+
+```
+
+## 4.3 Combine the ppp with the owin (keep only points inside Singapore)
+
+```{r}
+# Clip the point pattern to the Singapore window to exclude any points outside the boundary
+childcareSG_ppp <- childcare_ppp[sg_owin]
+
+```
+
+```{r}
+# Confirm the combined object (ppp with polygon window information)
+childcareSG_ppp  # should report a polygonal window and the point count
+
+```
+
+## 4.6 Clark-Evan Test for Nearest Neighbour Analysis
+
+**Hypotheses:**
+
+-   $H_0$: Childcare centres are randomly distributed (Complete Spatial Randomness, CSR).
+
+-   $H_1$: Childcare centres are not randomly distributed (clustered or regular).
+
+The 95% confident interval will be used.
+
+The Clark--Evans test returns an index *R*:
+
+-   $R < 1 → clustered$.
+-   $R = 1 → random$
+-   $R > 1 → regular$
+
+### 4.6.1 Clark--Evans without CSR Simulation (Z-test)
+
+```{r}
+# Run Clark–Evans using observed pattern only (Z-test)
+ce_noCSR <- spatstat.explore::clarkevans.test(
+X = childcareSG_ppp, # ppp object of childcare centres
+correction = "none", # no edge correction (per slides)
+alternative = "clustered" # one-sided: test for clustering (R < 1)
+)
+
+# Show results
+ce_noCSR
+
+```
+
+::: callout-note
+### Clark--Evans Test without CSR (Z-test)
+
+-   **R = 0.53532 (\< 1)** → indicates clustering.
+-   **p-value \< 2.2e-16 (\< 0.05):** → reject H₀.
+-   **Statistical conclusion:** Distribution is not random; strong clustering exists.
+-   **Business communication:** Childcare centres are concentrated in specific neighbourhoods. This reflects demand-driven placement but may leave some areas underserved. Authorities should consider equity in future allocations.
+:::
+
+### 4.6.2 Clark--Evans with CSR via Monte‑Carlo (nsim = 99)
+
+```{r}
+# Monte‑Carlo Clark–Evans: compare observed R to R from CSR simulations (nsim = 99)
+ce_MC <- spatstat.explore::clarkevans.test( # compute simulated p‑value under CSR
+X = childcareSG_ppp, # same ppp as above (metres)
+correction = "none", # keep consistent with slides
+alternative = "clustered", # one‑sided for clustering (R < 1)
+method = "MonteCarlo", # enable Monte‑Carlo simulation mode
+nsim = 99 # number of CSR replicates as per slides
+) # end clarkevans.test call
+
+ce_MC
+
+```
+
+::: callout-note
+### Clark--Evans Test with CSR (Monte Carlo, nsim=99)
+
+-   **R = 0.53532 (\< 1):** → clustering again.
+-   **p-value = 0.01 (\< 0.05)** → reject H₀ at 95% CI.
+-   **Statistical conclusion:** Distribution is not random; clustering is statistically significant even under CSR simulations.
+-   **Business communication:** Confirms earlier finding with stronger robustness. Clustering is not due to chance --- it is systematic. Policymakers should expand childcare access in low-density areas to reduce inequality in service availability.
+:::
+
+## 4.7 Kernel Density Estimation (KDE) Method
+
+**Goal:** Turn points into a smooth surface to reveal hotspots. Bandwidth controls smoothness; kernel controls the spread shape.
+
+### 4.7.1 Working with automatic bandwidth selection method
+
+```{r}
+kde_SG_diggle <- density(          # Create KDE surface and save to object 'kde_SG_diggle'
+  childcareSG_ppp,                 # Input: childcare centres dataset in 'ppp' format
+  sigma = bw.diggle,               # Bandwidth: automatic smoothing radius (Diggle’s selector)
+  edge  = TRUE,                    # Apply edge correction to fix boundary underestimation
+  kernel = "gaussian"              # Kernel type: Gaussian (bell-shaped smoothing function)
+)                                  # End of density() call
+
+```
+
+```{r}
+# Plot the kernel density estimation surface for childcare centres
+plot(kde_SG_diggle)        
+
+```
+
+```{r}
+
+summary(kde_SG_diggle)
+
+```
+
+```{r}
+# Calculate optimal bandwidth (smoothing parameter) using Diggle’s method
+bw <- bw.diggle(childcareSG_ppp)             
+bw   # Display the selected bandwidth value
+
+```
+
+### 4.7.2 Rescalling KDE values
+
+```{r}
+childcareSG_ppp_km <- rescale.ppp(  # Rescale the point pattern dataset from metres to kilometres
+  childcareSG_ppp, 1000, "km")      # Display the selected bandwidth value 
+
+```
+
+```{r}
+kde_childcareSG_km <- density(  # Compute kernel density estimation on rescaled dataset
+  childcareSG_ppp_km,           # Input point pattern in kilometres
+  sigma = bw.diggle,            # Use Diggle’s optimal bandwidth (sigma)
+  edge  = TRUE,                 # Apply edge correction to fix boundary bias
+  kernel = "gaussian"           # Use Gaussian kernel for smoothing
+)
+
+```
+
+```{r}
+# Plot KDE surface for childcare centres (units in km)
+plot(kde_childcareSG_km)
+
+```
+
+### 4.7.3 Working with different automatic badwidth methods
+
+```{r}
+# Compute bandwidth using Cronie & van Lieshout method
+bw.CvL(childcareSG_ppp_km)
+
+```
+
+```{r}
+# Compute bandwidth using Scott’s rule-of-thumb method
+bw.scott(childcareSG_ppp_km)
+
+```
+
+```{r}
+# Compute bandwidth using likelihood cross-validation (PPL)
+bw.ppl(childcareSG_ppp_km)
+
+```
+
+```{r}
+# Re-compute bandwidth using Diggle’s method (on km scale)
+bw.diggle(childcareSG_ppp_km)
+
+```
+
+```{r}
+kde_childcareSG_ppl <- density(   # KDE using PPL bandwidth for smoothing
+  childcareSG_ppp_km,             # Input dataset in kilometres
+  sigma = bw.ppl,                 # Use bandwidth chosen by PPL
+  edge  = TRUE,                   # Apply edge correction
+  kernel = "gaussian"             # Gaussian smoothing kernel
+)
+
+par(mfrow=c(1,2))                            # Set plot area into 1 row, 2 columns for comparison
+plot(kde_childcareSG_km, main = "bw.diggle") # Plot KDE using Diggle bandwidth
+plot(kde_childcareSG_ppl, main = "bw.ppl")   # Plot KDE using PPL bandwidth
+
+```
+
+### 4.7.4 Working with different kernel methods
+
+```{r}
+par(mfrow=c(2,2))                        # Divide plotting window into 2 rows × 2 columns
+
+plot(density(childcareSG_ppp_km,         # KDE with Gaussian kernel
+             sigma=0.2959712, edge=TRUE, 
+             kernel="gaussian"), 
+     main="Gaussian")                    # Title for Gaussian plot
+
+plot(density(childcareSG_ppp_km,         # KDE with Epanechnikov kernel
+             sigma=0.2959712, edge=TRUE, 
+             kernel="epanechnikov"), 
+     main="Epanechnikov")                # Title for Epanechnikov plot
+
+plot(density(childcareSG_ppp_km,         # KDE with Quartic kernel
+             sigma=0.2959712, edge=TRUE, 
+             kernel="quartic"), 
+     main="Quartic")                     # Title for Quartic plot
+
+plot(density(childcareSG_ppp_km,         # KDE with Disc kernel
+             sigma=0.2959712, edge=TRUE, 
+             kernel="disc"), 
+     main="Disc")                        # Title for Disc plot
+
+```
+
+## 4.8 Fixed and Adaptive KDE
+
+### 4.8.1 Computing KDE by using fixed bandwidth
+
+```{r}
+kde_childcareSG_fb <- density(   # KDE using fixed bandwidth method
+  childcareSG_ppp_km,            # Input childcare centres dataset (in km)
+  sigma = 0.6,                   # Fixed bandwidth = 0.6 km (600 metres)
+  edge  = TRUE,                  # Apply edge correction at boundaries
+  kernel = "gaussian"            # Gaussian smoothing kernel
+)
+
+plot(kde_childcareSG_fb)         # Plot the fixed bandwidth KDE result
+
+```
+
+### 4.8.2 Computing KDE by using adaptive bandwidth
+
+```{r}
+kde_childcareSG_ab <- adaptive.density(    # KDE using adaptive bandwidth method
+  childcareSG_ppp_km,                      # Input childcare centres dataset (in km)
+  method="kernel"                          # Kernel smoothing method
+)
+
+plot(kde_childcareSG_ab)  # Plot the adaptive bandwidth KDE result
+
+```
+
+```{r}
+par(mfrow=c(1,2))         # Set plotting window to 1 row × 2 columns
+plot(kde_childcareSG_fb, main = "Fixed bandwidth")     # Show fixed bandwidth KDE
+plot(kde_childcareSG_ab, main = "Adaptive bandwidth")  # Show adaptive bandwidth KDE
+
+```
+
+## 4.9 Plotting cartographic quality KDE map
+
+### 4.9.1 Converting gridded output into raster
+
+```{r}
+# Convert KDE (im class) into SpatRaster object
+kde_childcareSG_bw_terra <- rast(kde_childcareSG_km)
+
+```
+
+```{r}
+# Check the class of the raster object (should be "SpatRaster")
+class(kde_childcareSG_bw_terra)
+
+```
+
+```{r}
+# Print raster properties: resolution, extent, units, etc.
+kde_childcareSG_bw_terra
+
+```
+
+### 4.9.2 Assigning projection systems
+
+```{r}
+# Assign projection system SVY21 / Singapore TM (EPSG:3414)
+crs(kde_childcareSG_bw_terra) <- "EPSG:3414"
+
+```
+
+```{r}
+# Re-check raster details, now with CRS applied
+kde_childcareSG_bw_terra
+
+```
+
+### 4.9.3 Plotting KDE map with tmap
+
+```{r}
+tm_shape(kde_childcareSG_bw_terra) +      # Define raster object to be plotted
+  tm_raster(col.scale =                        # Set raster colour scheme
+              tm_scale_continuous(values="viridis"), 
+            col.legend = tm_legend(       # Add legend for density values
+              title = "Density values",   # Legend title
+              title.size = 0.7,           # Legend title text size
+              text.size = 0.7),           # Legend labels text size
+            bg.color = "white",           # Background colour of map
+            bg.alpha = 0.7,               # Transparency of background
+            position = tm_pos_in("right","bottom"), # Place legend bottom-right
+            frame = TRUE) +               # Draw frame around raster
+  tm_graticules(labels.size = 0.7) +      # Add graticule grid with label size 0.7
+  tm_compass() +                          # Add compass to map
+  tm_layout(scale = 1.0)                  # Set layout scale
+
+```
+
+## 4.10 First Order SPPA at the Planning Subzone Level
+
+### 4.10.1 Geospatial data wrangling
+
+#### 4.10.1.1 Extracting study area
+
+```{r}
+pg <- mpsz_cl %>%                         # Create dataset 'pg' by filtering master plan polygons
+  filter(PLN_AREA_N == "PUNGGOL")         # Keep only polygons where planning area = Punggol
+
+tm <- mpsz_cl %>%                         # Create dataset 'tm'
+  filter(PLN_AREA_N == "TAMPINES")        # Keep only polygons where planning area = Tampines
+
+ck <- mpsz_cl %>%                         # Create dataset 'ck'
+  filter(PLN_AREA_N == "CHOA CHU KANG")   # Keep only polygons where planning area = Choa Chu Kang
+
+jw <- mpsz_cl %>%                         # Create dataset 'jw'
+  filter(PLN_AREA_N == "JURONG WEST")     # Keep only polygons where planning area = Jurong West
+
+```
+
+```{r}
+par(mfrow=c(2,2))                              # Arrange plotting area into 2 rows × 2 columns
+
+plot(st_geometry(pg), main="Punggol")          # Plot polygon boundary of Punggol planning area
+plot(st_geometry(tm), main="Tampines")         # Plot polygon boundary of Tampines planning area
+plot(st_geometry(ck), main="Choa Chu Kang")    # Plot polygon boundary of Choa Chu Kang planning area
+plot(st_geometry(jw), main="Jurong West")      # Plot polygon boundary of Jurong West planning area
+
+
+```
+
+#### 4.10.1.2 Creating owin object
+
+```{r}
+pg_owin <- as.owin(pg)     # Convert Punggol polygon(s) to an 'owin' window (study region)
+tm_owin <- as.owin(tm)     # Convert Tampines polygon(s) to 'owin'
+ck_owin <- as.owin(ck)     # Convert Choa Chu Kang polygon(s) to 'owin'
+jw_owin <- as.owin(jw)     # Convert Jurong West polygon(s) to 'owin'
+
+```
+
+#### 4.10.1.3 Combining point events object and owin object
+
+```{r}
+childcare_pg_ppp <- childcare_ppp[pg_owin]  # Clip national points to Punggol window (points inside only)
+childcare_tm_ppp <- childcare_ppp[tm_owin]  # Clip points to Tampines window
+childcare_ck_ppp <- childcare_ppp[ck_owin]  # Clip points to Choa Chu Kang window
+childcare_jw_ppp <- childcare_ppp[jw_owin]  # Clip points to Jurong West window
+
+```
+
+```{r}
+childcare_pg_ppp_km <- rescale.ppp(  # Rescale Punggol points from metres → kilometres
+  childcare_pg_ppp, 1000, "km"       # divide coords by 1000; label new unit as "km"
+)
+childcare_tm_ppp_km <- rescale.ppp(  # Rescale Tampines points to kilometres
+  childcare_tm_ppp, 1000, "km"
+)
+childcare_ck_ppp_km <- rescale.ppp(  # Rescale CCK points to kilometres
+  childcare_ck_ppp, 1000, "km"
+)
+childcare_jw_ppp_km <- rescale.ppp(  # Rescale Jurong West points to kilometres
+  childcare_jw_ppp, 1000, "km"
+)
+
+```
+
+```{r}
+par(mfrow = c(2,2))               # Arrange plotting area into a 2×2 grid
+
+plot(unmark(childcare_pg_ppp_km), # Plot Punggol points (unmark = hide text marks)
+     main = "Punggol")            # Panel title
+
+plot(unmark(childcare_tm_ppp_km), # Plot Tampines points
+     main = "Tampines")
+
+plot(unmark(childcare_ck_ppp_km), # Plot Choa Chu Kang points
+     main = "Choa Chu Kang")
+
+plot(unmark(childcare_jw_ppp_km), # Plot Jurong West points
+     main = "Jurong West")
+
+par(mfrow = c(1,1))               # Reset plotting layout back to single panel
+
+```
+
+### 4.10.2 Clark and Evans Test
+
+```{r}
+clarkevans.test(childcare_ck_ppp, # Clark–Evans test for the Choa Chu Kang point pattern
+  correction  = "none",           # No edge correction (consistent with slides)
+  clipregion  = NULL,             # Use the pattern's own observation window
+  alternative = c("two.sided"),   # Two-sided hypothesis (clustered or regular)
+  nsim        = 999               # 999 CSR simulations for p-value
+)                                 # End of clarkevans.test call
+
+```
+
+#### 4.10.2.2 Tampines planning area
+
+```{r}
+clarkevans.test(childcare_tm_ppp,   # Clark–Evans test for the Tampines point pattern
+  correction  = "none",             # No edge correction (to match slides)
+  clipregion  = NULL,               # Do not clip by an additional region (use pattern's window)
+  alternative = c("two.sided"),     # Two-sided test: allow clustering (R<1) or regularity (R>1)
+  nsim        = 999                 # Monte-Carlo CSR simulations (999 replicates)
+)                                   # End of clarkevans.test call
+
+```
+
+### 4.10.3 Computing KDE surfaces by planning area
+
+```{r}
+par(mfrow = c(2,2))                # Arrange plotting window into 2 rows × 2 columns
+
+plot(density(childcare_pg_ppp_km,  # KDE for Punggol (data already rescaled to km)
+             sigma = bw.diggle,    # Use Diggle’s automatic bandwidth selector
+             edge  = TRUE,         # Apply edge correction (reduces boundary bias)
+             kernel = "gaussian"), # Gaussian kernel (smooth bell-shaped influence)
+     main = "Punggol")             # Panel title
+
+plot(density(childcare_tm_ppp_km,  # KDE for Tampines
+             sigma = bw.diggle,    # Same bandwidth rule for comparability
+             edge  = TRUE,         # Edge correction on
+             kernel = "gaussian"), # Gaussian kernel
+     main = "Tampines")            # Panel title
+
+plot(density(childcare_ck_ppp_km,  # KDE for Choa Chu Kang
+             sigma = bw.diggle,    # Diggle bandwidth (km)
+             edge  = TRUE,         # Edge correction on
+             kernel = "gaussian"), # Gaussian kernel
+     main = "Choa Chu Kang")       # Panel title
+
+plot(density(childcare_jw_ppp_km,  # KDE for Jurong West
+             sigma = bw.diggle,    # Diggle bandwidth (km)
+             edge  = TRUE,         # Edge correction on
+             kernel = "gaussian"), # Gaussian kernel
+     main = "Jurong West")         # Panel title
+
+```
+
+# 5. 2nd Order Spatial Point Patterns Analysis Methods
+
+## 5.5 Second-order Spatial Point Patterns Analysis
+
+**First-order** asks "where are points denser?"; **second-order** asks "how do points interact with each other across distance?"
+
+We'll use four classical functions:\n 
+- G(r) --- nearest-neighbour distribution (from each event to its **nearest** event). \n 
+- F(r) --- empty-space distribution (from random locations to **nearest** event). \n
+- K(r) --- accumulates neighbours within radius r; higher than CSR suggests clustering. \n 
+- L(r) = √(K(r)/π) --- variance-stabilised K; plot L(r) − r to read deviations easily.
+
+For each function your Prof shows **estimation** and a **Monte Carlo CSR test with envelopes**.
+
+## 5.6 Analysing Spatial Point Process Using G-Function
+
+### 5.6.1 Choa Chu Kang planning area
+
+#### 5.6.1.1 Computing G-function estimation
+
+```{r}
+set.seed(1234)                                             # fix the random seed so plots are reproducible for students
+G_CK <- Gest(childcare_ck_ppp, correction = "border")      # estimate nearest-neighbour CDF G(r) with border edge correction
+plot(G_CK, xlim = c(0, 500))                               # plot G(r) up to 500 m; dashed line shows CSR (Poisson) reference
+
+```
+
+#### 5.6.1.2 Performing Complete Spatial Randomness (CSR) Test --- Monte Carlo
+
+To confirm the observed spatial patterns above, a hypothesis test will be conducted. The hypothesis and test are as follows:
+
+$H_0$ = The distribution of childcare services at Choa Chu Kang are randomly distributed.
+
+$H_1$ = The distribution of childcare services at Choa Chu Kang are not randomly distributed.
+
+The null hypothesis will be rejected if p-value is smaller than alpha value of 0.001.
+
+Monte Carlo test with G-fucntion
+
+```{r}
+# run 999 CSR simulations; compute simulation envelopes for G(r)
+G_CK.csr <- envelope(childcare_ck_ppp, Gest, nsim = 999)   
+
+```
+
+```{r}
+# plot observed G(r), CSR expectation, and 999-sim envelopes
+plot(G_CK.csr)    
+
+```
+
+::: callout-note
+### Reading the plot:
+
+If the **black observed** curve is mostly **above** the grey envelope → points are **clustered** at those distances. If it is **below → regular/repulsive** (inhibition). Inside the envelope → not significantly different from CSR at that scale.
+:::
+
+### 5.6.2 Tampines planning area
+
+#### 5.6.2.1 Computing G-function estimation
+
+```{r}
+G_tm <- Gest(childcare_tm_ppp, correction = "best")        # estimate G(r) using 'best' automatic edge correction
+plot(G_tm)                                                 # plot observed G(r) vs theoretical CSR G(r)
+
+```
+
+#### 5.6.2.2 Performing Complete Spatial Randomness Test
+
+To confirm the observed spatial patterns above, a hypothesis test will be conducted. The hypothesis and test are as follows:
+
+$H_o$ = The distribution of childcare services at Tampines are randomly distributed.
+
+$H_1$ = The distribution of childcare services at Tampines are not randomly distributed.
+
+The null hypothesis will be rejected is p-value is smaller than alpha value of 0.001.
+
+The code chunk below is used to perform the hypothesis testing.
+
+```{r}
+G_tm.csr <- envelope(childcare_tm_ppp, Gest,   # simulate CSR envelopes for G(r) at Tampines
+                     correction = "all",       # request all supported edge corrections inside envelope calc
+                     nsim = 999)               # use 999 simulations as in Prof’s slide
+plot(G_tm.csr)                                 # display observed curve, CSR, and envelopes
+
+```
+
+> **Decision rule (as per slides):** Reject $H_0$: CSR if the observed curve exits the envelope and the associated p-value \< 0.001 (α = 0.001).
+
+## 5.7 Analysing Spatial Point Process Using F-Function
+
+### 5.7.1 Choa Chu Kang planning area
+
+#### 5.7.1.1 Computing F-function estimation
+
+```{r}
+F_CK <- Fest(childcare_ck_ppp)   # estimate empty-space CDF F(r): distance from random locations to nearest facility
+plot(F_CK)                       # plot multiple estimators and the CSR reference curve F_pois(r)
+
+```
+
+### 5.7.2 Performing Complete Spatial Randomness Test
+
+To confirm the observed spatial patterns above, a hypothesis test will be conducted. The hypothesis and test are as follows:
+
+$H_0$ = The distribution of childcare services at Choa Chu Kang are randomly distributed.
+
+$H_1$ = The distribution of childcare services at Choa Chu Kang are not randomly distributed.
+
+The null hypothesis will be rejected if p-value is smaller than alpha value of 0.001.
+
+Monte Carlo test with F-fucntion
+
+```{r}
+F_CK.csr <- envelope(childcare_ck_ppp, Fest, nsim = 999)   # simulate 999 CSR patterns; compute F(r) envelopes
+
+```
+
+```{r}
+plot(F_CK.csr)
+
+```
+
+::: callout-note
+### Reading the plot:
+
+-   **F(r) above CSR** → space tends to be **closer** to facilities than CSR (suggests clustering).
+-   **F(r) below CSR** → **larger gaps** than expected (suggests inhibition).
+:::
+
+***5.7.3 Tampines planning area***
+
+\*\*\*\*5.7.3.1 Computing F-function estimation\*\*\*\*
+
+```{r}
+F_tm = Fest(childcare_tm_ppp, correction = "best")
+plot(F_tm)
+
+```
+
+#### 5.7.3.2 Performing Complete Spatial Randomness Test
+
+To confirm the observed spatial patterns above, a hypothesis test will be conducted. The hypothesis and test are as follows:
+
+Ho = The distribution of childcare services at Tampines are randomly distributed.
+
+H1= The distribution of childcare services at Tampines are not randomly distributed.
+
+The null hypothesis will be rejected is p-value is smaller than alpha value of 0.001.
+
+The code chunk below is used to perform the hypothesis testing.
+
+```{r}
+F_tm.csr <- envelope(childcare_tm_ppp, Fest, correction = "all", nsim = 999)
+
+```
+
+```{r}
+plot(F_tm.csr)
+
+```
+
+## 5.8 Analysing Spatial Point Process Using K-Function
+
+### 5.8.1 Choa Chu Kang planning area
+
+#### 5.8.1.1 Computing K-fucntion estimate
+
+```{r}
+# estimate K(r) using Ripley (isotropic) edge correction
+K_ck <- Kest(childcare_ck_ppp, correction = "Ripley")      
+
+plot(K_ck, . -r ~ r, ylab= "K(d)-r", xlab = "d(m)")
+
+```
+
+#### 5.8.1.2 Performing Complete Spatial Randomness Test
+
+To confirm the observed spatial patterns above, a hypothesis test will be conducted. The hypothesis and test are as follows:
+
+Ho = The distribution of childcare services at Choa Chu Kang are randomly distributed.
+
+H1= The distribution of childcare services at Choa Chu Kang are not randomly distributed.
+
+The null hypothesis will be rejected if p-value is smaller than alpha value of 0.001.
+
+```{r}
+K_tm.csr <- envelope(childcare_tm_ppp, Kest,   # build CSR envelopes for K(r) in Tampines
+                     nsim = 99,                # 99 simulations exactly as shown
+                     rank = 1,                 # use rank-1 global envelope
+                     glocal = TRUE)            # enable global+local envelope calculation
+plot(K_tm.csr, . - r ~ r,                      # plot (K_hat - r) vs r using the formula used by Prof
+     xlab = "d", ylab = "K(d)-r",              # match labels from the screenshot
+     xlim = c(0, 500))                         # limit the x-axis to 0–500 m as in the slide
+
+
+```
+
+::: callout-note
+### Reading the plot:
+
+-   Under CSR, K(r) = πr² and L(r) − r = 0.
+-   **Curve above CSR** → clustering; **below** → inhibition; **inside envelopes** → not significantly different from CSR.
+:::
+
+### 5.8.2 Tampines planning area
+
+#### 5.8.2.1 Computing K-fucntion estimation
+
+```{r}
+K_tm = Kest(childcare_tm_ppp, correction = "Ripley")
+plot(K_tm, . -r ~ r, 
+     ylab= "K(d)-r", xlab = "d(m)", 
+     xlim=c(0,1000))
+
+```
+
+#### 5.8.2.2 Performing Complete Spatial Randomness Test
+
+To confirm the observed spatial patterns above, a hypothesis test will be conducted. The hypothesis and test are as follows:
+
+$H_0$ = The distribution of childcare services at Tampines are randomly distributed.
+
+$H_1$ = The distribution of childcare services at Tampines are not randomly distributed.
+
+The null hypothesis will be rejected if p-value is smaller than alpha value of 0.001.
+
+The code chunk below is used to perform the hypothesis testing.
+
+```{r}
+K_tm.csr <- envelope(childcare_tm_ppp, Kest, nsim = 99, rank = 1, glocal=TRUE)
+
+```
+
+```{r}
+plot(K_tm.csr, . - r ~ r, 
+     xlab="d", ylab="K(d)-r", xlim=c(0,500))
+
+```
+
+## 5.9 Analysing Spatial Point Process Using L-Function
+
+### 5.9.1 Choa Chu Kang planning area
+
+#### 5.9.1.1 Computing L Fucntion estimation
+
+```{r}
+L_ck <- Lest(childcare_ck_ppp, correction = "Ripley")      # estimate L(r) using Ripley edge correction
+plot(L_ck, . - r ~ r,                                      # plot (L_hat - r) vs r to centre CSR at zero
+     ylab = "L(d)-r", xlab = "d(m)")                       # match axis labels exactly as shown
+
+```
+
+#### 5.9.1.2 Performing Complete Spatial Randomness Test
+
+To confirm the observed spatial patterns above, a hypothesis test will be conducted. The hypothesis and test are as follows:
+
+$H_0$ = The distribution of childcare services at Choa Chu Kang are randomly distributed.
+
+$H_1$ = The distribution of childcare services at Choa Chu Kang are not randomly distributed.
+
+The null hypothesis will be rejected if p-value if smaller than alpha value of 0.001.
+
+The code chunk below is used to perform the hypothesis testing.
+
+```{r}
+L_ck.csr <- envelope(childcare_ck_ppp, Lest,  # generate L-function CSR envelopes for CK
+                     nsim = 99,               # 99 simulations (as per screenshot)
+                     rank = 1,                # rank-1 global envelope
+                     glocal = TRUE)           # global+local envelope option
+plot(L_ck.csr, . - r ~ r,                     # plot (L_hat - r) vs r using Prof’s plotting formula
+     xlab = "d", ylab = "L(d)-r")             # axis labels exactly as in the slide
+
+```
+
+### 5.9.2 Tampines planning area
+
+#### 5.9.2.1 Computing L-function estimation
+
+```{r}
+L_tm <- Lest(childcare_tm_ppp, correction = "Ripley")  # estimate L(r) for Tampines
+plot(L_tm, . - r ~ r,                                  # plot (L_hat - r) vs r as in Prof’s figure
+     ylab = "L(d)-r", xlab = "d(m)",                   # axis labels to match the slide
+     xlim = c(0, 1000))                                # distance window 0–1000 m as shown
+
+```
+
+#### 5.9.2.2 Performing Complete Spatial Randomness Test
+
+To confirm the observed spatial patterns above, a hypothesis test will be conducted. The hypothesis and test are as follows:
+
+$H_0$ = The distribution of childcare services at Tampines are randomly distributed.
+
+$H_1$ = The distribution of childcare services at Tampines are not randomly distributed.
+
+The null hypothesis will be rejected if p-value is smaller than alpha value of 0.001.
+
+The code chunk below will be used to perform the hypothesis testing.
+
+```{r}
+L_tm.csr <- envelope(childcare_tm_ppp, Lest,  # CSR envelopes for L(r) in Tampines
+                     nsim = 99,               # 99 simulations
+                     rank = 1,                # rank-1 global envelope
+                     glocal = TRUE)           # global+local envelope handling
+plot(L_tm.csr, . - r ~ r,                     # plot (L_hat - r) vs r per Prof’s code
+     xlab = "d", ylab = "L(d)-r",             # keep labels consistent with the slide
+     xlim = c(0, 500))                        # show 0–500 m window exactly as given
+
+```

@@ -1,0 +1,382 @@
+---
+title: "In-class Ex06: Take-home Exercise 2 Kick Starter"
+author: "TAN Chin Khoon"
+date: "04 October 2025"
+date-modified: "last-modified"
+number-sections: true
+---
+
+## Loading the R package
+
+Write a code chunk to install and load tidyverse, sf, sfdep, tmap, knitr, kableExtra, and DT into R environment.
+
+```{r}
+
+pacman::p_load(
+  tidyverse,
+  sf,
+  sfdep,
+  tmap,
+  knitr,
+  kableExtra,
+  DT
+  )  
+
+```
+
+::: callout-note
+-   tidyverse, a family of modern R packages specially developed for performing data science tasks,\
+-   sf, a modern R package specially developed for performing geospatial data science tasks except visualising geospatial data;\
+-   tmap, an R package for create elegant thematic maps based on the principles of Layered Grammar of Graphics;\
+-   knitr, an R package that provide an elegant, flexible, and fast static table generation with R;\
+-   kableExtra, an extension of knitr for creating elegant html table with R; and\
+-   DT, an R package DT provides an R interface to the JavaScript library DataTables for create interactive htnl tables.
+:::
+
+## Importing data
+
+Write code chunks to perform the followings:
+
+-   Importing Bus Stop Location shapefile downloaded from LTA DataMall into R environment.\
+-   Importing Master Plan 2019 Subzone Boundary (No Sea) from Singapore's open data portal.\
+-   Importing Passenger Volume by Origin Destination Bus Stops downloaded from LTA DataMall into R environment.
+
+### Importing Bus Stop Location
+
+```{r}
+
+BusStop = st_read(dsn = "/Users/cktan/Desktop/SMU/01_Geospatial Analytics (ISSS626)/Hands-on_Ex/In-Class_Ex06/data/geospatial",
+                  layer = "BusStop") %>%
+st_transform(crs = 3414)
+
+```
+
+### Importing Importing Master Plan 2019 Subzone Boundary (No Sea)
+
+```{r}
+
+# Read the subzone boundary KML into an sf object named 'mpsz_sf'
+mpsz <- sf::st_read("data/geospatial/MasterPlan2019SubzoneBoundaryNoSeaKML.kml") %>%
+  sf::st_zm(drop = TRUE, what = "ZM") %>%  # remove Z (elevation) and M (measure) dimensions to keep 2D only
+  sf::st_transform(crs = 3414)   
+
+```
+::: callout-note
+Refer to [2.3.2 Importing Geospatial Data into R](https://r4gdsa.netlify.app/chap02#importing-geospatial-data-into-r) of R for Geospatial Data Science and Analytics to learn how to import and tidy a kml file.
+:::
+
+### Importing Passenger Volume by Origin Destination Bus Stops
+
+```{r}
+
+odbus <- read_csv("data/origin_destination_bus_202508.csv")
+
+```
+::: {.callout-note}
+
+`read_csv()` of readr package should be used instead of `read.csv()` of of Base R. `read_csv()` is **written in C++**, optimized for performance. On the other hands, `read.csv()` is **pure R**, much slower for large files. Besides that, `read_csv()` automatically infers column types (numeric, character, date, etc.) more accurately. In comparison, `read.csv()` often converts strings to factors by default, which can lead to subtle bugs.
+
+:::
+
+## Visualising the geospatial data
+
+Below is the code chunk that is used to visualise the bus stops within Singapore.
+
+```{r,fig.width=6,fig.height=3}
+
+tmap_mode("plot")   # use "view" for interactive
+
+tm_shape(mpsz) +
+  tm_polygons(col = "grey95", border.col = "darkgrey") +
+tm_shape(BusStop) +
+  tm_dots(col = "red", size = 0.1, alpha = 0.6) +
+tm_layout(
+  title = "Bus Stop Locations within Singapore Subzones",
+  title.position = c("bottom","right"),
+  title.size = 0.8,
+  frame = TRUE,
+  legend.outside = TRUE
+)
+
+```
+
+However, figure above reveals that there a several bus stops (i.e black dots appear at the upper left) located outside of the main Singapore boundary.
+
+### Extracting Bus Stops located within Singapore
+
+```{r}
+
+# If BusStop has Z/M dims, drop them (harmless if not)
+BusStop <- st_zm(BusStop, drop = TRUE, what = "ZM")
+
+# Now do the spatial join: keep only bus stops that fall inside Singapore subzones
+BusStop_in_SG <- st_join(
+  BusStop, mpsz,
+  join = st_within,
+  left = FALSE
+)
+
+```
+
+Now, plot the bus stops within Singapore.
+
+```{r,fig.width=6,fig.height=3}
+
+tmap_mode("plot")   # use "view" for interactive
+
+tm_shape(mpsz) +
+  tm_polygons(col = "grey95", border.col = "darkgrey") +
+tm_shape(BusStop_in_SG) +
+  tm_dots(col = "red", size = 0.1, alpha = 0.6) +
+tm_layout(
+  title = "Bus Stop Locations within Singapore Subzones",
+  title.position = c("bottom","right"),
+  title.size = 0.6,
+  frame = TRUE,
+  legend.outside = TRUE
+)
+
+```
+
+## Analytical Hexagon
+
+### Why analytical grids?
+In geospatial analysis, regularly shaped grids are used for many reasons such as normalizing geography for mapping or to mitigate the issues of using irregularly shaped polygons created arbitrarily (such as county boundaries or block groups that have been created from a political process). Regularly shaped grids can only be comprised of equilateral triangles, squares, or hexagons, as these three polygon shapes are the only three that can tessellate (repeating the same shape over and over again, edge to edge, to cover an area without gaps or overlaps) to create an evenly spaced grid.
+
+### Why hexagon?
+Hexagons reduce sampling bias due to edge effects of the grid shape, this is related to the low perimeter-to-area ratio of the shape of the hexagon. A circle has the lowest ratio but cannot tessellate to form a continuous grid. Hexagons are the most circular-shaped polygon that can tessellate to form an evenly spaced grid.
+
+### Deriving Analytical Hexagon
+
+Create analytics hexagon layer cover the entire Singapore.
+
+```{r}
+
+hexagon <- st_make_grid(
+  mpsz,               # Singapore subzone boundary object
+  cellsize = 700,     # side-to-side distance between hex centers (in metres)
+  what = "polygons",  # output polygons
+  square = FALSE      # hexagonal grid (TRUE → square grid)
+) %>%
+  st_sf()             # convert sfc to full sf object
+
+```
+
+Now, let's inspecting the hexagon layer visually.
+
+```{r, fig.width=10,fig.height=5}
+
+# Merge all subzones into one geometry (Singapore mainland + islands)
+sg_outline <- st_union(mpsz)
+
+tmap_mode("plot")
+
+tm_shape(sg_outline) +
+  tm_polygons(col = "palegreen3", border.col = NA) +        # unified green Singapore
+tm_shape(hexagon) +
+  tm_borders(col = "grey50", lwd = 0.25) +                 # grey hex grid overlay
+tm_shape(BusStop_in_SG) +                        # detailed bus stop distribution
+  tm_dots(col = "red", size = 0.1, fill_alpha = 0.08) +
+tm_compass(type = "8star", size = 2, position = c("right", "bottom")) +
+tm_scalebar(position = c("right", "bottom")) +
+tm_layout(
+  title = "Analytical hexagon layer overplot on Singapore",
+  title.position = c("center", "top"),
+  title.size = 1.2,
+  title.fontface = "bold",  
+  inner.margins = c(0.05, 0.08, 0.20, 0.05),  # adjust bottom margin (0.10) pushes title below frame
+  outer.margins = c(0.05, 0.08, 0.08, 0.05),  # keeps white space around map
+  frame = TRUE,
+  legend.show = FALSE
+)
+
+```
+
+### Selecting hexagons with bus stops
+
+```{r}
+
+# 1) Count bus stops per hex
+hexagon$busstop_count =
+  lengths(st_intersects(
+    hexagon, BusStop_in_SG))
+
+# 2) Keep ONLY hexes with ≥ 1 bus stop
+hexagon_with_bs <- filter(
+  hexagon, busstop_count > 0)
+
+```
+
+Next, let's inspecting the hexagon layer after filtering visually.
+
+```{r, fig.width=10,fig.height=5}
+
+# 3) Plot (only remaining hexagons)
+tmap_mode("plot")
+tm_shape(sg_outline) +
+  tm_polygons(col = "palegreen3", border.col = NA) +          # clean SG outline
+tm_shape(hexagon_with_bs) +
+  tm_borders(col = "white", alpha = 1, border.col = "grey40", lwd = 0.25) +                    # ONLY these hexes remain
+tm_compass(type = "8star", size = 2, position = c("right","bottom")) +
+tm_scalebar(position = c("right","bottom")) +
+tm_layout(
+  title = "Analytical hexagon layer overplot on Singapore",
+  title.position = c("center", "top"),
+  title.size = 1.2,
+  title.fontface = "bold",  
+  inner.margins = c(0.05, 0.08, 0.20, 0.05),  # adjust bottom margin (0.10) pushes title below frame
+  outer.margins = c(0.05, 0.08, 0.08, 0.05),  # keeps white space around map
+  frame = TRUE,
+  legend.show = FALSE
+)
+
+```
+
+
+### Assigning ids to each hexagon
+
+Let us examine the content of ***hexagon*** sf data:
+
+```{r}
+
+head(hexagon_with_bs)
+
+```
+:::{.callout-warning}
+
+Notice that the data frame does not include an ID field.
+
+:::
+
+Below are the code chunk to include the ID field:
+
+```{r}
+
+# hexagon_with_id <- hexagon_with_bs %>% 
+#   select(, -busstop_count)
+# 
+# hexagon_with_id$HEX_ID <- sprintf(
+#   "H%04d", seq_len(
+#     nrow(hexagon))) %>% 
+#   as.factor()
+
+hexagon_with_id <- hexagon_with_bs %>%
+  select(-busstop_count) %>%  # remove the busstop_count column
+  mutate(
+    HEX_ID = sprintf("H%04d", seq_len(nrow(hexagon_with_bs))) %>% as.factor()
+  )
+
+```
+
+:::{.callout-note}
+
+1. `select()` is used to drop busstop_count field from the sf data frame.
+1. A new feld called ***HEX_ID*** is created. Then, `sprintf()`, `seq_len()` and `nrow()` are used to insert sequential ID values with a character H in front.
+1. `as.factor()` is used to convert the values into factor data type.
+
+:::
+
+Now, let's inspect the new ***hexagon*** sf data frame below 
+
+```{r}
+
+head(hexagon_with_id)
+
+```
+:::{.callout-note}
+
+Notice that a new ID column called ***HEX_ID*** has been added into hexagon data frame and the values are 5-digit running number start with the letter H. At the same time, ***busstop_count*** field has been dropped from the data frame.
+
+:::
+
+## Preparing trip generation data
+
+### Cleaning the data
+
+Before going deep in the wrangling, we will clean up the data so that we are left with a lightweight data set that R can process more easily.
+
+1. We will retain and rename columns below to make them more understandable and easier to join with other data sets.  
+2. We will also rename the columns to make them more understandable and will make joining with other data sets easier.  
+3. Lastly, will also convert BUS_STOP_N to factor as it has a finite set of values so we can convert it to categorical data to make it easier to work with.  
+
+```{r}
+
+trips <- odbus %>%
+  select(c(ORIGIN_PT_CODE, DAY_TYPE, TIME_PER_HOUR, TOTAL_TRIPS)) %>%
+  rename(BUS_STOP_N = ORIGIN_PT_CODE) %>%
+  rename(HOUR_OF_DAY = TIME_PER_HOUR) %>%
+  rename(TRIPS = TOTAL_TRIPS)
+trips$BUS_STOP_N <- as.factor(trips$BUS_STOP_N)
+
+```
+
+Inspect the content of the ***trips*** dataframe:
+
+```{r}
+
+head(trips)
+
+```
+
+### Populating Hexagon IDs into BusStop data frame
+
+Before we can aggregate trips generate at bus stops onto hexagon level, we need to populate the hexagon ids in hexagon data frame into BusStop data frame.
+
+```{r}
+
+bs_hex <- st_intersection(
+  BusStop, hexagon_with_id) %>%
+  st_drop_geometry() %>%
+  select(c(BUS_STOP_N, HEX_ID))
+
+```
+
+Inspect the content of the ***bs_hex*** dataframe:
+
+```{r}
+
+head(bs_hex)
+
+```
+
+### Adding HEX_ID into bus trips data
+
+To derive the hourly number of bus trips per hexagon, we need to add ***HEX_ID*** to trips data. By doing so, we will be able to aswer location questions such as how many bus trip originate from a certain hexagon?
+
+In the code chunk below `inner_join()` is used to join the trips data with ***bs_hex***.
+
+```{r}
+
+trips <- inner_join(trips, bs_hex)
+
+```
+
+Inspect the dataframe of ***trip*** after adding HEX_ID:
+
+```{r}
+
+head(trips)
+
+```
+
+### Aggregating TRIPS based on HEX_ID
+
+In the code chunk below, `group_by()` and `summarise()` is used to aggregate ***TRIPS*** by ***HEX_ID***, ***DAY_TYPE*** and ***HOUR_OF_DAY***.
+
+```{r}
+
+trips <- trips %>%
+  group_by(
+    HEX_ID,
+    DAY_TYPE,
+    HOUR_OF_DAY) %>%
+  summarise(TRIPS = sum(TRIPS))
+
+```
+
+```{r}
+
+kable(head(trips))
+
+```
+

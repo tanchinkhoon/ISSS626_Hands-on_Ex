@@ -1,0 +1,347 @@
+---
+title: "In-class Exercise 4: Geographically Weighted Summary Statistics - gwModel method"
+author: "TAN Chin Khoon"
+date: "September 20, 2025"
+date-modified: "last-modified"
+execute: 
+  eval: true
+  echo: true
+  warning: false
+  freeze: true
+---
+
+## Loading the package
+
+Using the step we leanred from previous hands-in, install and load the necessary R packages in R environment.
+
+```{r}
+pacman::p_load(sf, ggstatsplot, tmap, tidyverse, knitr, GWmodel)
+
+```
+
+## Preparing the Data
+
+Using the steps we learned from previous hands-on, complete the following tasks:  
+
+- import Hunan shapefile and parse it into a sf polygon feature object.  
+- import Hunan_2012.csv file parse it into a tibble data.frame.  
+- join Hunan and Hunan_2012 data.frames.  
+
+### Importing Hunan shapefile
+
+```{r}
+
+hunan_sf <- st_read(dsn = "/Users/cktan/Desktop/SMU/01_Geospatial Analytics (ISSS626)/Hands-on_Ex/Hands-on_Ex04/data/geospatial", 
+                 layer = "Hunan")
+
+```
+
+### Importing Hunan 2012 table
+
+```{r}
+
+# hunan2012 <- read_csv("/Users/cktan/Desktop/SMU/01_Geospatial Analytics (ISSS626)/Hands-on_Ex/Hands-on_Ex04/data/aspatial/Hunan_2012.csv")
+
+hunan2012 <- read.csv("/Users/cktan/Desktop/SMU/01_Geospatial Analytics (ISSS626)/Hands-on_Ex/Hands-on_Ex04/data/aspatial/Hunan_2012.csv",
+                      stringsAsFactors = FALSE, check.names = FALSE)
+
+```
+
+### Joining Hunan and Hunan_2012
+
+```{r}
+
+hunan_sf <- left_join(hunan_sf, hunan2012) %>%
+  select(1:3, 7, 15, 16, 31, 32)
+
+```
+
+
+## Mapping GDPPC
+
+Using the steps we learned from Hands-on Exercise 5, prepare a choropleth map showing the geographic distribution of GDPPC of Hunan Province.
+
+
+```{r}
+
+basemap <- tm_shape(hunan_sf) +
+  tm_polygons() +
+  tm_text("NAME_3", size=0.5)
+
+gdppc <- qtm(hunan_sf, "GDPPC")
+
+tmap_arrange(basemap, gdppc, asp=1, ncol=2)
+
+```
+
+## Converting to SpatialPolygonDataFrame
+
+Note: GWmodel presently is built around the older sp and not sf formats for handling spatial data in R. 
+
+```{r}
+
+hunan_sp <- hunan_sf %>%
+  as_Spatial()
+
+```
+
+## Geographically Weighted Summary Statistics with adaptive bandwidth
+
+### Determine adaptive bandwidth
+
+#### Cross-validation
+
+```{r}
+
+bw_CV <- bw.gwr(GDPPC ~ 1, 
+             data = hunan_sp,
+             approach = "CV",
+             adaptive = TRUE, 
+             kernel = "bisquare", 
+             longlat = T)
+bw_CV
+
+```
+
+#### AIC
+
+```{r}
+
+bw_AIC <- bw.gwr(GDPPC ~ 1, 
+             data = hunan_sp,
+             approach ="AIC",
+             adaptive = TRUE, 
+             kernel = "bisquare", 
+             longlat = T)
+bw_AIC
+
+```
+
+### Computing geographically wieghted summary statistics
+
+```{r}
+
+gwstat <- gwss(data = hunan_sp,
+               vars = "GDPPC",
+               bw = bw_AIC,
+               kernel = "bisquare",
+               adaptive = TRUE,
+               longlat = T)
+
+```
+
+### Preparing the output data
+
+Code chunk below is used to extract **SDF** data table from **gwss** object output from `gwss()`. It will be converted into data.frame by using `as.data.frame()`.
+
+```{r}
+
+gwstat_df <- as.data.frame(gwstat$SDF)
+
+```
+
+Next, `cbind()` is used to append the newly derived data.frame onto ```hunan_sf``` sf data.frame.
+
+```{r}
+
+hunan_gstat <- cbind(hunan_sf, gwstat_df)
+
+```
+
+### Visualising geographically weighted summary statistic  
+
+
+```{r}
+
+tm_shape(hunan_gstat) +
+  tm_fill("GDPPC_LM",
+          n = 5,
+          style = "quantile") +
+  tm_borders(alpha = 0.5) +
+  tm_layout(main.title = "Distribution of geographically wieghted mean",
+            main.title.position = "center",
+            main.title.size = 2.0,
+            legend.text.size = 1.2,
+            legend.height = 1.50, 
+            legend.width = 1.50,
+            frame = TRUE)
+
+```
+
+## Geographically Weighted Summary Statistics with fixed
+
+### Determine fixed bandwodth
+
+#### Cross-validation
+
+```{r}
+
+bw_CV <- bw.gwr(GDPPC ~ 1, 
+             data = hunan_sp,
+             approach = "CV",
+             adaptive = FALSE, 
+             kernel = "bisquare", 
+             longlat = T)
+bw_CV 
+
+```
+
+#### AIC
+
+```{r}
+
+bw_AIC <- bw.gwr(GDPPC ~ 1, 
+             data = hunan_sp,
+             approach ="AIC",
+             adaptive = FALSE, 
+             kernel = "bisquare", 
+             longlat = T)
+bw_AIC
+
+```
+
+### Computing adaptive bandwidth
+
+```{r}
+
+gwstat <- gwss(data = hunan_sp,
+               vars = "GDPPC",
+               bw = bw_AIC,
+               kernel = "bisquare",
+               adaptive = FALSE,
+               longlat = T)
+
+```
+
+### Preparing the output data
+
+Code chunk below is used to extract **SDF** data table from **gwss** object output from `gwss()`. It will be converted into data.frame by using `as.data.frame()`.
+
+```{r}
+
+gwstat_df <- as.data.frame(gwstat$SDF)
+
+```
+
+Next, `cbind()` is used to append the newly derived data.frame onto ```hunan_sf``` sf data.frame.
+
+```{r}
+
+hunan_gstat <- cbind(hunan_sf, gwstat_df)
+
+```
+
+### Visualising geographically weighted summary statistics
+
+```{r}
+
+tm_shape(hunan_gstat) +
+  tm_fill("GDPPC_LM",
+          n = 5,
+          style = "quantile") +
+  tm_borders(alpha = 0.5) +
+  tm_layout(main.title = "Distribution of geographically wieghted mean",
+            main.title.position = "center",
+            main.title.size = 2.0,
+            legend.text.size = 1.2,
+            legend.height = 1.50, 
+            legend.width = 1.50,
+            frame = TRUE)
+
+```
+
+## Geographically Weighted Correlation with Adaptive Bandwidth
+
+**Business question:** Is there any relationship between GDP per capita and Gross Industry Output?
+
+### Conventional statistical solution
+
+```{r}
+
+ggscatterstats(
+  data = hunan2012, 
+  x = Agri, 
+  y = GDPPC,
+  xlab = "Gross Agriculture Output", ## label for the x-axis
+  ylab = "GDP per capita", 
+  label.var = County, 
+  label.expression = Agri > 10000 & GDPPC > 50000, 
+  point.label.args = list(alpha = 0.7, size = 4, color = "grey50"),
+  xfill = "#CC79A7", 
+  yfill = "#009E73", 
+  title = "Relationship between GDP PC and Gross Agriculture Output")
+
+```
+
+### Geospatial analytics solution
+
+#### Determine the bandwidth
+
+```{r}
+
+bw <- bw.gwr(GDPPC ~ GIO, 
+             data = hunan_sp, 
+             approach = "AICc", 
+             adaptive = TRUE)
+
+```
+
+#### Computing gwCorrelation
+
+```{r}
+
+gwstats <- gwss(hunan_sp, 
+                vars = c("GDPPC", "GIO"), 
+                bw = bw,
+                kernel = "bisquare",
+                adaptive = TRUE, 
+                longlat = T)
+
+```
+
+#### Extracting the result
+
+Code chunk below is used to extract **SDF** data table from **gwss** object output from `gwss()`. It will be converted into data.frame by using `as.data.frame()`.
+
+```{r}
+
+gwstat_df <- as.data.frame(gwstats$SDF) %>%
+  select(c(12,13)) %>%
+  rename(gwCorr = Corr_GDPPC.GIO,
+         gwSpearman = Spearman_rho_GDPPC.GIO)
+
+```
+
+Next, cbind() is used to append the newly derived data.frame onto hunan_sf sf data.frame.
+
+```{r}
+
+hunan_Corr <- cbind(hunan_sf, gwstat_df)
+
+```
+
+#### Visualising Local Correlation
+
+```{r}
+
+tm_shape(hunan_Corr) +
+  tm_polygons(fill = "gwSpearman",
+              fill.scale = tm_scale_intervals(
+                style = "quantile",
+                n = 5,
+                values = "brewer.blues"),
+              fill.legend = tm_legend(
+                title = "local Spearman Rho")) +
+  tm_borders(fill_alpha = 0.5) +
+  tm_title("Local Spearman Rho", 
+  size = 2.0) +
+  tm_layout(frame = TRUE)
+
+```
+
+**References**
+
+- Brunsdon, C. et. al. (2002) “Geographically weighted summary statistics - a framework for localised exploratory data analysis”, Computer, Environment and Urban Systems, Vol 26, pp. 501-525. Available as e-journal, SMU library.  
+
+- Harris, P. & Brunsdon, C. (2010) “Exploring spatial variation and spatial relationships in freshwater acidification critical load data set for Great Britain using geographically weighted summary statistics”, Computers & Geosciences, Vol. 36, pp. 54-70. Available as e-journal, SMU library.
+

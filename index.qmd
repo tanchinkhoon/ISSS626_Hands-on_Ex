@@ -1,0 +1,32 @@
+---
+title: Geospatial Analytics and Applications Coursework
+---
+
+Welcome to **Geospatial Analytics and Application (ISSS626)**. This website collects my submission of coursework. Use the top navigation bar to open each page.
+
+::: callout-note
+### How to use this site
+
+-   **Home** (this page): Overview, quick links, and status.
+-   **About**: Short profile of the student.
+-   **Hands-on Exercise** (menu): Open individual hands-on assignments.
+-   **In-Class Exercise** (menu): Open individual in-class assignments
+-   **Take-home Exercise** (menu): Open individual take-home assignments
+:::
+
+## Quick Links -- Recent Submissions
+
+(Refer to the drop-down menus above for complete list of assignment submissions)
+
+-   👉 **Take-home Exercise 2**: [Open the assignment](Take-home_Ex02/take-home_ex02)
+-   👉 **In-class Exercise 7**: [Open the assignment](in-class_ex07/in-class_ex07)
+-   👉 **Hands-on Exercise 7**: [Open the assignment](Hands-on_Ex07/hand-on_ex07)
+-   👉 **In-class Exercise 6**: [Open the assignment](in-class_ex06/in-class_ex06)
+-   👉 **Hands-on Exercise 6**: [Open the assignment](Hands-on_Ex06/hand-on_ex06)
+
+
+## Objectives:
+
+1.  Demonstrate step-by-step workflows for geospatial tasks that a beginner can follow.
+2.  Use clear, descriptive names and relative file paths so the website renders correctly on Netlify.
+3.  Provide reproducible results with the same structure for every assignment.

@@ -1,0 +1,74 @@
+project:
+  type: website
+  output-dir: _site
+
+website:
+  title: "ISSS626"
+  navbar:
+    left:
+      - text: "Hands-on Exercise"
+        menu:
+          - text: "Hands-on Exercise 7"
+            href: Hands-on_Ex07/Hand-on_Ex07
+          - text: "Hands-on Exercise 6"
+            href: Hands-on_Ex06/Hand-on_Ex06
+          - text: "Hands-on Exercise 5b"
+            href: Hands-on_Ex05/Hand-on_Ex05b
+          - text: "Hands-on Exercise 5a"
+            href: Hands-on_Ex05/Hand-on_Ex05a        
+          - text: "Hands-on Exercise 4"
+            href: Hands-on_Ex04/Hand-on_Ex04
+          - text: "Hands-on Exercise 3"
+            href: Hands-on_Ex03/Hand-on_Ex03
+          - text: "Hands-on Exercise 2"
+            href: Hands-on_Ex02/Hand-on_Ex02
+          - text: "Hands-on Exercise 1"
+            href: Hands-on_Ex01/Hand-on_Ex01.qmd
+      - text: "In-class Exercise"
+        menu:
+          - text: "In-class Exercise 7"
+            href: In-Class_Ex07/in-class_ex07   
+          - text: "In-class Exercise 6"
+            href: In-Class_Ex06/in-class_ex06   
+          - text: "In-class Exercise 5b"
+            href: In-Class_Ex05/in-class_ex05b
+          - text: "In-class Exercise 5a"
+            href: In-Class_Ex05/in-class_ex05  
+          - text: "In-class Exercise 4"
+            href: In-Class_Ex04/in-class_ex04 
+          - text: "In-class Exercise 3b"
+            href: In-Class_Ex03b/in-class_Ex03b        
+          - text: "In-class Exercise 3a"
+            href: In-Class_Ex03/in-class_Ex03a
+      - text: "Take-home Exercise"
+        menu:
+          - text: "Take-home Exercise 2"
+            href: Take-home_Ex02/take-home_ex02 
+          - text: "Take-home Exercise 1"
+            href: Take-home_Ex01/take-home_ex01 
+    right:
+      - text: "Home"
+        href: index.qmd
+      - text: "About"
+        href: about.qmd
+      - icon: linkedin
+        href: https://www.linkedin.com/in/tanchinkhoon/ 
+        aria-label: Linkedin
+      - icon: github
+        href: https://github.com/tanchinkhoon/ISSS626_Hands-on_Ex
+        aria-label: Github
+
+format:
+  html:
+    # --- Outline / TOC defaults (apply to all pages) ---
+    toc: true                # show outline
+    toc-title: "On this page"
+    toc-location: right      # left | right
+    toc-depth: 4             # include ### headings and above
+    number-sections: false   # 1, 1.1, 1.2 numbering
+    page-navigation: true    # Previous / Next links at bottom
+    smooth-scroll: true      # nice scrolling when clicking TOC
+    css: styles.css
+    
+    
+

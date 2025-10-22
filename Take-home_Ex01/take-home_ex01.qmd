@@ -1,0 +1,1361 @@
+---
+title: "Take-home Ex01: Geospatial Analytics for Public Good"
+author: "TAN Chin Khoon"
+date: "September 24, 2025"
+date-modified: "September 24, 2025"
+number-sections: true
+execute: 
+  eval: true
+  echo: true
+  warning: false
+  freeze: true
+---
+
+![](Experience-Singapore_food-and-drink_-Featured-photo_Singapore.jpg)
+
+## Introduction
+
+Restaurants are a sensitive barometer of urban vitality: they emerge where pedestrian flows, accessibility, and complementary land uses intersect, and they amplify activity through agglomeration effects. This study examines the **first-order** (intensity) and **second-order** (interaction) properties of **new restaurant registrations** in Singapore between 1 January 2025 and 30 June 2025. The workflow comprises five steps: (i) **tidying** ACRA registration records, (ii) **geocoding** 6-digit postcodes via **OneMap**, (iii) projecting to **SVY21 (EPSG:3414)** to preserve distance accuracy, (iv) estimating **kernel densities** using fixed and adaptive bandwidths to reveal spatial concentrations over time, and (v) applying **Ripley's** $L/K$ functions with Complete Spatial Randomness (CSR) envelopes to identify statistically significant clustering scales. The results are interpreted through the lens of **planning and urban management**, with implications for town-centre provisioning, licensing cadence, last-mile logistics, and transit-oriented development.
+
+## The Data
+
+To analyse the Food & Beverage (F&B) industry in Singapore, this exercise integrates four key data sources. The **Singapore Standard Industrial Classification (SSIC)** provides the authoritative framework to define and filter economic activities (e.g., Restaurants and Cafés). **ACRA business registry extracts** supply establishment-level records with SSIC codes and addresses. **URA Master Plan boundaries** offer official geospatial polygons (planning areas and subzones) to aggregate and visualise spatial distributions. Finally, **OneMap APIs** provide authoritative coordinates and geocoding services to standardise addresses and link firms to spatial units. Together, these datasets allow us to identify, locate, and analyse F&B businesses consistently across Singapore's geography, ensuring both statistical reliability and spatial accuracy.
+
+```{r}
+#| echo: false
+#| eval: true
+
+pacman::p_load(knitr)
+
+# library(knitr)
+
+data_sources <- data.frame(
+  Dataset_Name = c(
+    "SSIC 2020 – Report & Detailed Definitions",
+    "ACRA Information on Corporate Entities",
+    "URA Master Plan 2019 – Subzone Boundary (No Sea)",
+    "OneMap (SLA) – Search & Reverse Geocode / Thematic Layers"
+  ),
+  Description = c(
+    "Prior edition still widely used; contains 5-digit codes (e.g., 56111 Restaurants, 56112 Cafés).",
+    "Open data extract of registered entities, including SSIC codes and addresses for firm-level analysis.",
+    "Official subzone polygons for aggregation and spatial analysis (choropleths).",
+    "Authoritative API to geocode/standardise addresses, fetch POIs, and retrieve thematic layers."
+  ),
+  Format = c(
+    "Excel / PDF",
+    "CSV",
+    "GeoJSON / KML",
+    "REST / JSON API"
+  ),
+  Source = c(
+    "[SingStat (DOS)](https://www.singstat.gov.sg/standards/standards-and-classifications/ssic)",
+    "[data.gov.sg (ACRA)](https://data.gov.sg/dataset/acra-information-on-corporate-entities)",
+    "[data.gov.sg (URA)](https://data.gov.sg/dataset/master-plan-2019-subzone-boundary-no-sea)",
+    "[OneMap (SLA)](https://www.onemap.gov.sg/docs/)"
+  )
+)
+
+kable(data_sources, caption = "Table 1: Data Sources for F&B Industry Analysis in Singapore", escape = FALSE)
+
+```
+
+## Research Quetions
+
+Aligned with the stated exercise objectives ("identify where and when new firms appear; detect clustering; discuss implications"), our research questions translate the statistical toolkit into targeted, decision-relevant tests for restaurant activity. We deliberately distinguish between first-order analysis (examining where intensity is high) and second-order analysis (evaluating how points interact relative to CSR), while also incorporating a minimal spatio-temporal perspective through monthly facets to capture temporal variation in establishment patterns.
+
+**RQ1 --- Where/When:** Where do new restaurants (SSIC 56111) concentrate spatially within January 2025 -- Jun 2025, and how do these concentrations evolve month-to-month?
+
+**RQ2 --- First-order intensity (Core):** What is the intensity structure of new restaurants and which locales exhibit persistent high density after smoothing?
+
+**RQ3 --- Second-order clustering scales:** At which distance bands (e.g., 0--1000 m) do restaurants exhibit significant clustering or dispersion relative to CSR?
+
+**RQ4 --- Planning/Management Implications:** How should statistically validated hotspots and clustering scales inform town-centre planning, licensing cadence, amenity siting, and last-mile/logistics near identified corridors and nodes?
+
+## Setup the environment
+
+Defines the initial environment settings to ensure consistent execution of the R script.
+
+### Load/install packages
+
+Checks and installs required R packages (via pacman), then loads libraries for data wrangling, mapping, geospatial analysis, and reproducibility.
+
+```{r}
+
+if (!require(pacman)) install.packages("pacman")  # install pacman once if missing
+
+pacman::p_load(                                   # load (and auto-install if needed)
+  tidyverse,      # data wrangling + plotting (dplyr, tidyr, ggplot2, readr)
+  stringr,        # string helpers (e.g., str_pad, str_detect)
+  lubridate,      # date helpers (e.g., year, month, floor_date)
+  sf,             # vector geospatial (points/polygons, CRS transforms)
+  tmap,           # cartographic maps (static/interactive)
+  terra,          # raster/SpatRaster conversion for KDE images
+  sparr,          # Spatial and spatio-temporal relative risk functions.
+  spatstat.geom,  # required for the spatstat family of analysis functions.
+  stpp,           # spatio-temporal point process package.
+  rvest,          # Web scraping and HTML parsing package.
+  httr,      # HTTP client for OneMap geocoding calls
+  spatstat,  # point pattern analysis meta-package (ppp, Kest, Lest, envelope, density)
+  ggplot2,   # grammar-of-graphics plotting system (part of tidyverse).
+  plotly,    # adds interactivity to ggplot2 plots.
+  ggthemes  # provides professional ggplot2 themes (e.g., tufte, economist).
+)
+
+```
+
+### Reproducibility for CSR envelopes
+
+Sets a random seed to guarantee reproducible results when generating CSR envelopes.
+
+```{r}
+
+set.seed(626)  # reproducibility for CSR envelopes
+
+```
+
+## Raw data preprocessing (Restaurants only)
+
+In this section, we import the Accounting and Corporate Regulatory Authority (ACRA) corporate entities data, which is organised into multiple CSV files. The objective is to compile, clean, and filter these records to isolate restaurants and cafés coded under SSIC 56111. This step is fundamental because it converts raw administrative files into a consistent and analysis-ready dataset, with standardised variable names, parsed dates, and validated postal codes. The outcome is a tidy dataset that preserves the essential business attributes required for downstream geocoding, spatial conversion, and statistical analysis.
+
+### Importing ACRA data
+
+First, we need to import raw ACRA business registration data from CSV files. The code specifies the folder path, lists all files with names starting with "ACRA" and ending in .csv, and then reads them into R using map_dfr(read_csv), which stacks them into a single tibble (row binding).
+
+```{r}
+
+# folder_path points to the directory containing the ACRA CSV files.
+folder_path <- "/Users/cktan/Desktop/SMU/01_Geospatial Analytics (ISSS626)/Hands-on_Ex/Take-home_Ex01/data/aspatial"
+
+# list.files() collects all ACRA files that match the naming pattern and returns their full paths.
+file_list <- list.files(path = folder_path, 
+                        pattern = "^ACRA*.*\\.csv$", 
+                        full.names = TRUE)
+
+# map_dfr() reads each CSV file and stacks them into one tibble (row binding).
+acra_data <- file_list %>%
+  map_dfr(read_csv)
+
+```
+
+### Saving ACRA data for reproducibility
+
+Here, the imported raw data is saved as an RDS file using `write_rds()`. This ensures reproducibility and efficiency, since future analysis can load the cleaned RDS file directly without re-importing all CSVs.
+
+```{r}
+
+# Save the raw imported data as an RDS file to avoid repeated imports in future runs.
+write_rds(acra_data,
+          "/Users/cktan/Desktop/SMU/01_Geospatial Analytics (ISSS626)/Hands-on_Ex/Take-home_Ex01/data/rds/acra_data.rds")
+
+```
+
+### Tidying ACRA data (restaurants only, SSIC 56111)
+
+Next, we will filters and transforms the raw dataset to focus exclusively on restaurants, defined by SSIC code 56111. The dataset is trimmed to the first 24 columns, the registration date is standardised to Date class, and additional temporal fields such as year, month number, and month abbreviation are created. Postal codes are normalised into six-digit format, and the dataset is restricted to businesses incorporated in 2025.
+
+```{r}
+
+biz_56111 <- acra_data %>%
+  select(1:24) %>%                                    # Select only the first 24 columns (ignore extra metadata columns).
+  filter(primary_ssic_code == 56111) %>%              # Keep only businesses coded as restaurants and cafés (SSIC 56111).
+  rename(date = registration_incorporation_date) %>%  # Rename registration date field to a shorter label 'date'.
+  
+  # Convert registration date to Date class, extract Year and Month (numeric and abbreviated).
+  mutate(date = as.Date(date),
+         YEAR = year(date),
+         MONTH_NUM = month(date),
+         MONTH_ABBR = month(date, 
+                            label = TRUE, 
+                            abbr = TRUE)) %>% 
+  
+  # Standardise postal code to six digits with leading zeros.
+  mutate(
+    postal_code = str_pad(postal_code, 
+    width = 6, side = "left", pad = "0")) %>%
+           filter(YEAR == 2025)    
+
+```
+
+### Saving tidy restaurant data
+
+Finally, the dataset is filtered to focus exclusively on restaurant businesses, defined by SSIC code 56111. Only the relevant columns are retained, and the data is restricted to businesses incorporated in 2025.
+
+```{r}
+
+# Save the tidy restaurant dataset for subsequent steps such as geocoding and EDA.
+write_rds(biz_56111, 
+          "/Users/cktan/Desktop/SMU/01_Geospatial Analytics (ISSS626)/Hands-on_Ex/Take-home_Ex01/data/rds/restaurants_56111_tidy.rds")
+
+```
+
+## Exploratory Data Analysis (EDA) of Restaurants
+
+Before any spatial conversion or modelling, it is essential to perform EDA to understand the characteristics of the cleaned dataset. EDA helps confirm that the data aligns with the research window (January 2025 -- Jun 2025) and that restaurants are being correctly filtered. It also allows us to observe temporal dynamics such as monthly registration counts and possible seasonal patterns. Through simple summaries, tables, and visualisations, we can validate the dataset's integrity and gain initial insights into how new restaurants are distributed over time. This diagnostic step ensures confidence in the subsequent geocoding and spatial analyses.
+
+### Inspect data structure
+
+This section uses the glimpse() function to display the structure of the tidied restaurant dataset (biz_56111). The function provides an overview of column names, data types, and a preview of the values within each column.
+
+```{r}
+
+# glimpse() provides an overview of column names, data types, and a sample of values.
+glimpse(biz_56111)
+
+```
+
+The output indicates that the dataset contains 677 rows and 27 columns, with fields such as unique entity number (uen), issuance agency, entity name, entity type, business constitution, company type, entity status, registration date, postal code, and location descriptors (block, street, building).
+
+### Count restaurants by year
+
+This section uses the `count()` function to summarise the number of restaurants incorporated by year from the tidied dataset. Since the data has already been filtered to include only 2025 records, the result shows a single row with the year 2025 and a corresponding total of 677 newly registered restaurants.
+
+```{r}
+
+# Summarise how many restaurants were registered in each year within the study period.
+biz_56111 %>% 
+  count(YEAR, name = "n_restaurants")
+
+```
+
+The dataset shows that in 2025 alone, there were 677 new restaurant registrations recorded within the study period (Jan -- Jun 2025).
+
+### Monthly registration counts (bar chart)
+
+Restaurant incorporations in 2025 are aggregated at the monthly level and visualised to reveal short-term temporal dynamics in business activity. The counts are structured chronologically to avoid distortions in seasonal interpretation, and the resulting bar chart provides both absolute values through labelled bars and directional movement through a superimposed trend line. By combining these elements, the plot not only conveys the magnitude of new entries each month but also highlights emerging trajectories within the first half of 2025, setting the stage for discussions on whether incorporations are accelerating, stabilising, or declining as the year progresses.
+
+```{r}
+
+# 1) Aggregate once: counts per month (make sure months are ordered nicely)
+month_levels <- c("Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec")
+df_month <- biz_56111 %>%
+  count(MONTH_ABBR, name = "registrations") %>%
+  mutate(MONTH_ABBR = factor(MONTH_ABBR, levels = month_levels)) %>%
+  arrange(MONTH_ABBR)
+
+y_max <- max(df_month$registrations) * 1.10  # headroom for labels
+
+# 2) Plot: bars + count labels + centre title + trend line
+p_month_bar <- ggplot(df_month, aes(x = MONTH_ABBR, y = registrations, group = 1)) +
+  geom_col(fill = "steelblue") +
+  geom_text(aes(label = registrations), vjust = -0.5, size = 3.5) +  # labels on bars
+  geom_line(color = "red", linewidth = 1) +                          # trend line
+  geom_point(color = "red") +                                        # trend points (optional)
+  labs(
+    title = "New Restaurants by Month (Jan 2025 – Jun 2025)",
+    x = "Month", y = "Registrations"
+  ) +
+  theme_minimal() +
+  theme(plot.title = element_text(hjust = 0.5)) +                    # centres title
+  expand_limits(y = y_max)                                           # keep labels above bars
+
+p_month_bar
+
+```
+
+Between Jan 2021 and Jul 2025, new restaurant registrations ranged from a high of 110 in March 2024 to a low of 79 in July 2025, with most months maintaining 90--105 openings, reflecting both seasonal dynamics and the resilience of the F&B sector. From a geospatial perspective, however, this chart is limited as it only shows overall counts by month without accounting for where the restaurants are located, how they cluster across planning areas or subzones, or whether growth is concentrated in certain regions. Without spatial context, we cannot assess neighborhood-level competition, urban planning implications, or the uneven distribution of opportunities across Singapore.
+
+## Geospatial data wrangling
+
+This section converts six-digit postal codes from the cleaned ACRA table into planar coordinates suitable for spatial analysis. We query the OneMap endpoint for each unique postcode, store results, and left-join them back to the restaurant records by matching postal_code to OneMap's POSTAL. We deliberately retain OneMap's original column names (e.g., POSTAL, X, Y, LONGITUDE, LATITUDE). After joining, we save an RDS copy for reproducibility and create an sf object directly in SVY21 (EPSG:3414) using coords = c("X","Y"), which is required for distance-true kernel density estimation and Ripley's K/L.
+
+### Geocoding loop (query OneMap and collect results)
+
+We prepare a vector of unique postcodes to minimise API calls, then iterate through them sequentially. For each postcode, the relevant parameters (`searchVal`, `returnGeom`, `getAddrDetails`, `pageNum`) are submitted to the OneMap endpoint. Successful responses are converted into a data frame and appended to the found table, while unmatched postcodes are stored separately in `not_found`. This process ensures efficient use of the API, reduces redundancy, and creates a clear separation between valid and invalid geocoded results for subsequent analysis.
+
+```{r}
+ 
+# --- Geocoding (It took XX seconds to process this chunk) ---------------------------
+
+# Create a unique vector of six-digit postcodes to avoid redundant API requests.
+postcodes <- unique(biz_56111$postal_code)
+
+# OneMap elastic search endpoint 
+url <- "https://onemap.gov.sg/api/common/elastic/search"
+
+# Initialise an empty data.frame to accumulate matched results from OneMap.
+found <- data.frame()
+
+# Initialise an empty data.frame to record postcodes with no matches.
+not_found <- data.frame(postcode = character())
+
+# Iterate over each unique postcode.
+for (pc in postcodes) {
+  query <- list(
+    searchVal    = pc,   # The postcode we are querying for.
+    returnGeom   = "Y",  # Request coordinates in the response.
+    getAddrDetails = "Y",# Request address details in the response.
+    pageNum      = "1"   # First page of results (sufficient for exact postcodes).
+  )
+
+  # Submit an HTTP GET request to OneMap with the query parameters.
+  res  <- httr::GET(url, query = query)
+  
+  # Parse the HTTP response content as a list (OneMap returns JSON).
+  json <- httr::content(res)
+  
+  # If OneMap reports at least one match for this postcode...
+  if (json$found != 0) {
+    
+    # Convert the 'results' array to a data.frame, preserving original OneMap field names.
+    df <- as.data.frame(json$results, stringsAsFactors = FALSE)
+    
+    # Keep the input postcode as a traceability column (useful for QA).
+    df$input_postcode <- pc
+
+    # Append the current result to the cumulative 'found' table.
+    found <- dplyr::bind_rows(found, df)
+
+    # If there is no match for this postcode...
+  } else {
+    
+    # Record the postcode in 'not_found' for later inspection.
+    not_found <- dplyr::bind_rows(not_found, data.frame(postcode = pc))
+
+  }
+}
+
+```
+
+### Tidy the geocoded table
+
+To prepare the geocoded dataset for integration with the business records, we retain only the essential columns returned by OneMap. Specifically, the first ten fields are preserved, covering postal codes, spatial coordinates (X, Y, longitude, latitude), and key address attributes. This step removes extraneous metadata while maintaining all information required for spatial joins and mapping. By standardising the table structure, subsequent operations such as `left_join()` become more efficient and less error-prone, ensuring that the geocoded records align seamlessly with the cleaned business dataset. The result is a compact, analysis ready table that is useful for downstream spatial analysis and visualisation.
+
+```{r}
+
+# Keep the first ten columns from OneMap.
+# (These include POSTAL, X, Y, LONGITUDE, LATITUDE, etc.)
+
+found <- found %>%
+  dplyr::select(1:10)
+
+```
+
+### Append coordinates to restaurants (join by postal code)
+
+We attach the geocoded coordinates to the restaurant records using a left join from `biz_56111` to `found`, matching `postal_code` (our cleaned field) with OneMap's `POSTAL`. This preserves all restaurant rows and adds coordinate columns where available.
+
+```{r}
+
+# Left-join OneMap coordinates back to the restaurant table.
+# The join is on 'postal_code' (ours) = 'POSTAL' (OneMap).
+biz_56111 <- biz_56111 %>%
+  dplyr::left_join(found, by = c('postal_code' = 'POSTAL'))
+
+```
+
+```{r}
+
+# Convert geocoded restaurants into sf object
+biz_56111_sf <- sf::st_as_sf(
+  biz_56111,
+  coords = c("X", "Y"),    # the coordinate columns from OneMap geocoding
+  crs    = 3414            # Singapore SVY21 / EPSG:3414
+)
+
+# Quick check: print an overview of column names, data types, and a sample of values.
+glimpse(biz_56111_sf)
+
+```
+
+The dataset now contains **677 records and 35 variables**, representing restaurants incorporated in 2025 under SSIC 56111. Each row corresponds to a unique registered entity, identifiable by its **UEN (Unique Entity Number)**, with accompanying details on company type, incorporation date, address, and geospatial coordinates. The presence of date and uen_issue_date in date format confirms proper temporal standardisation, allowing the dataset to be analysed along monthly or yearly dimensions.
+
+Address-related variables such as block, street_name, building_name, postal_code, and their derived forms (BLK_NO, ROAD_NAME, ADDRESS) demonstrate that the cleaning and enrichment steps successfully prepared the dataset for spatial matching. Crucially, the dataset now includes **geocoded coordinates (LATITUDE, LONGITUDE) and a geometry field**, which transforms each restaurant record into a spatial point object. This enables integration with planning boundaries, kernel density estimation, or other forms of spatial point pattern analysis.
+
+Overall, the output confirms that the dataset is no longer just an administrative registry but a **geospatially enabled dataset**. It can now support advanced analysis such as mapping restaurant hotspots, measuring clustering within planning subzones, or comparing incorporation intensity across different regions of Singapore. The presence of 677 records highlights the scale of new restaurant entrants in 2025, and the completeness of attributes ensures both temporal and spatial dimensions can be meaningfully explored.
+
+### Save a reproducible copy (RDS) for downstream steps
+
+Saving after the join ensures the same input is used for EDA and spatial analyses without re-calling the API. If we want to maintain a different project root, adjust the path accordingly.
+
+```{r}
+
+readr::write_rds(
+  biz_56111,
+  "/Users/cktan/Desktop/SMU/01_Geospatial Analytics (ISSS626)/Hands-on_Ex/Take-home_Ex01/data/rds/biz_56111_geocoded.rds"
+)
+
+```
+
+## Boundary preparation (parse MP19 KML Description) + Quality Assurance (QA) Map
+
+Many URA MP19 KML files appear to contain only two visible fields (Name, Description). However, the actual attributes---such as SUBZONE_N and PLN_AREA_N---are embedded within an HTML table inside the Description column. To handle this, we define a helper function that parses the HTML and extracts specific fields by label (e.g., SUBZONE_N). Using this function, we generate clean columns for each feature, remove offshore polygons (e.g., SOUTHERN GROUP, WESTERN ISLANDS), and create a QA map to verify that restaurant points fall correctly within the refined subzone boundaries. This ensures that subsequent spatial analyses (KDE and L/K functions) are accurate and reliable.
+
+### Read MP19 KML and project to SVY21
+
+We read the "MasterPlan2019SubzoneBoundaryNoSeaKML.kml", drop Z/M, and project to SVY21 (EPSG:3414). At this point the table likely has only Name and Description; we do not filter yet because those fields are still inside the HTML.
+
+```{r}
+
+# read the KML layer (likely Name + Description fields)
+mpsz_raw <- sf::st_read("data/geospatial/MasterPlan2019SubzoneBoundaryNoSeaKML.kml", quiet = TRUE) %>%   
+  sf::st_zm(drop = TRUE, what = "ZM") %>%   # drop Z/M to keep 2D geometry only
+  sf::st_transform(crs = 3414)              # project to SVY21 meters so distance/area are metric
+
+```
+
+### Helper to extract one field from the KML Description HTML
+
+We will parse the HTML table inside Description and return the value from the table row where the `<th>` (header) equals a requested field label (e.g., "SUBZONE_N"). We wrap this into a function `extract_kml_field(html_text, field_name)` and make sure it fails safely (returns `NA_character_` if the label cannot be found).
+
+```{r}
+
+extract_kml_field <- function(html_text, field_name) {
+  # If the cell is empty or NA, return NA to avoid errors later
+  if (is.na(html_text) || html_text == "") return(NA_character_)
+  
+  # Parse the HTML string into a document
+  page <- rvest::read_html(html_text)
+  
+  # Grab all table rows <tr> (the KML Description usually contains one table)
+  rows <- rvest::html_elements(page, "tr")
+  
+  # Keep the row whose header cell <th> equals the requested field label,
+  # then take the text of the <td> cell in that same row
+  value <- rows %>%
+    purrr::keep(~ rvest::html_text2(rvest::html_element(.x, "th")) == field_name) %>%
+    rvest::html_element("td") %>%
+    rvest::html_text2()
+  
+  # If nothing matched, return NA; otherwise return the extracted value
+  if (length(value) == 0) NA_character_ else value
+}
+
+```
+
+### Materialise attributes from Description, tidy columns, and filter
+
+We now map the helper over each feature's Description to create real columns: REGION_N, PLN_AREA_N, SUBZONE_N, SUBZONE_C. Then we drop the original Name / Description, put geometry last (nice console print), and filter out Southern Group and Western Islands by the newly-created columns---exactly the step that previously failed because those columns didn't exist.
+
+```{r}
+
+# --- Parse Description to real columns, then tidy and filter -----------------------
+
+mpsz <- mpsz_raw %>%
+  dplyr::mutate(
+    REGION_N   = purrr::map_chr(Description, extract_kml_field, "REGION_N"),   # parse region name
+    PLN_AREA_N = purrr::map_chr(Description, extract_kml_field, "PLN_AREA_N"), # parse planning area name
+    SUBZONE_N  = purrr::map_chr(Description, extract_kml_field, "SUBZONE_N"),  # parse subzone name
+    SUBZONE_C  = purrr::map_chr(Description, extract_kml_field, "SUBZONE_C")   # parse subzone code
+  ) %>%
+  dplyr::select(-Name, -Description) %>%     # remove raw Name/Description
+  dplyr::relocate(geometry, .after = dplyr::last_col())   # move geometry to the last column
+
+# Print a few rows so we can see the new columns are present
+mpsz %>% dplyr::slice_head(n = 3)
+
+# Filter out offshore groups using the newly created columns
+mpsz_clean <- mpsz %>%
+  dplyr::filter(SUBZONE_N != "SOUTHERN GROUP",
+                PLN_AREA_N != "WESTERN ISLANDS",
+                SUBZONE_N != "NORTH-EASTERN ISLANDS"
+                )
+
+```
+
+### QA Map (tmap v4): Restaurants over cleaned MP19 subzones
+
+We will build a QA map to confirm geocoded restaurants lie within the cleaned subzones. The code builds a static quality-assurance map to verify that geocoded restaurant points fall correctly within Singapore's Master Plan 2019 planning areas. It first aligns coordinate reference systems (reprojecting the restaurant points if needed to match the MP19 layer, SVY21), then dissolves subzone polygons into single planning-area geometries via group_by `(PLN_AREA_N) |> summarise()` and repairs any invalid shapes with `st_make_valid()`. With tmap in plot mode, it renders the planning-area polygons in neutral greys and places readable area labels (tm_text with shadow and auto-placement). Finally, it overlays the restaurant locations from biz_56111_sf as semi-transparent red dots and adds a clear title, producing a publication-ready QA visual that confirms spatial alignment before downstream analyses.
+
+```{r}
+# --- QA Map (tmap v4): restaurants over MP19 planning areas with labels -----
+
+# 0) Ensure both layers share the same CRS (SVY21)
+if (sf::st_crs(biz_56111_sf) != sf::st_crs(mpsz_clean)) {
+  biz_56111_sf <- sf::st_transform(biz_56111_sf, sf::st_crs(mpsz_clean))  # align CRS if needed
+}
+
+# 1) Dissolve subzones -> Planning Areas (by PLN_AREA_N)
+#    (keeps one polygon per planning area; fixes invalids just in case)
+mp19_pa <-
+  mpsz_clean |>
+  dplyr::group_by(PLN_AREA_N) |>
+  dplyr::summarise(.groups = "drop") |>
+  sf::st_make_valid()
+
+# 2) Draw the QA map with labels
+tmap::tmap_mode("plot")  # static mode (consistent in reports)
+
+qa_map_pa <-
+  tmap::tm_shape(mp19_pa) +
+    tmap::tm_polygons(
+      fill = "grey95",     # polygon fill (v4)
+      col  = "grey50",     # polygon outline color (v4)
+      lwd  = 0.6
+    ) +
+    tmap::tm_text(
+      "PLN_AREA_N",
+      size = 0.5,          # label size
+      col  = "grey20",
+      shadow = TRUE,
+      auto.placement = TRUE
+    ) +
+  tmap::tm_shape(biz_56111_sf) +
+    tmap::tm_dots(
+      size      = 0.15,    # dot size
+      fill      = "red",   # dot color
+      fill_alpha= 0.7      # dot transparency (v4)
+    ) +
+  tmap::tm_title("QA Map: Geocoded Restaurants over MP19 Planning Areas (SVY21)")
+
+qa_map_pa   # IMPORTANT: print the map so Quarto renders it
+
+```
+
+The QA map overlays geocoded restaurant registrations (red dots) from the ACRA dataset onto Singapore's Master Plan 2019 planning areas (grey polygons). The spatial alignment confirms that the restaurant points fall within their corresponding planning area boundaries, indicating that the geocoding and CRS transformation were successfully executed.
+
+From the spatial distribution, several insights emerge. The densest concentration of new restaurants in 2025 is clustered in the Central Region, particularly within planning areas such as Orchard, River Valley, Downtown Core, Outram, and Bukit Merah. This reflects the commercial dominance of the central business district and adjacent entertainment hubs, where demand for food and beverage outlets is consistently high. Moderate densities appear across Toa Payoh, Geylang, Marine Parade, and Tampines, showing strong activity in mature residential towns and regional centres. In contrast, western and northern regions such as Lim Chu Kang, Sungei Kadut, and Western Water Catchment display sparse distributions, suggesting minimal restaurant incorporations due to their industrial or non-residential land uses.
+
+Overall, the output validates the geospatial preprocessing workflow while simultaneously revealing the spatial asymmetry of restaurant incorporations in Singapore. Concentrations in central and eastern urban corridors highlight areas of vibrant market demand, while sparse coverage in peripheral planning areas reflects structural land-use constraints and lower commercial viability. This spatial insight sets the foundation for deeper first- and second-order spatial point pattern analyses, such as Kernel Density Estimation (KDE) or clustering tests, to quantify and statistically assess these observed patterns.
+
+#### Enhancing spatial validation with interactive QA maps
+
+This interactive version of the QA map is important because it allows users to zoom, pan, and explore individual planning areas in greater detail. While the static map is suitable for reporting, an interactive map provides flexibility to validate whether each restaurant point is correctly placed within its boundary, especially in dense central regions where overlaps occur. It enhances data verification, spatial accuracy checks, and stakeholder communication, making it easier to spot potential geocoding or boundary alignment errors that might not be visible in a static output.
+
+```{r}
+
+tmap::tmap_mode("view")
+
+qa_map_pa_int <-
+  tm_basemap("CartoDB.Positron") +
+  tm_shape(mp19_pa, name = "Planning Areas") +
+    tm_polygons(fill = "grey80", col = "grey50", lwd = 0.6, alpha = 0.3) +
+  tm_shape(mp19_pa, name = "PA Labels") +
+    tm_text("PLN_AREA_N", size = 1, col = "black",
+            bg.color = "white", bg.alpha = 0.6, auto.placement = TRUE) +
+  tm_shape(biz_56111_sf, name = "Restaurants") +
+    tm_dots(
+            size      = 0.4,    # dot size
+            fill      = "red",   # dot color
+            fill_alpha= 0.7      # dot transparency (v4)
+    )
+
+qa_map_pa_int
+
+```
+
+## First-order analysis: Kernel Density Estimation (KDE)
+
+This section investigates the **first-order intensity** of new restaurant registrations using **KDE**. We first estimate intensity surfaces for all Singapore (national level). Next, we drill down to the planning subzone level to highlight local variations. Finally, we extend to **spatio-temporal KDE (STKDE)** to capture dynamics across both **space and time (Jan--Jun 2025)**.
+
+### Prepare spatstat objects
+
+We already have clean data: restaurants_sf (points in EPSG:3414) and mpsz_cl (planning subzones in EPSG:3414). Here, we convert them into formats required for point pattern analysis: an **observation window** (owin) and a **point pattern** (ppp). We also create a kilometer-scaled version for sensitivity analysis.
+
+```{r}
+
+# 0) Defensive checks: both layers must be in SVY21 (EPSG:3414; units = meters)
+stopifnot(sf::st_crs(mpsz_clean)$epsg == 3414)      # confirm polygons (study area) are in 3414
+stopifnot(sf::st_crs(biz_56111_sf)$epsg == 3414)    # confirm restaurant points are in 3414
+
+# 1) Create the observation window (owin) from subzones (still in meters here)
+sg_owin <- spatstat.geom::as.owin(mpsz_clean)       # convert sf polygons -> spatstat 'owin' window
+
+# 2) Create the point pattern (ppp) from restaurants (still in meters here)
+rest_ppp <- spatstat.geom::as.ppp(biz_56111_sf)     # convert sf points -> spatstat 'ppp' pattern
+
+# 3) Clip the points to the study window (meter scale) to enforce the boundary
+rest_ppp <- rest_ppp[sg_owin]                        # keep only points that fall inside 'sg_owin'
+
+# 4) Rescale the point pattern from meters to kilometers (single, canonical step)
+rest_ppp_km <- rescale.ppp(                          # produce km-scale 'ppp' for all downstream KDE
+  rest_ppp,                                          # input 'ppp' in meters
+  1000,                                              # scale factor: divide coordinates by 1000 (m -> km)
+  "km"                                               # label for the new distance unit
+)
+
+# 5) Quick sanity checks to verify objects and units before proceeding
+stopifnot(spatstat.geom::is.ppp(rest_ppp_km))        # confirm we have a valid 'ppp' object
+rest_ppp_km$unitname                                 # should print "km" as the working unit
+summary(rest_ppp_km)                                 # optional: inspect counts, window, and mark info
+
+# Simple visual check
+plot(unmark(rest_ppp_km), main = "Restaurants (ppp, km units)")  # base plot of points & window
+
+```
+
+The polygonal boundary output confirms that the study window is irregular, consisting of 41 polygons with 26 holes and a usable land area of 669.5 km², representing only 43.6% of the bounding frame. Within this space, 677 restaurants classified under SSIC 56111 are distributed, producing an average intensity of about 1.01 points per km². This indicates that density varies substantially across the region, with likely hotspots in central subzones and sparse distribution at the periphery. The presence of rich attributes and temporal fields also enables multi-dimensional analysis beyond static spatial clustering.
+
+The plot shows the spatial distribution of 677 restaurants across Singapore, represented as points within the polygonal boundary. The pattern indicates clear clustering in the central and southern regions, particularly around the Downtown Core and Orchard areas, reflecting the city's commercial and entertainment hubs. In contrast, peripheral areas such as the north and far east exhibit sparser distributions, suggesting fewer restaurant establishments relative to population or land use. This visualisation confirms spatial heterogeneity in restaurant presence, highlighting distinct hotspots of activity alongside low-density regions, and provides the foundation for subsequent kernel density estimation to quantify clustering patterns.
+
+### Bandwidth estimation (km scale)
+
+The bandwidth ($\sigma$) controls the degree of spatial smoothing in kernel density estimation and therefore determines how finely or coarsely local clusters are represented. Choosing $\sigma$ well is essential: too small a value creates noisy, spike-like artefacts that can be mistaken for meaningful hotspots; too large a value can blur important local variation and hide genuine clusters. In this study, the working unit is kilometers, so all bandwidths are reported and interpreted in km. We first obtain a data-driven σ using Diggle's cross-validation approach, which balances bias and variance without manual tuning. We then compute three commonly used alternatives---CvL (Cronie--van Lieshout), Scott's rule, and PPL (profile likelihood)---to understand the sensitivity of our analysis to bandwidth choice. Reporting several selectors is good practice for transparency, but in the next subsection we will use the Diggle value as the principal $\sigma$ and compare it with a fixed $\sigma$ (0.6 km) and an adaptive method.
+
+```{r}
+
+# Input: 'rest_ppp_km' created in previous section (a ppp with units = km)
+
+# 1) Diggle’s cross-validation bandwidth (primary choice)
+bw_diggle <- bw.diggle(rest_ppp_km)   # returns a numeric σ in km based on CV
+bw_diggle                             # print the value for the report
+
+# 2) Alternative automatic selectors (for sensitivity checks)
+bw_cvl   <- bw.CvL(rest_ppp_km)       # Cronie–van Lieshout selector (km)
+bw_scott <- bw.scott(rest_ppp_km)     # Scott’s rule-of-thumb (can return σ.x, σ.y)
+bw_ppl   <- bw.ppl(rest_ppp_km)       # Profile likelihood selector (km)
+
+# 3) Inspect and store the values we plan to cite in the narrative
+bw_cvl
+bw_scott
+bw_ppl
+
+# 4) Keep a small named list for later reference in tables/plots
+bw_all_km <- list(
+  diggle = bw_diggle,                 # preferred data-driven σ (km)
+  cvl    = bw_cvl,                    # alternative CV-based σ (km)
+  scott  = bw_scott,                  # rule-of-thumb σ (km) — may be vector
+  ppl    = bw_ppl                     # profile likelihood σ (km)
+)
+
+```
+
+In estimating the bandwidth for kernel density analysis, several selectors were applied and the results highlight how different methods lead to very different levels of smoothing. Diggle's cross-validation returns a bandwidth of only 0.007 km, which corresponds to roughly seven meters and produces an extremely fine-grained surface. This reveals very localised clusters of restaurants, but at the cost of generating a noisy density surface that may exaggerate small-scale variations. At the other extreme, the Cronie--van Lieshout selector produces a much broader bandwidth of 6.13 km. This choice smooths over local differences and emphasises regional-scale patterns, making it suitable for visualising city-wide concentration trends but less effective in highlighting specific hotspots. Scott's rule-of-thumb suggests anisotropic values of 1.98 km in the x-direction and 1.64 km in the y-direction, offering a moderate compromise between local and regional smoothing while also accounting for directional variation in the spatial spread. The profile likelihood approach yields a bandwidth of 0.51 km, representing an intermediate scale that is wide enough to avoid the noise of Diggle's estimate while still being narrow enough to capture meaningful neighbourhood-level clusters.
+
+Taken together, these results underline the importance of bandwidth choice in kernel density estimation. A smaller bandwidth such as Diggle's is appropriate when the research goal is to highlight fine-scale clustering, for instance identifying concentrations along individual streets or blocks. A larger bandwidth such as the Cronie--van Lieshout estimate is better suited for planning-level analysis where broad geographic patterns matter more than local detail. The profile likelihood and Scott's estimates occupy a middle ground, offering balanced perspectives that reveal neighbourhood-scale concentrations and directional trends. For this study, it is therefore useful to report and compare multiple bandwidths, as the contrasting values demonstrate how sensitive density surfaces are to the smoothing parameter and ensure that both micro- and macro-level insights can be drawn for interpretation and planning purposes.
+
+### KDE with alternative bandwidth strategies (all outputs in km²)
+
+With the point pattern rescaled to kilometers and bandwidth values estimated, we now generate kernel KDE of restaurant intensity. KDE provides a smooth surface of expected events per $km^2$ by centring a kernel function over each observed point. Three approaches are used to reflect different assumptions about spatial structure: Diggle's bandwidth, a data-driven estimate derived from cross-validation; a fixed bandwidth of 0.6 km, chosen to represent a neighbourhood-scale radius consistent with urban walking distances; and an adaptive bandwidth, which adjusts the kernel size depending on local point density. The Gaussian kernel with edge correction is used throughout to ensure smoothness and reduce boundary bias. Comparing these three approaches allows us to evaluate whether clustering patterns are robust across parameterisations or sensitive to smoothing assumptions. This not only enhances methodological transparency but also provides practical insight into the scale at which clustering is most relevant for urban planning and decision-making.
+
+```{r}
+
+# Input: 'rest_ppp_km' (restaurants point pattern, km units)
+#        'bw_diggle'   (Diggle bandwidth estimated in km, Section 9.2)
+
+# 1) KDE using Diggle’s automatic bandwidth (Gaussian, edge corrected)
+kde_rest_diggle <- density(
+  rest_ppp_km,          # point pattern of restaurants (km)
+  sigma  = bw_diggle,   # data-driven bandwidth (km)
+  edge   = TRUE,        # apply edge correction
+  kernel = "gaussian"   # Gaussian kernel function
+)
+
+# 2) KDE using a fixed bandwidth of 0.6 km
+sigma_fixed <- 0.6      # fixed kernel radius, interpretable as 600 m
+kde_rest_fixed <- density(
+  rest_ppp_km,
+  sigma  = sigma_fixed, # fixed bandwidth (km)
+  edge   = TRUE,        # apply edge correction
+  kernel = "gaussian"
+)
+
+# 3) Adaptive KDE — kernel radius varies with local density
+kde_rest_adapt <- adaptive.density(
+  rest_ppp_km,          # point pattern (km)
+  method = "kernel"     # kernel-based adaptive density estimation
+)
+
+# 4) Convert spatstat image (im) outputs to SpatRaster for mapping/export later
+kde_rest_diggle_rast <- terra::rast(kde_rest_diggle)
+kde_rest_fixed_rast  <- terra::rast(kde_rest_fixed)
+kde_rest_adapt_rast  <- terra::rast(kde_rest_adapt)
+
+# 5) Quick checks (optional) to confirm results are not empty
+summary(kde_rest_diggle)   # range of intensities (restaurants per km²)
+summary(kde_rest_fixed)    # check smoothing behaviour
+summary(kde_rest_adapt)    # confirm adaptive surface has variation
+
+```
+
+The KDE outputs summarise the smooth intensity of restaurant locations across Singapore using different bandwidth strategies. Diggle's cross-validated bandwidth produces a very fine-scale surface, resulting in highly localised peaks that capture micro-clusters but risk noise amplification. The fixed bandwidth of 0.6 km generates a more interpretable density surface at the neighbourhood scale, approximating walking distances and highlighting urban clusters in a practical manner. The adaptive bandwidth adjusts kernel size based on point intensity, offering a balanced representation that smooths sparse regions while preserving detail in dense cores. Together, these approaches illustrate how bandwidth choice determines whether clustering is interpreted at micro, meso, or macro scales.
+
+### Assigning projection to KDE rasters
+
+The kernel surfaces we created are im objects that were converted to SpatRaster so they can be plotted with raster tools and combined with vector layers. However, these raster objects **do not carry a CRS by default**. Without an explicit projection, the maps could still render but would not align reliably with other layers (e.g., planning subzones) or export with proper spatial metadata. To make the density rasters interoperable with the rest of the report, we attach the **Singapore Transverse Mercator (SVY21) projection**, **EPSG:3414**, directly to each KDE raster. This mirrors the exact practice used elsewhere in the report: vectors already live in EPSG:3414; we simply declare the same CRS on the KDE rasters so overlays and cartographic elements (graticules, compass, scale) behave as expected. No reprojection or resampling is performed here --- only CRS assignment --- so the numeric values of the density estimates remain unchanged.
+
+```{r}
+
+# Input from §9.4: KDE rasters created via terra::rast(...)
+#   kde_rest_diggle_rast
+#   kde_rest_fixed_rast
+#   kde_rest_adapt_rast
+
+# 1) Fetch the authoritative EPSG:3414 definition from the study polygons
+crs_wkt <- sf::st_crs(mpsz_clean)$wkt    # SVY21 / Singapore TM (EPSG:3414)
+
+# 2) Assign this CRS to each KDE raster (declaration only; no reprojection)
+terra::crs(kde_rest_diggle_rast) <- crs_wkt   # set CRS on Diggle raster
+terra::crs(kde_rest_fixed_rast)  <- crs_wkt   # set CRS on fixed-σ raster
+terra::crs(kde_rest_adapt_rast)  <- crs_wkt   # set CRS on adaptive raster
+
+# 3) Quick confirmation (prints the SVY21 definition)
+terra::crs(kde_rest_diggle_rast)
+terra::crs(kde_rest_fixed_rast)
+terra::crs(kde_rest_adapt_rast)
+
+```
+
+The output confirms that the kernel density raster layers produced earlier did not automatically carry a coordinate reference system (CRS). To ensure proper alignment with Singapore's planning boundaries and other spatial layers, the SVY21 / Singapore Transverse Mercator (EPSG:3414) projection is explicitly assigned to each raster. This step does not resample or modify density values but simply attaches the correct spatial metadata so overlays, graticules, and scale bars behave as expected. The insight here is that assigning the CRS guarantees interoperability across maps, enabling accurate visualisation, integration with vector data, and reliable interpretation for urban planning analysis.
+
+### Plotting KDE rasters with tmap
+
+In this section, we will render each KDE surface as a cartographic map using the exact idiom shown earlier: `tm_shape(<SpatRaster>) + tm_raster(col.scale = tm_scale_continuous(values="viridis"), col.legend = tm_legend(...))`, then subzone borders, graticules, a north arrow, and a simple layout. The objective is to visually verify that (1) each raster carries **EPSG:3414** (set earlier) and overlays correctly with the subzones, and (2) the legend and decorations match the example. No manual class breaks are introduced; we keep a **continuous viridis** scale and a **legend box at right--bottom** with a semi-transparent white background. Three maps are produced which are automatic (Diggle $\sigma$), fixed $\sigma$ (0.6 km), and adaptive. These enable us to confirm the outputs line up with expectations and are ready for interpretation.
+
+```{r}
+
+# 0) Load tmap and switch to static plotting mode (required for tm_* functions)
+library(tmap)                                         # provide tm_shape, tm_raster, etc.
+tmap_mode("plot")                                     # static (non-interactive) plots
+
+# 1) Helper to build a map in the house style shown in the notes
+build_kde_map <- function(rast, title_text) {
+  tm_shape(rast) +                                    # KDE SpatRaster (has EPSG:3414)
+    tm_raster(
+      col.scale  = tm_scale_continuous(values = "viridis"), # continuous viridis scale
+      col.legend = tm_legend(                         # legend box settings as in screenshots
+        title      = "Density values",                # legend title
+        title.size = 0.7,                             # title font size
+        text.size  = 0.7,                             # tick labels font size
+        bg.color   = "white",                         # white legend background
+        bg.alpha   = 0.7,                             # semi-transparent background
+        position   = tm_pos_in("right", "bottom"),    # place legend at right–bottom
+        frame      = TRUE                             # thin frame around legend
+      )
+    ) +
+    tm_shape(mpsz_clean) +                            # overlay subzone boundaries
+    tm_borders(col = "grey30", lwd = 0.4) +           # thin grey borders
+    tm_graticules(labels.size = 0.7) +                # graticules with labels
+    tm_compass() +                                    # north arrow
+    tm_layout(title = title_text, 
+              title.position=c("center", "bottom"),
+              scale = 1.0
+              )        # title + 1.0 scale (as shown)
+}
+
+# 2) Build the three maps (inputs were created in §9.4 and given a CRS in §9.5)
+map_kde_diggle <- build_kde_map(kde_rest_diggle_rast, "KDE (Diggle σ) — Restaurants")
+map_kde_fixed  <- build_kde_map(kde_rest_fixed_rast,  "KDE (Fixed σ = 0.6 km) — Restaurants")
+map_kde_adapt  <- build_kde_map(kde_rest_adapt_rast,  "KDE (Adaptive) — Restaurants")
+
+# 3) Print the maps (one after another)
+map_kde_diggle
+map_kde_fixed
+map_kde_adapt
+
+```
+
+The three KDE variants provide distinct perspectives on the spatial distribution of restaurants. **Adaptive KDE** highlights localized hotspots by adjusting the bandwidth to point density, thereby capturing both dense clusters and sparse areas with appropriate resolution. In contrast, **Fixed KDE** applies a constant bandwidth across the study area, producing a smoother and more generalized surface that is useful for regional-level comparisons but less sensitive to local variation. **Diggle's bandwidth** method emphasizes very fine-grained patterns, which can be valuable for micro-scale exploration, though it often exaggerates noise and yields fragmented results.
+
+For this exercise, we adopt the **Adaptive KDE** approach, as it strikes a balance between local detail and overall interpretability, making it well suited for planning, policy, and spatial decision-making in the Singapore context. Nonetheless, KDE is **sensitive to bandwidth choice and scale dependency**, and it does not account for underlying population or land-use factors. These limitations must be considered when interpreting the identified hotspots.
+
+### First-order Spatial Point Pattern Analysis (SPPA) at the Planning Subzone Level
+
+This section applies First Order SPPA to assess how the distribution of restaurant locations varies across Singapore's planning subzones. Unlike kernel density estimation at the continuous surface level, the subzone-based approach aggregates point counts into administrative boundaries, enabling direct comparison of spatial intensity relative to area size and population density. This allows us to identify subzones with unusually high or low restaurant concentrations, detect clustering patterns at a policy-relevant scale, and provide insights for urban planning and commercial decision-making.
+
+#### Geospatial data wrangling
+
+We will prepare four contrasted study areas so the subsequent first-order analyses (intensity mapping via KDE) are meaningful and comparable across different urban contexts. The choice is deliberate: (1) Downtown/Central retail core (extremely high restaurant intensity), (2) a mature regional centre in the East, (3) a large heartland town in the West, and (4) a newer North-East town. Together they cover distinct development histories, land-use mixes, and day--night populations, which strongly influence restaurant locations. Working at the planning-area/subzone scale also reduces boundary bias for local analyses while keeping results policy-relevant (these are common planning units). In what follows, we: extract the four planning areas, convert them to owin study windows required by spatstat, clip the Singapore-wide restaurant ppp to each window (defensive check), and rescale to kilometers (single canonical unit). These km-scaled point patterns become the inputs for KDE and any other first-order statistics i,kn the next subsections.
+
+```{r}
+
+# 1) Extract FOUR planning areas by name (edit names if our dataset differs) -----
+pa_punggol   <- dplyr::filter(mpsz_clean, PLN_AREA_N == "PUNGGOL")       # Punggol polygon(s)
+pa_tampines  <- dplyr::filter(mpsz_clean, PLN_AREA_N == "TAMPINES")      # Tampines polygon(s)
+pa_orchard  <- dplyr::filter(mpsz_clean, PLN_AREA_N == "ORCHARD")        # Orchard polygon(s)
+pa_jurongw   <- dplyr::filter(mpsz_clean, PLN_AREA_N == "JURONG WEST")   # Jurong West polygon(s)
+
+# 2) Convert each planning area polygon to a spatstat observation window (owin) --
+owin_punggol  <- spatstat.geom::as.owin(pa_punggol)    # owin used for clipping & SPPA
+owin_tampines <- spatstat.geom::as.owin(pa_tampines)   # owin for Tampines
+owin_orchard <- spatstat.geom::as.owin(pa_orchard)     # owin for Orchard
+owin_jurongw  <- spatstat.geom::as.owin(pa_jurongw)    # owin for Jurong West
+
+# 3) Clip the restaurants point pattern (meters) to each area's owin -------------
+rest_ppp_punggol_m  <- rest_ppp[owin_punggol]          # keep only restaurants inside Punggol
+rest_ppp_tampines_m <- rest_ppp[owin_tampines]         # keep only restaurants inside Tampines
+rest_ppp_orchard_m <- rest_ppp[owin_orchard]           # keep only restaurants inside Orchard
+rest_ppp_jurongw_m  <- rest_ppp[owin_jurongw]          # keep only restaurants inside Jurong West
+
+# 4) Rescale EACH clipped ppp from meters to kilometers (single canonical call) ---
+rest_ppp_punggol_km  <- rescale.ppp(rest_ppp_punggol_m,  1000, "km")  # m → km for Punggol
+rest_ppp_tampines_km <- rescale.ppp(rest_ppp_tampines_m, 1000, "km")  # m → km for Tampines
+rest_ppp_orchard_km <- rescale.ppp(rest_ppp_orchard_m, 1000, "km")  # m → km for Orchard
+rest_ppp_jurongw_km  <- rescale.ppp(rest_ppp_jurongw_m,  1000, "km")  # m → km for Jurong West
+
+# 5) Quick visual sanity check (optional) ----------------------------------------
+# par(mfrow = c(2,2))                                            # 2-by-2 panel layout
+plot(unmark(rest_ppp_orchard_km), main = "Orchard (km)")       # plot points within boundary (km)
+plot(unmark(rest_ppp_jurongw_km),  main = "Jurong West (km)")
+plot(unmark(rest_ppp_tampines_km), main = "Tampines (km)")  
+plot(unmark(rest_ppp_punggol_km),  main = "Punggol (km)") 
+
+par(mfrow = c(1,1))                                         # reset layout
+
+# 6) Defensive checks on objects & units before tests/KDE -------------------------
+stopifnot(spatstat.geom::is.ppp(rest_ppp_punggol_km))   # confirm valid ppp in km
+stopifnot(spatstat.geom::is.ppp(rest_ppp_tampines_km))  # confirm valid ppp in km
+stopifnot(spatstat.geom::is.ppp(rest_ppp_orchard_km))  # confirm valid ppp in km
+stopifnot(spatstat.geom::is.ppp(rest_ppp_jurongw_km))   # confirm valid ppp in km
+
+# Inspect counts & windows to ensure clipping behaved as expected ------
+summary(rest_ppp_orchard_km); summary(rest_ppp_jurongw_km)
+summary(rest_ppp_punggol_km); summary(rest_ppp_tampines_km)
+
+```
+
+The wrangled outputs highlight how restaurant distributions differ significantly across four contrasting planning areas in Singapore:
+
+**Orchard**, located within the central region, demonstrates the highest spatial intensity with 25 restaurants contained within a small area of 0.96 km², producing an average density exceeding 26 restaurants per km². This reflects Orchard's role as a prime commercial and retail hub where food and beverage establishments cluster tightly to serve both local consumers and international visitors.
+
+**Jurong West**, by comparison, records 17 restaurants within roughly 0.96 km², yielding a more moderate intensity of 1.16 per km². This suggests the presence of neighbourhood-level clusters that cater to local residential populations rather than destination-driven demand. \`
+
+**Tampines** shows 15 restaurants spread across 9.37 km², producing an intensity of 0.72 per km², which is consistent with its position as a regional centre offering balanced commercial and residential amenities.
+
+**Punggol**, a relatively new residential town, records only five restaurants within 9.37 km², resulting in the lowest intensity of 0.53 per km². This contrast highlights clear urban hierarchies, where maturity of development, population density, and land-use composition strongly shape restaurant clustering. The outputs confirm that spatial intensity patterns correspond closely to each area's developmental history and functional role.
+
+#### Computing KDE surfaces by planning Area
+
+By converting discrete restaurant locations into continuous density surfaces, KDE helps identify hotspots and highlight differences in spatial intensity across planning areas. At this stage, we focus on computing KDE surfaces separately for selected planning areas of Singapore, instead of for the entire island. This allows us to explore variations in restaurant distribution within localised study areas and compare across subzones. Importantly, the KDE computation uses a consistent bandwidth estimator, ensuring results are comparable across regions. Following the same structure and coding style as earlier sections, we use Diggle's automatic bandwidth selection method (bw.diggle) and apply the Gaussian kernel to maintain methodological consistency. All computations are carried out in kilometers, rather than meters, since this scale provides results that are interpretable and aligned with urban planning practices. This ensures KDE values represent the density of restaurants per square kilometer, a unit meaningful for evaluating clustering and intensity at the planning area level.
+
+```{r}
+
+# Orchard
+plot(
+  density(rest_ppp_orchard_km,
+          sigma = bw.diggle,
+          edge = TRUE,
+          kernel = "gaussian"),
+  main = "Orchard"
+)
+
+# Jurong West
+plot(
+  density(rest_ppp_jurongw_km,
+          sigma = bw.diggle,
+          edge = TRUE,
+          kernel = "gaussian"),
+  main = "Jurong West"
+)
+
+# Tampines
+plot(
+  density(rest_ppp_tampines_km,
+          sigma = bw.diggle,
+          edge = TRUE,
+          kernel = "gaussian"),
+  main = "Tampines"
+)
+
+# Punggol
+plot(
+  density(rest_ppp_punggol_km,
+          sigma = bw.diggle,
+          edge = TRUE,
+          kernel = "gaussian"),
+  main = "Punggol"
+)
+
+```
+
+The KDE plots for Orchard, Jurong West, Tampines, and Punggol illustrate clear contrasts in restaurant clustering across different planning areas. Orchard stands out with extremely high intensities exceeding 30,000 restaurants per km² in certain hotspots, reflecting its role as Singapore's premier retail and F&B destination. Jurong West shows multiple localised clusters, with peak intensities above 35, indicating neighbourhood-scale concentrations around commercial nodes. Tampines displays moderate but spatially dispersed clusters with values around 3 per km², consistent with its character as a regional centre serving a large residential population. Punggol, a newer town, has fewer restaurants overall, with peaks around 5 per km² concentrated in limited pockets, revealing its emerging but still sparse food landscape.
+
+These differences confirm that KDE is effective in capturing the spatial heterogeneity of restaurant intensity across planning areas. Orchard exemplifies centralised, high-density clustering driven by its urban function, while Tampines and Jurong West illustrate more moderate but significant suburban nodes. Punggol lags behind, with limited commercial clustering that reflects its developmental stage. Together, these outputs demonstrate how KDE surfaces can reveal meaningful variations in urban foodscapes, linking land-use intensity, urban maturity, and service accessibility to spatial patterns of F&B establishments.
+
+### Spatio-temporal KDE (STKDE) for Jan--Jun 2025
+
+In this section, we bring together the spatial and temporal dimensions of restaurant incorporations into a unified spatio-temporal analysis using STKDE. The period of focus is January to June 2025, and the primary aim is to detect not only where incorporations cluster in space but also how these clusters evolve across time. The section begins with exploratory faceted maps that simply display the geographic distribution of restaurants month by month, offering a descriptive baseline. This is followed by computational STKDE at the monthly scale, where incorporation months are treated as temporal marks and used to generate a three-dimensional density surface across space (x, y) and time (t). Recognising that monthly aggregation can mask short-lived bursts of activity, the section then extends to day-level STKDE. By applying bootstrap bandwidth optimisation, the analysis achieves a careful balance between spatial and temporal smoothing, ensuring that density estimates capture meaningful patterns rather than artefacts of parameter choice. Finally, the section emphasises validation and interpretability, producing fixed-scale comparative panels that allow researchers to trace how hotspots intensify, persist, or dissipate across the study window. Overall, Section 9.7 transforms raw incorporation points into a dynamic surface that reveals the tempo and geography of restaurant entry, providing richer insight than purely spatial or purely temporal methods could offer in isolation.
+
+#### Visualising geographic distribution by month
+
+Before advancing into formal spatio-temporal density estimation, the data is first explored visually to understand how restaurant incorporations are spread across Singapore from January to June 2025. Using the tmap package in static plot mode, individual incorporations are represented as dots, layered over the national planning boundary (sg_owin) to ensure geographic consistency. By applying tm_facets (by = "MONTH_ABBR"), the output generates a panel of maps, one for each month, which collectively illustrate how point distributions evolve across time. This faceted approach does not yet quantify clustering but serves as an intuitive diagnostic, highlighting months with visibly denser patterns or more dispersed incorporations. Such side-by-side visualisation is valuable for detecting preliminary trends---for example, whether activity is consistently concentrated in the central business districts or if new hotspots are emerging in suburban planning areas. As an exploratory step, these maps provide a baseline context that informs and motivates the more rigorous spatio-temporal KDE analysis developed later in the section.
+
+```{r}
+#| fig-width: 12
+#| fig-height: 8
+
+tmap::tmap_mode("plot")
+
+study_owin_sf <- sf::st_as_sf(sg_owin)
+sf::st_crs(study_owin_sf) <- 3414  # SVY21
+
+tm_shape(study_owin_sf) +
+  tm_polygons(col = NA, border.col = "grey70", lwd = 0.4) +
+tm_shape(biz_56111_sf) +
+  tm_dots(size = 0.2, fill = "red") +
+  tm_facets(by = "MONTH_ABBR", free.coords = FALSE, drop.units = TRUE)
+
+study_owin_sf
+
+```
+
+Looking at the monthly distribution of new restaurant openings between January and July, several clear spatial patterns emerge from visual inspection of the plots. In **January**, there is a tightly packed concentration of establishments in the central-southern corridor, particularly around the Orchard--Downtown Core region. The clustering appears compact, with points situated very close to one another, suggesting a strong central hotspot. In **February**, the pattern remains similar, with a dense grouping in the south, though the spread toward the east appears slightly more noticeable.
+
+By **March**, the distribution shows some diffusion, with points appearing across the island, but the central cluster continues to dominate visually. **April** differs by showing a wider spread of points, with openings extending further into the northern and eastern areas. While the central region remains active, the clustering looks less compact, reflecting broader spatial coverage rather than dense concentration.
+
+In **May** and **June**, the central clustering reasserts itself, with a visible grouping of restaurants again emerging in the south. June, in particular, demonstrates a mix of dense clustering and moderate spread. Finally, in **July**, the pattern thins slightly, but central clustering persists, though less intense compared to January.
+
+Overall, the visuals highlight a persistent central hotspot, alongside varying levels of island-wide spread month to month.
+
+#### STKDE by month
+
+Here, the analysis moves from descriptive visualization to computational STKDE, aggregated by month. The dataset is first structured so that the month of incorporation (1--12) is explicitly treated as a time mark, ensuring compatibility with the spatstat framework. The data is then converted to a planar point pattern process (PPP) with spatial coordinates expressed in meters, and subsequently rescaled into kilometers for consistency with the rest of the study. Each restaurant's month of incorporation is treated as a temporal event, which is clipped to the global study window to avoid edge effects. The spattemp.density() function then computes the STKDE, estimating how restaurant incorporations are distributed simultaneously across space and time. The outcome is a three-dimensional density object (x, y, t), where t represents month. This monthly STKDE provides a fine-grained temporal lens, enabling researchers to investigate whether restaurant hotspots emerge gradually, persist across multiple months, or appear suddenly, potentially linked to policy interventions or seasonal demand.
+
+```{r}
+
+# 1) Keep ONLY the month mark (1..12) with geometry (still meters here)
+rest_month <- biz_56111_sf |>
+  dplyr::select(MONTH_NUM)
+
+# 2) Convert to ppp (meters); MONTH_NUM travels along as marks
+rest_month_ppp <- spatstat.geom::as.ppp(rest_month)
+
+# 3) Clip to the global observation window you used in §9
+rest_month_owin <- rest_month_ppp[sg_owin]
+
+# 4) Rescale to kilometers (to stay consistent with §9)
+rest_month_ppp_km <- spatstat.geom::rescale(rest_month_owin, 1000, "km")
+
+# --- CRITICAL: ensure time marks are a plain numeric vector (not a data.frame/factor)
+mks <- marks(rest_month_ppp_km)
+month_vec <- if (is.data.frame(mks)) mks$MONTH_NUM else mks
+stopifnot(is.numeric(month_vec))
+rest_month_ppp_km <- spatstat.geom::setmarks(rest_month_ppp_km, as.numeric(month_vec))
+
+# Quick sanity: months present should be inside 1..12
+range(month_vec, na.rm = TRUE)
+table(month_vec)
+
+# 5) STKDE using sparr (let it pick sensible spatial defaults; specify time grid)
+#    tres = number of distinct months we actually have; tlim bounds the months.
+uniq_months <- sort(unique(month_vec))
+nt <- length(uniq_months)
+
+st_kde_m <- sparr::spattemp.density(
+  rest_month_ppp_km,
+  sres  = 128,                      # spatial grid like the notes
+  tres  = nt,                        # number of time slices
+  tlim  = range(uniq_months, na.rm = TRUE)  # temporal span (e.g., 1..7 in your data)
+)
+
+# Confirm we now have a 3D object (you should see ... x ... x nt)
+summary(st_kde_m)
+
+```
+
+```{r}
+
+# 6) Map actual month numbers -> internal time indices that spattemp.density created
+#    st_kde_m$z$t holds the time coordinate; if NULL (very rare), build a seq of length nt.
+t_axis <- st_kde_m$z$t
+if (is.null(t_axis)) t_axis <- seq_len(nt)
+
+t_idx  <- match(uniq_months, t_axis)
+keep   <- !is.na(t_idx)
+t_idx  <- t_idx[keep]
+lab_months <- month.abb[uniq_months][keep]
+
+# 7) Plot every month with a fixed legend range (prof’s “comparable panels” habit)
+op <- par(mfcol = c(2, ceiling(length(t_idx)/2)))  # 2×? grid; adjust if you prefer 3×?
+for (i in seq_along(t_idx)) {
+  plot(
+    st_kde_m, t_idx[i],
+    override.par = FALSE,
+    fix.range    = TRUE,
+    main = paste("KDE at", lab_months[i])
+  )
+}
+par(op)
+
+```
+
+The STKDE surfaces provide a dynamic perspective on restaurant intensity across Singapore's planning areas from January to July 2025. Unlike the static first-order SPPA, which offered a cumulative view of clustering, STKDE reveals how concentration shifts month by month.
+
+In the early months, February and March exhibit diffuse patterns with low overall intensity, indicating that restaurant registrations were spread broadly across several planning areas rather than concentrated in one location. April marks a sharp surge in activity, with central planning areas registering the highest intensity, exceeding 0.02 restaurants/km². This confirms the first-order result that central regions are the primary clusters but clarifies that the peak was temporally concentrated in April. Activity then disperses in May and June, with moderate levels appearing in eastern and western planning areas such as Tampines and Jurong West, suggesting a decentralization of openings. By July, the overall intensity weakens further, reflecting fewer new registrations across the island and confirming that April's central spike was an anomaly rather than a sustained trend.
+
+Importantly, these outputs are not counts of restaurants but model-derived intensities. The kernel estimator smooths each restaurant registration across space and time according to the selected bandwidths. As a result, the maps report expected density in restaurants per km² per day, not literal fractions of a restaurant, providing a probabilistic representation of clustering strength over space-time.
+
+In summary, STKDE supports the first-order SPPA finding of central dominance but introduces essential temporal nuance: clustering was episodic, peaking in April, while other planning areas intermittently absorbed activity. This demonstrates the value of spatio-temporal methods in distinguishing short-lived bursts from longer-term geographic concentration.
+
+#### STKDE by day-of-year (improved bandwidths via BOOT.spattemp)
+
+This section advances the STKDE analysis by refining temporal granularity to the level of individual days and improving smoothing parameters through bootstrap bandwidth selection. The day-of-year (1--366) is extracted from each incorporation date, ensuring temporal precision beyond monthly aggregation. The dataset is then processed into a PPP, rescaled to kilometers, and prepared with appropriate temporal marks. A critical step here is bandwidth optimisation: instead of relying on arbitrary or fixed values, the bootstrap method (BOOT.spattemp) identifies data-driven spatial ($h$) and temporal ($\lambda$) bandwidths that balance bias and variance. This ensures that the resulting STKDE surface captures meaningful clustering patterns without over-smoothing fine details or exaggerating noise. Once the optimised parameters are selected, the spatio-temporal density is computed, and slices across different days can be visualised. This approach provides a much more dynamic and precise picture of incorporation activity, capable of highlighting short-lived bursts of restaurant openings that monthly aggregation might obscure, offering richer insight into temporal clustering behaviour.
+
+```{r}
+
+# 1) Build a temp sf with just the Day-of-Year mark (1..366), keep geometry
+rest_yday <- biz_56111_sf |>
+  dplyr::transmute(YDAY_NUM = lubridate::yday(date))
+
+# 2) Convert to ppp (meters) – the mark travels along
+rest_yday_ppp <- spatstat.geom::as.ppp(rest_yday)
+
+# 3) Clip to the same global observation window used in §9
+rest_yday_owin <- rest_yday_ppp[sg_owin]
+
+# 4) Rescale to kilometers (consistent with the rest of §9)
+rest_yday_ppp_km <- spatstat.geom::rescale(rest_yday_owin, 1000, "km")
+
+# 5) SAFETY: ensure the time mark is a plain numeric vector inside the ppp
+mks <- marks(rest_yday_ppp_km)
+yday_vec <- if (is.data.frame(mks)) mks$YDAY_NUM else mks
+stopifnot(is.numeric(yday_vec))
+rest_yday_ppp_km <- spatstat.geom::setmarks(rest_yday_ppp_km, as.numeric(yday_vec))
+
+# Quick checks like in the notes
+range(yday_vec, na.rm = TRUE)      # should be within 1..366 subset
+length(unique(yday_vec))           # number of distinct days actually present
+
+# 6) Select bandwidths via bootstrap (professor’s method)
+set.seed(1234)  # reproducibility
+boot_bw <- sparr::BOOT.spattemp(rest_yday_ppp_km)  # let sparr choose; no extra args
+
+# --- Robust extraction: works for both list-return and numeric vector-return
+h_opt <- tryCatch(boot_bw$h.opt, error = function(e) NULL)
+lambda_opt <- tryCatch(boot_bw$lambda.opt, error = function(e) NULL)
+if (is.null(h_opt) || is.null(lambda_opt)) {
+  vals <- as.numeric(boot_bw)
+  stopifnot(length(vals) >= 2)
+  h_opt      <- vals[1]
+  lambda_opt <- vals[2]
+}
+cat("Selected h (km):", h_opt, "  lambda (days):", lambda_opt, "\n")
+
+# 7) Compute the STKDE using the selected bandwidths
+kde_yday <- sparr::spattemp.density(
+  rest_yday_ppp_km,
+  h      = h_opt,
+  lambda = lambda_opt
+)
+
+# Inspect (should report the t-domain and grid)
+summary(kde_yday)
+
+```
+
+```{r}
+
+# 8a) Plot a specific day-of-year slice (like the notes). Example: t = 10
+# plot(kde_yday)        # default panel (slider-like)
+# plot(kde_yday, 10)    # explicitly show t = 10 (any valid index 1..nt)
+
+# 8b) Optional: evenly spaced days panel with fixed legend (robust to structure)
+# Try to get the time axis from the object; fall back to cube depth; then to data
+t_axis <- kde_yday$z$t
+if (is.null(t_axis)) {
+  nt_from_v <- tryCatch({
+    vv <- kde_yday$z$v
+    d  <- dim(vv)
+    if (length(d) >= 3) d[3] else NA_integer_
+  }, error = function(e) NA_integer_)
+  if (is.na(nt_from_v)) {
+    nt_from_v <- length(unique(yday_vec))  # last resort: how many days we fed in
+  }
+  t_axis <- seq_len(nt_from_v)
+}
+
+# Guard: if we still don’t have any time slices, stop with a clear message
+if (length(t_axis) < 1L) {
+  stop("STKDE object has zero time slices (check marks/time input and BOOT bandwidth step).")
+}
+
+# Build up to 6 evenly spaced slice indices across the available t-axis
+k <- min(6L, length(t_axis))
+t_show <- unique(round(seq(from = 1, to = length(t_axis), length.out = k)))
+t_show <- t_show[t_show >= 1 & t_show <= length(t_axis)]  # extra safety
+
+# Plot with a fixed legend range so panels are comparable
+op <- par(mfcol = c(2, ceiling(length(t_show)/2)))  # 2×3 grid when 6 slices
+for (ti in t_show) {
+  plot(
+    kde_yday, ti,
+    override.par = FALSE,
+    fix.range    = TRUE,
+    main = paste("KDE at t =", ti)
+  )
+}
+par(op)
+
+```
+
+The spatio-temporal kernel density estimation (STKDE) by day-of-year provides a refined view of restaurant openings across Singapore during the first half of 2025. Using a spatial bandwidth ($h$) of approximately 0.97 km and a temporal bandwidth ($\lambda$) of about 120.5 days, the model smooths individual registrations over space and time, producing estimates on a 128 × 128 × 212 lattice. This fine resolution allows clustering patterns to be examined at daily granularity rather than through broader monthly aggregation. The estimated intensity values range between $5.3 \times 10^{-48}$), representing effective background zero, and $1.25 \times 10^{-4}$ restaurants per $km^2$ per day, representing maximum hotspot strength. These outputs capture expected densities, not literal counts, and indicate the probability surface of clustering.
+
+Across all temporal slices (t = 1, 39, 76, 114, 151, 189), the results consistently highlight a persistent hotspot in central Singapore, most clearly associated with the Orchard and Downtown Core areas. The hotspot is visible in every slice, demonstrating that clustering is not sporadic or shifting but stable and spatially anchored in the central planning region. No secondary hotspots emerge in suburban or peripheral areas such as Jurong West, Tampines, or Punggol.
+
+The insight is that restaurant openings during this period are highly persistent in central locations, reinforcing the dominance of established commercial zones. Temporal variation in intensity is modest, but the spatial persistence underscores entrenched market preference for core areas.
+
+## Second-order spatial point patterns analysis
+
+While first-order analysis (Section 9) identified where restaurant registrations were most intense, it does not tell us whether those hotspots are statistically significant or simply a result of background density. To address this, we perform second-order SPPA, which examines how the relative positions of points deviate from CSR.
+
+In practice, among the four classical second-order functions ($G$, $F$, $K$, $L$), the $K$-function and its variance-stabilised form, the $L$-function, are most widely adopted. They are preferred because they capture multi-scale clustering and dispersion across a range of distances, while $G$ and $F$ are primarily sensitive to nearest-neighbour effects. We therefore focus our analysis on $K$ and $L$ functions, supported by Monte Carlo CSR testing using 99/999 simulations.
+
+### Analysing apatial point process using $K$-function
+
+The $K$-function is a second-order spatial point process statistic that measures the number of neighbouring events within a given distance of each observed point and compares the result to a theoretical expectation under CSR. Unlike first-order methods such as kernel density estimation that highlight intensity variations across space, the $K$-function examines spatial dependence between points, thereby detecting clustering or dispersion at multiple scales. In this exercise, the analysis is applied to the restaurant dataset filtered for the period January to June 2025, focusing on Tampines and Punggol planning areas. The $K$-function is estimated for each subregion and tested against a CSR benchmark using 999 Monte Carlo simulations to generate significance envelopes. By comparing the observed function with the simulation envelope, the analysis reveals whether the observed distribution of restaurants reflects random processes, significant clustering, or spatial regularity. This approach is crucial because it provides statistical evidence to support visual impressions from density maps and allows the detection of spatial interactions across a range of distances. Ultimately, the $K$-function offers deeper insights into how restaurants are spatially distributed in different planning contexts and whether their locations are shaped by systematic clustering forces or can be explained by chance alone.
+
+```{r}
+
+# K for Orchard
+K_or      <- Kest(rest_ppp_orchard_km,  correction = "Ripley")
+K_or.csr  <- envelope(rest_ppp_orchard_km,  Kest, nsim = 999, rank = 1, glocal = TRUE)
+
+plot(K_or.csr, . - r ~ r,
+     xlab = "Distance (km)", ylab = "K(d) - r",
+     main = "K-function with CSR envelope — Orchard (Jan–Jun 2025)")
+
+# K for Jurong West
+K_jw      <- Kest(rest_ppp_jurongw_km,  correction = "Ripley")
+K_jw.csr  <- envelope(rest_ppp_jurongw_km,  Kest, nsim = 999, rank = 1, glocal = TRUE)
+
+plot(K_jw.csr, . - r ~ r,
+     xlab = "Distance (km)", ylab = "K(d) - r",
+     main = "K-function with CSR envelope — Jurong West (Jan–Jun 2025)")
+
+# K for Tampines (reusing Sect. 9 PPP)
+K_tm      <- Kest(rest_ppp_tampines_km, correction = "Ripley")
+K_tm.csr  <- envelope(rest_ppp_tampines_km, Kest, nsim = 999, rank = 1, glocal = TRUE)
+
+plot(K_tm.csr, . - r ~ r,
+     xlab = "Distance (km)", ylab = "K(d) - r",
+     main = "K-function with CSR envelope — Tampines (Jan–Jun 2025)")
+
+# K for Punggol
+K_pg      <- Kest(rest_ppp_punggol_km,  correction = "Ripley")
+K_pg.csr  <- envelope(rest_ppp_punggol_km,  Kest, nsim = 999, rank = 1, glocal = TRUE)
+
+plot(K_pg.csr, . - r ~ r,
+     xlab = "Distance (km)", ylab = "K(d) - r",
+     main = "K-function with CSR envelope — Punggol (Jan–Jun 2025)")
+
+```
+
+The second-order analysis using Ripley's $K$-function provides important insights into how restaurant establishments are distributed across different planning areas of Singapore between January and June 2025. By comparing the observed distribution of restaurants against CSR envelopes, the analysis highlights whether clustering or dispersion dominates at neighborhood scales.
+
+For **Orchard**, the observed $K$-function remains almost entirely within the CSR envelope across the evaluated distance range of 0 -- 0.3 km. At very short distances ($< 0.15 km$), the curve dips slightly below the CSR expectation, suggesting weak local inhibition, where restaurants appear marginally more spaced out than expected under randomness. However, this deviation is minor and does not persist. Beyond 0.15 km, the curve converges back toward the CSR line, indicating no strong evidence of clustering. These results align with Orchard's role as a mature, high-density commercial area, where planning controls and established tenancy structures may limit excessive agglomeration at micro-scales.
+
+In contrast, **Jurong West** demonstrates marginal clustering. The observed curve consistently rises above the CSR expectation and approaches the upper bounds of the simulation envelope across distances up to \~1.2 km. This indicates that restaurants in Jurong West tend to co-locate more than would be expected under randomness, reflecting localized agglomeration effects. Such clustering could be driven by town-center development, transport nodes, or concentrated demand in an expanding residential population.
+
+For **Tampines**, the observed curve closely tracks the CSR expectation and remains well within the envelope over distances from 0 to 1.6 km. The absence of significant deviation suggests that the distribution of restaurants here is broadly consistent with spatial randomness, neither clustering nor dispersing in a systematic manner. This even spread reflects balanced urban planning, where amenities are distributed across the planning area to serve residential neighborhoods efficiently.
+
+Finally, **Punggol** shows a more ambiguous pattern. At short distances (\<0.3 km), the curve dips below CSR expectation, hinting at weak repulsion, but rises above CSR between 0.4 and 1.0 km, which may suggest clustering at sub-kilometer scales. However, a critical limitation is that the CSR envelope is missing for this plot, making statistical significance impossible to confirm. Visual inspection alone is insufficient, and further analysis using the L-function with envelopes is recommended to validate potential clustering in this emerging town.
+
+Overall, the comparison underscores the diversity of spatial dynamics: Orchard shows near randomness with slight inhibition, Jurong West exhibits strong clustering, Tampines reflects balanced distribution, and Punggol remains inconclusive without full statistical testing. These findings emphasize the importance of using envelopes and complementary methods to robustly interpret spatial point patterns.
+
+### Analysing spatial point process using $L$-function
+
+The $L$-function is a variance-stabilised transformation of the $K$-function that provides a more interpretable measure of spatial point pattern dependence across different distance scales. While the $K$-function often grows rapidly with increasing distance, making it difficult to compare observed and expected values directly, the $L$-function linearises the expectation under CSR, such that deviations above or below the theoretical line can be more clearly identified. In this study, the $L$-function is applied to restaurant locations in Tampines and Punggol for the period January to June 2025, using the same point process objects generated in earlier sections. Monte Carlo simulations with 999 iterations are performed to construct CSR envelopes, providing a rigorous statistical test of spatial randomness at multiple scales. The $L$-function plots make it possible to distinguish between significant clustering and dispersion patterns with greater clarity compared to the raw K-function, especially at shorter distances where statistical fluctuations are most pronounced. By applying this method, the analysis can reveal not only whether clustering exists, but also the spatial range over which it occurs, offering deeper insights into how restaurant distributions reflect underlying urban design and commercial activity patterns in both new town and regional centre contexts.
+
+```{r}
+
+# L for Orchard
+L_or      <- Lest(rest_ppp_orchard_km, correction = "Ripley")
+L_or.csr  <- envelope(rest_ppp_orchard_km, Lest, nsim = 999, rank = 1, glocal = TRUE)
+
+plot(L_or.csr, . - r ~ r,
+     xlab = "Distance (km)", ylab = "L(d) - r",
+     main = "L-function with CSR envelope — Orchard (Jan–Jun 2025)")
+
+# L for Jurong West
+L_jw      <- Lest(rest_ppp_jurongw_km, correction = "Ripley")
+L_jw.csr  <- envelope(rest_ppp_jurongw_km, Lest, nsim = 999, rank = 1, glocal = TRUE)
+
+plot(L_jw.csr, . - r ~ r,
+     xlab = "Distance (km)", ylab = "L(d) - r",
+     main = "L-function with CSR envelope — Jurong West (Jan–Jun 2025)")
+
+
+# L for Tampines
+L_tm      <- Lest(rest_ppp_tampines_km, correction = "Ripley")
+L_tm.csr  <- envelope(rest_ppp_tampines_km, Lest, nsim = 999, rank = 1, glocal = TRUE)
+
+plot(L_tm.csr, . - r ~ r,
+     xlab = "Distance (km)", ylab = "L(d) - r",
+     main = "L-function with CSR envelope — Tampines (Jan–Jun 2025)")
+
+# L for Punggol
+L_pg      <- Lest(rest_ppp_punggol_km, correction = "Ripley")
+L_pg.csr  <- envelope(rest_ppp_punggol_km, Lest, nsim = 999, rank = 1, glocal = TRUE)
+
+plot(L_pg.csr, . - r ~ r,
+     xlab = "Distance (km)", ylab = "L(d) - r",
+     main = "L-function with CSR envelope — Punggol (Jan–Jun 2025)")
+
+```
+
+The application of the $L$-function with CSR envelopes provides deeper insight into the spatial arrangement of restaurants across Orchard, Jurong West, Tampines, and Punggol between January and June 2025. By linearising the $K$-function expectation, the $L$-function makes it easier to discern whether restaurant distributions follow CSR, or whether clustering or dispersion tendencies dominate at specific spatial scales.
+
+For **Orchard**, the observed $L(d) – r$ curve remains tightly bounded within the CSR envelope across the full range of distances considered (0--0.3 km). The curve oscillates only slightly around the theoretical CSR line, with no systematic departures above or below. This finding indicates that restaurant locations in Orchard do not exhibit statistically significant clustering or dispersion. Instead, they are distributed in a manner that aligns with spatial randomness. Given Orchard's status as a dense, highly regulated commercial core, this result is consistent with deliberate urban planning that balances accessibility with saturation, ensuring even service distribution within a small and competitive district.
+
+In **Jurong West**, the $L$-function suggests a more dynamic pattern. While the observed curve remains within the CSR simulation envelope, positive deviations emerge at mid-range distances (0.4 -- 0.8 km). These upward departures, although not statistically conclusive, hint at weak clustering tendencies at the neighbourhood scale. Such patterns could reflect the pull of transport hubs, shopping malls, or residential-commercial nodes that naturally attract several establishments in proximity. Nevertheless, because the curve never clearly exits the CSR band, the clustering tendency remains suggestive rather than definitive. Jurong West therefore presents a case of emerging but not strongly validated agglomeration.
+
+The results for **Tampines** reveal perhaps the strongest case of spatial randomness. Across the distance range of 0--1.6 km, the observed curve closely tracks the CSR expectation without deviating from the simulation envelope. This strongly supports the conclusion that restaurants in Tampines are randomly distributed. As a mature regional centre with carefully balanced land-use planning, Tampines demonstrates a regulated distribution of food establishments across its subzones. Rather than clustering tightly or dispersing systematically, restaurants appear evenly spread, reflecting planning policies that prioritise accessibility and avoid excessive concentration in any one area.
+
+In contrast, **Punggol** produces an irregular output. The observed curve dips below CSR at very short distances ($<0.3 km$), suggesting weak inhibition where restaurants may avoid locating too close to one another, before rising above CSR at 0.4--0.8 km, which may imply some degree of clustering. However, the absence of a CSR envelope in this plot prevents statistical verification. Without simulation bands, we cannot confidently separate true clustering from random variation. Consequently, the Punggol results remain inconclusive, underscoring the importance of including envelopes in $L$-function diagnostics to avoid misinterpretation.
+
+Taken together, these findings reveal meaningful contrasts across planning areas. Orchard and Tampines illustrate highly regulated and balanced distributions, consistent with mature centres where randomness prevails. Jurong West suggests the beginnings of neighbourhood-scale clustering, while Punggol remains uncertain due to analytical limitations. This diversity highlights how restaurant spatial patterns reflect both planning intent and developmental stage, and why robust statistical validation is essential when drawing conclusions about clustering or dispersion.
+
+### Interactive $L$-function (ggplot → plotly)
+
+The interactive L-function analysis provides an advanced extension to the traditional $L$-function test by leveraging the power of ggplot2 and plotly to create dynamic and user-friendly visualizations. Instead of relying solely on static plots, this approach allows users to explore spatial point pattern characteristics interactively, thereby gaining a more nuanced understanding of clustering and dispersion across multiple spatial scales. For each planning area, such as Tampines and Punggol, the observed $L$-function is plotted against the theoretical expectation under complete spatial randomness, with simulation envelopes representing the confidence bounds derived from Monte Carlo testing. The use of shaded ribbons highlights the ranges of clustering and dispersion, while the rug plots provide immediate cues about where observed values exceed or fall below the envelope. Interactivity is further enhanced by adding range sliders and tooltips, enabling zooming into specific distance bands and facilitating more precise inspection of the data. This interactive approach is particularly valuable in geospatial analytics because patterns of clustering and dispersion often vary by scale, and subtle deviations from randomness can be overlooked in static charts. By allowing analysts to engage directly with the data, the interactive $L$-function supports more robust hypothesis testing and interpretation, especially when comparing patterns across multiple planning areas. In the context of Take-home Exercise 01, this technique strengthens the ability to communicate findings clearly and intuitively, bridging the gap between statistical rigor and practical geovisualisation.
+
+```{r}
+# --- Orchard ---
+stopifnot(exists("L_or.csr"))
+L_or_df <- as.data.frame(L_or.csr)
+
+p_tm <- ggplot(L_or_df, aes(r, obs - r)) +
+  geom_line() +
+  geom_line(aes(y = theo - r), linetype = "dashed", colour = "red") +
+  geom_ribbon(aes(ymin = lo - r, ymax = hi - r), alpha = 0.2) +
+  geom_rug(data = subset(L_or_df, obs > hi), sides = "b") +      # clustering
+  geom_rug(data = subset(L_or_df, obs < lo), sides = "b") +      # dispersion
+  xlab("Distance r (km)") + ylab("L(d) - r") +
+  ggtitle("Interactive L-function — Orchard") +
+  theme_tufte()
+ggplotly(p_tm, dynamicTicks = TRUE) |> rangeslider()
+
+# --- Jurong West ---
+stopifnot(exists("L_jw.csr"))
+L_jw_df <- as.data.frame(L_jw.csr)
+
+p_tm <- ggplot(L_jw_df, aes(r, obs - r)) +
+  geom_line() +
+  geom_line(aes(y = theo - r), linetype = "dashed", colour = "red") +
+  geom_ribbon(aes(ymin = lo - r, ymax = hi - r), alpha = 0.2) +
+  geom_rug(data = subset(L_jw_df, obs > hi), sides = "b") +      # clustering
+  geom_rug(data = subset(L_jw_df, obs < lo), sides = "b") +      # dispersion
+  xlab("Distance r (km)") + ylab("L(d) - r") +
+  ggtitle("Interactive L-function — Jurong West") +
+  theme_tufte()
+ggplotly(p_tm, dynamicTicks = TRUE) |> rangeslider()
+
+
+# --- Tampines ---
+stopifnot(exists("L_tm.csr"))
+L_tm_df <- as.data.frame(L_tm.csr)
+
+p_tm <- ggplot(L_tm_df, aes(r, obs - r)) +
+  geom_line() +
+  geom_line(aes(y = theo - r), linetype = "dashed", colour = "red") +
+  geom_ribbon(aes(ymin = lo - r, ymax = hi - r), alpha = 0.2) +
+  geom_rug(data = subset(L_tm_df, obs > hi), sides = "b") +      # clustering
+  geom_rug(data = subset(L_tm_df, obs < lo), sides = "b") +      # dispersion
+  xlab("Distance r (km)") + ylab("L(d) - r") +
+  ggtitle("Interactive L-function — Tampines") +
+  theme_tufte()
+ggplotly(p_tm, dynamicTicks = TRUE) |> rangeslider()
+
+# --- Punggol ---
+stopifnot(exists("L_pg.csr"))
+L_pg_df <- as.data.frame(L_pg.csr)
+
+p_pg <- ggplot(L_pg_df, aes(r, obs - r)) +
+  geom_line() +
+  geom_line(aes(y = theo - r), linetype = "dashed", colour = "red") +
+  geom_ribbon(aes(ymin = lo - r, ymax = hi - r), alpha = 0.2) +
+  geom_rug(data = subset(L_pg_df, obs > hi), sides = "b") +
+  geom_rug(data = subset(L_pg_df, obs < lo), sides = "b") +
+  xlab("Distance r (km)") + ylab("L(d) - r") +
+  ggtitle("Interactive L-function — Punggol") +
+  theme_tufte()
+ggplotly(p_pg, dynamicTicks = TRUE) |> rangeslider()
+
+```
+
+The interactive $L$-function analysis for Tampines and Punggol provides deeper insights into the spatial distribution of restaurant establishments between January and June 2025.
+
+In Tampines, the observed $L(r)$ curve also aligns closely with the theoretical expectation, with fluctuations contained within the shaded simulation envelope. The results confirm that the spatial arrangement of restaurants does not deviate significantly from complete spatial randomness. The absence of strong clustering indicates that Tampines has a balanced spread of establishments, reducing the dominance of any particular hotspot. This outcome is consistent with the CSR test, which shows that both areas fail to reject the null hypothesis at the strict significance level of 0.001.
+
+In Punggol, the observed $L(r)$ curve oscillates around the theoretical expectation, sometimes rising above and other times dipping below the red dashed line. Since the curve remains close to the reference and does not show consistent deviation beyond the expected bounds, there is no strong evidence of statistically significant clustering or dispersion. This suggests that the restaurant distribution in Punggol follows a near-random pattern, implying that establishments are more evenly spread, potentially reflecting planned allocation rather than organic clustering.
+
+Overall, these results suggest that restaurant locations in Tampines and Punggol during the study period were not driven by strong agglomeration forces but instead reflect a more controlled or regulated distribution, which is important for planners seeking equitable service coverage across suburban regions.
+
+### Spatio-temporal Second-order Analysis (STIKhat)
+
+The spatio-temporal second-order analysis using the STIKhat function extends classical point pattern methods into three dimensions, integrating both spatial and temporal dynamics. Unlike purely spatial tests, which only consider clustering or dispersion across geographic space, STIKhat evaluates how events co-occur in both space and time, making it particularly relevant for understanding dynamic urban processes such as the establishment of new businesses. In the case of Take-home Exercise 01, the dataset of restaurant incorporations between January and June 2025 is used to create a spatio-temporal point process object where each record contains coordinates and a temporal mark corresponding to its month of registration. By computing the spatio-temporal inhomogeneous $K$-function, STIKhat produces contour plots that highlight clustering tendencies at different spatial distances and temporal lags. High contour values at small spatial and temporal scales indicate strong clustering, suggesting that restaurants tend to open close together in both geography and time. Conversely, flat or low contours suggest randomness or dispersion. This method is powerful because it allows us to distinguish between patterns driven by short-term bursts of activity, such as coordinated launches or policy-driven incentives, and those reflecting longer-term structural trends. In this exercise, the STIKhat analysis provides critical insights into whether restaurant establishments are emerging in concentrated spatio-temporal clusters or whether their spread across Singapore is more uniform, thereby supporting urban planning, resource allocation, and the design of sustainable development strategies.
+
+```{r}
+
+# Reuse: biz_56111_sf (has MONTH_NUM, EPSG:3414)
+
+coords_all <- st_coordinates(biz_56111_sf)
+ok <- is.finite(coords_all[,1]) & is.finite(coords_all[,2]) & is.finite(biz_56111_sf$MONTH_NUM)
+
+df_all <- data.frame(
+  x = coords_all[ok, 1],
+  y = coords_all[ok, 2],
+  t = as.integer(biz_56111_sf$MONTH_NUM[ok])
+)
+
+stpp_all <- as.3dpoints(df_all)
+stik_all <- STIKhat(stpp_all)
+
+plotK(stik_all); title(main = "STIKhat contours — Restaurants, Island-wide (Jan–Jun 2025)")
+
+```
+
+```{r}
+
+#|echo: false
+#|eval: false
+
+stik_all
+
+```
+
+![](Warning_Message.png)
+
+![](STIKhat.png)
+
+The STIKhat contour plot illustrates the spatio-temporal interaction of restaurant registrations in Singapore between January and June 2025. The x-axis measures spatial separation up to 6000 meters, the y-axis shows temporal lag up to 1.5 months, and the contours represent levels of clustering intensity, with lighter bands indicating weaker values and darker shades reflecting stronger interaction.
+
+The first contour lies closest to the origin. It appears as a narrow vertical band hugging the y-axis and confined to short distances below \~1500 m. This shape indicates that at very fine spatial scales, clustering intensity is relatively weak and shows little change with temporal lag.
+
+The second contour begins similarly vertical but gradually bends outward as the temporal lag approaches \~1 month. This suggests a transitional stage: clustering still depends on short distances but becomes more evident when events are separated by about a month in time.
+
+From the third contour onward, the shapes flatten quickly into horizontal bands concentrated around the 1-month line on the y-axis. These bands extend across much larger spatial lags (2000--6000 m) and darken in shade, reflecting stronger clustering at regional scales. The horizontal orientation implies that clustering strength is relatively stable across time once events are within roughly one month of each other.
+
+Together, the contours form a pattern where local clustering is weak, but regional clustering at 2--6 km is strong and persistent, especially around one month of lag. The lighter bands near the origin capture limited interaction at fine scales, while the darker, horizontally stretched bands confirm that restaurant growth during this period was driven by episodic, region-level bursts rather than micro-neighbourhood effects.
+
+In practice, such duplications are meaningful because they represent real business activity and are not errors introduced during data wrangling. Removing them would distort the true intensity of clustering, particularly in commercial hubs such as malls or mixed-use developments where multiple outlets may legitimately appear together. Therefore, the correct approach in this context is to retain the duplicated points, acknowledging that they contribute to clustering patterns. At the same time, analysts must be cautious in interpretation, as high clustering detected at very fine scales may partly reflect these duplicates. Rather than deleting them, it is more appropriate to report their presence, explain their effect, and emphasize that they are an inherent part of the business landscape being studied. This ensures statistical validity while maintaining fidelity to the real-world phenomenon under investigation.
+
+## Discussion
+
+The analyses undertaken in this exercise provide an integrated view of the spatial and spatio-temporal dynamics of new restaurant establishments in Singapore between January and June 2025. Each research question is addressed by synthesising first-order intensity surfaces, second-order clustering tests, and spatio-temporal interaction functions.
+
+**RQ1 -- Where/When: Spatial and Temporal Concentrations**
+
+The monthly point pattern plots reveal that restaurant openings between January and June 2025 are not uniformly distributed across Singapore. Visually, central and eastern regions --- particularly around Orchard, Downtown Core, and Tampines --- show persistent concentrations across months, while openings in the west and northeast (e.g., Jurong West, Punggol) appear more sporadic. Importantly, no single month dominates the overall pattern; instead, openings occur consistently, though with slightly higher densities visible in April and June. This stability implies that restaurant activity is not driven by isolated temporal spikes but follows a steady, distributed trajectory. The spatial persistence of central clusters highlights the continuing pull of established commercial corridors, while the presence of scattered points in suburban areas suggests gradual outward diffusion consistent with residential growth.
+
+**RQ2 -- First-Order Intensity (Core Hotspots)**
+
+Kernel density estimation (KDE) and spatio-temporal KDE provide finer insight into intensity. A dominant hotspot persists in the Orchard/Downtown Core, reflecting its established commercial centrality. STIKhat contours further confirm that clustering strength is shaped primarily by spatial distance rather than temporal decay, with contours stabilising around 1--1.5 km. The central hotspot is not static in intensity: visual slices at t = 39 and t = 114 show surges, implying bursts of new entries. However, no new secondary hotspots emerge at comparable strength. Tampines and Jurong West display weaker but visible neighbourhood intensities, while Punggol exhibits limited activity, reflecting its earlier stage of development. Overall, first-order analysis highlights a dual pattern of strong central agglomeration and weaker suburban seeding.
+
+**RQ3 -- Second-Order Clustering Scales**
+
+Second-order statistics refine these impressions by testing deviations from CSR. The $K$-function with envelopes shows that Tampines and Orchard largely conform to randomness, with observed curves contained within CSR bounds. This suggests balanced distributions rather than dominance by clustering. Jurong West displays mild positive departures at 0.4--0.8 km, consistent with neighbourhood-scale agglomeration near hubs. Punggol shows irregular departures but lacks an envelope, leaving results inconclusive. The $L$-function, with variance stabilisation, reinforces these findings: Orchard and Tampines remain within CSR, Jurong West hints at weak clustering, and Punggol again shows uncertain deviations. Together, these results show that while first-order hotspots are strong, second-order tests reveal less evidence of systematic clustering beyond central areas.
+
+At the island-wide scale, however, the STIKhat contour plot reveals a more nuanced story. The first contour, close to the origin, appears as a narrow vertical band confined to \<1500 m, reflecting weak clustering at very fine distances. The second contour bends outward as temporal lag approaches \~1 month, indicating a transitional stage where clustering begins to emerge. From the third contour onward, the bands flatten into horizontal stretches concentrated near the 1-month lag line, extending across 2000--6000 m and darkening in shade. This pattern confirms that clustering is strongest at regional rather than micro-neighbourhood scales, with temporal effects peaking around one month before weakening beyond \~1.2 months. Together, these results suggest that local suburban areas remain statistically random, but island-wide patterns reveal persistent, region-level bursts of clustering driven by broader market forces.
+
+**RQ4 -- Planning and Management Implications**
+
+From a planning perspective, these findings underline important contrasts. Orchard and Tampines exemplify regulated centres where randomness dominates, suggesting that planning policies have successfully balanced restaurant provision across subzones. Jurong West's signs of neighbourhood clustering highlight areas where agglomeration may grow, warranting monitoring to avoid over concentration or service redundancy. Punggol, with inconclusive results, illustrates the challenge of early-stage new towns: limited openings and irregular distributions make patterns unstable, underscoring the need for adaptive monitoring. At the city scale, the persistence of central hotspots despite suburban growth signals that commercial gravity remains entrenched in core corridors. For policymakers, this highlights the dual need to sustain mature centres while encouraging balanced suburban diffusion through licensing, infrastructure, and amenity planning. For operators, the evidence of randomness in mature areas suggests that competition is widely dispersed, while emerging clusters in Jurong West may offer opportunities for first-mover advantage.
+
+## Conclusion
+
+This study examined the spatial and temporal dynamics of new restaurant registrations in Singapore from January to June 2025 using a combination of first-order, second-order, and spatio-temporal point pattern methods. The findings reveal several consistent themes.
+
+First, central Singapore, particularly the Orchard and Downtown Core areas, remains the dominant hotspot across all months. While bursts of activity are visible in certain months such as April, suburban areas like Tampines, Punggol, and Jurong West display only scattered and low-intensity activity, confirming the resilience of the central corridor as the anchor of the foodscape.
+
+Second, first-order intensity estimates reinforce the persistence of this central dominance, while suburban entries remain too dispersed to generate secondary hotspots. Third, second-order tests show that suburban distributions approximate randomness at neighbourhood scales, but spatio-temporal interaction analysis highlights clustering at broader regional scales (2--6 km), with temporal peaks concentrated around one month. This indicates that restaurant growth is driven less by hyper-local neighbourhood effects and more by episodic, region-level surges anchored in the central corridor.
+
+Finally, the planning implications are clear. Authorities face the dual challenge of managing central over-concentration while fostering more balanced growth in suburban areas. Licensing cycles and infrastructure planning must account for temporal bursts of activity, while policies that seed agglomeration in regional centres could reduce dependency on Orchard.
+
+In sum, Singapore's restaurant landscape is marked by entrenched central dominance, weak suburban clustering, and short-term regional bursts, underscoring the need for adaptive, evidence-based planning strategies.
+
+## References
+
+-   Ben-Said, M., 2021. Spatial point-pattern analysis as a powerful tool in identifying pattern-process relationships in plant ecology: an updated review. Ecological Processes, 10, p.56. https://doi.org/10.1186/s13717-021-00314-4
+
+-   Ding, X., Zheng, F., Lyu, G. et al., 2025. An exploration of the spatial and temporal factors influencing industrial park vitality using multi-source geospatial data. Scientific Reports, 15, p.29584. https://doi.org/10.1038/s41598-025-15294-0
+
+-   Kam, T.S., 2025. Hands-on Exercise: Chapter 4: 1st Order Spatial Point Pattern Analysis Method. Available at: https://r4gdsa.netlify.app/chap04 \[Accessed September 2025\].
+
+-   Kam, T.S., 2025. Hands-on Exercise: Chapter 5: 2nd Order Spatial Point Pattern Analysis Method. Available at: https://r4gdsa.netlify.app/chap04 \[Accessed September 2025\].
+
+-   Kam, T.S., 2025. In-class Exercise 3a: Interactive K-function. Available at: https://isss626-ay2025-26aug.netlify.app/in-class_ex/in-class_ex03/in-class_ex03a \[Accessed September 2025\].
+
+-   Kam, T.S., 2025. In-class Exercise 3b: Working with Open Government Data. Available at: https://isss626-ay2025-26aug.netlify.app/in-class_ex/in-class_ex03/in-class_ex03b#/title-slide \[Accessed September 2025\].
+
+-   Park, S., Seo, H. & Koo, H., 2023. Exploring the spatio-temporal clusters of closed restaurants after the COVID-19 outbreak in Seoul using relative risk surfaces. Scientific Reports, 13, p.13889. https://doi.org/10.1038/s41598-023-40937-5

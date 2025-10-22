@@ -1,0 +1,21 @@
+# RStudio
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+.DS_Store
+.tmp
+
+# Quarto caches (keep output _site/)
+_quarto/
+.qmd-cache/
+*.knit.md
+
+# Ignore big data in every exercise, but allow placeholder files
+Hands-on_Ex*/Data/**
+In-class_Ex*/Data/**
+Take-home_Ex*/Data/**
+/.quarto/
+
+**/*.quarto_ipynb
+*.tmp

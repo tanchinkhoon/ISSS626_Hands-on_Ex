@@ -1,0 +1,42 @@
+---
+title: "In-class Exercise 2: Spatial Point Patterns Analysis - Spatstat methods"
+author: "TAN Chin Khoon"
+date: "September 13, 2025"
+number-sections: true
+execute: 
+  eval: true
+  echo: true
+  warning: false
+  freeze: true
+---
+
+# Issue 1: Installing maptools
+
+maptools is retired and binary is removed from CRAN. However, we can download from [Posit Public Package Manager](https://packagemanager.posit.co/client/#/repos/cran/setup?snapshot=2023-10-13&distribution=windows&r_environment=ide) snapshots by using the code chunk below.
+
+```{r}
+install.packages("maptools", 
+                 repos = "https://packagemanager.posit.co/cran/2023-10-13")
+
+```
+
+After the installation is completed, it is important to edit the code chunk as shown below in order to avoid maptools being download and install repetitively every time the Quarto document been rendered.
+
+![](Screenshot 2025-09-18 at 9.25.53 PM.png){width="316"}
+
+# Issue 2: Creating coastal outline
+
+In sf package, there are two functions allow us to combine multiple simple features into one simple features. They are st_combine() and st_union().
+
+- st_combine() returns a single, combined geometry, with no resolved boundaries; returned geometries may well be invalid.
+
+- If y is missing, st_union(x) returns a single geometry with resolved boundaries, else the geometries for all unioned pairs of x[i] and y[j].
+
+## Working with st_union()
+The code chunk below, `st_union()` is used to derive the coastal outline sf tibble data.frame.
+
+```{r}
+# sg_sf <- mpsz_sf %>%
+#   st_union()
+
+```
