@@ -1606,48 +1606,316 @@ cm_am; cm_pm; cm_wk
 
 ## Emerging Hot Spot Analysis (EHSA)
 
+
 ```{r}
 
-# not "sf" — use "geometry"
-sf_grid <- attr(st_cube, "geometry")   # this is an sf POLYGON/MULTIPOLYGON
-stopifnot(inherits(sf_grid, "sf"))
+
+```
+
+
+
+```{r}
+
+
+```
+
+
+
+```{r}
+
+
+```
+
+
+
+```{r}
+
+
+```
+
+
+
+```{r}
+
+
+```
+
+
+
+```{r}
+
+
+```
+
+
+
+```{r}
+
+
+```
+
+
+
+```{r}
+
+
+```
+
+
+
+```{r}
+
+
+```
+
+
+
+```{r}
+
+
+```
+
+
+
+```{r}
+
+
+```
+
+
+
+```{r}
+
+
+```
+
+
+
+```{r}
+
 
 ```
 
 
 ```{r}
 
-library(spdep)
 
-nb_st_s  <- spdep::poly2nb(sf_grid, queen = TRUE)
-nb_st_s  <- spdep::include.self(nb_st_s)                     # Gi* needs self
-lw_st_s  <- spdep::nb2listw(nb_st_s, style = "W", zero.policy = TRUE)
+```
+
+
+
+
+```{r}
+
+
+```
+
+
+
+
+```{r}
+
+
+```
+
+
+
+```{r}
+
+
+```
+
+
+
+```{r}
+
+
+```
+
+
+
+```{r}
+
 
 ```
 
 
 ```{r}
 
-# trips_long: HEX_ID, window (factor: Morning/Afternoon/Weekend), Trips (numeric)
-
-gi_by_window <- sf_grid |>
-  dplyr::select(HEX_ID, geometry) |>
-  dplyr::left_join(trips_long, by = "HEX_ID") |>
-  sf::st_as_sf() |>
-  dplyr::group_by(window) |>
-  dplyr::mutate(
-    gistar = sfdep::local_gstar_perm(
-      x   = as.numeric(Trips),
-      nb  = nb_st_s,
-      wt  = lw_st_s$weights,  # <- the weights list
-      nsim = 999,
-      alternative = "two.sided",
-      zero.policy = TRUE
-    )
-  ) |>
-  tidyr::unnest(gistar)   # adds columns like Gi, p_sim, etc.
 
 ```
+
+
+```{r}
+
+
+```
+
+
+```{r}
+
+
+```
+
+
+
+```{r}
+
+
+```
+
+
+
+```{r}
+
+
+```
+
+
+
+```{r}
+
+
+```
+
+
+
+
+```{r}
+
+
+```
+
+
+
+```{r}
+
+
+```
+
+
+```{r}
+
+
+```
+
+
+
+```{r}
+
+
+```
+
+
+
+```{r}
+
+
+```
+
+
+
+```{r}
+
+
+```
+
+
+
+```{r}
+
+
+```
+
+
+
+```{r}
+
+
+```
+
+
+
+```{r}
+
+
+```
+
+
+```{r}
+
+
+```
+
+
+
+```{r}
+
+
+```
+
+
+
+```{r}
+
+
+```
+
+
+
+```{r}
+
+
+```
+
+
+
+```{r}
+
+
+```
+
+
+
+```{r}
+
+
+```
+
+
+
+```{r}
+
+
+```
+
+
+
+```{r}
+
+
+```
+
+
+
+```{r}
+
+
+```
+
+
+```{r}
+
+
+```
+
+
+
+```{r}
+
+
+```
+
 
 
 
