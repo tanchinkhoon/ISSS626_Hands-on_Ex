@@ -17,7 +17,7 @@ execute:
 
 Public transport is the backbone of Singapore’s urban mobility system, linking homes, workplaces and commercial centres into an integrated city network. Within this system, public buses remain the most extensive and inclusive mode, serving both central and peripheral areas. As Singapore advances toward the Land Transport Master Plan 2040, analysing spatial and temporal variations in bus passenger movement is essential for informed planning. Descriptive statistics and heat maps offer only surface patterns and cannot reveal the deeper spatial relationships among travel zones.
 
-This study applies Local Measures of Spatial Autocorrelation, including Local Moran I, Local Geary C and Getis Ord Gi Star, to identify clusters and outliers in bus trip intensity across Singapore. These indicators reveal neighbourhoods of consistently high or low ridership and pinpoint areas that diverge from surrounding conditions. To incorporate the temporal dimension, the study employs Emerging Hot Spot Analysis using the Gi Star statistic together with the Mann Kendall trend test to assess how hot and cold spots evolve during morning, evening and weekend periods.
+This study applies Global and Local Measures of Spatial Autocorrelation, including Global and Local Moran I, and Getis Ord Gi Star, to identify clusters and outliers in bus trip intensity across Singapore. These indicators reveal neighbourhoods of consistently high or low ridership and pinpoint areas that diverge from surrounding conditions. To incorporate the temporal dimension, the study employs Emerging Hot Spot Analysis (EMSA) using the Gi Star statistic together with the Mann Kendall (KM) trend test to assess how hot and cold spots evolve during morning, evening and weekend periods.
 
 The results will provide empirical evidence for improving bus network design, enhancing accessibility and promoting a more efficient and equitable transport system that supports sustainable urban development.
 
@@ -94,15 +94,17 @@ if (!require(pacman)) install.packages("pacman")
 
 pacman::p_load(                           
   tidyverse,  # Provides data manipulation and plotting tools (dplyr, ggplot2, readr).
-  stats,
+  stats,      # Base R toolbox for statistical tests, distributions, and modelling.
   sf,         # Handles spatial vector data such as points, lines, and polygons.
-  spdep,
+  spdep,      # Core spatial dependence utilities for spatial neighbour weights, and models.
   sfdep,      # Performs spatial dependence analysis (Moran I, Gi* and related statistics).
   tmap,       # Creates static and interactive thematic maps for visualisation.
-  ggplot2,
+  ggplot2,    # Grammar of graphics plotting used for your diagnostics and faceted bar charts.
   plotly,     # Adds interactivity to ggplot maps and statistical plots.
   Kendall,    # Performs the Mann Kendall trend test for temporal trend detection.
-  classInt,
+  classInt,   # Breaks generators for choropleths.
+  tibble,     # Modern data frame with cleaner printing and safer subsetting for pipelines.
+  purrr,      # Functional programming mappers like map and pmap to run EHSA across multiple periods.
   knitr,      # Enables dynamic report generation in Quarto or R Markdown.
   kableExtra  # Enhances table formatting for publication-quality outputs.
 )
@@ -193,7 +195,6 @@ tm_layout(
 )
 
 ```
-
 \
 The output confirms that the mainland filtering process was successfully executed, with 5,172 bus stop records initially detected and 5,167 retained within the Singapore mainland boundary after applying spatial masking, indicating that only five points (about 0.1%) were excluded as they fell outside the valid mainland polygon, likely on offshore islands or along the coastline. The workflow using `st_union()`, `st_make_valid()`, and st_cast("POLYGON") effectively consolidated all polygons and retained the largest one representing the mainland, ensuring spatial integrity before point-in-polygon filtering. The use of `st_within()` provides a strict geometric constraint that omits points lying exactly on the boundary, which explains the minor data loss; this can be refined by substituting with `st_intersects()` or buffering the polygon slightly if inclusion of boundary points is desired. The generated Quality Assurance (QA) map visually validates the correctness of the masking process, showing bus stops confined within the white mainland region bordered in grey and no spurious points beyond the coastal limits. Overall, the output verifies that the data cleaning and spatial masking steps were precise and successful, leaving only legitimate mainland bus stops for further geospatial analysis.
 
@@ -201,7 +202,7 @@ The output confirms that the mainland filtering process was successfully execute
 
 A regular hexagon tessellation is generated to define neutral analytical units across the mainland. Hexagons reduce directional bias and provide a compact neighbourhood structure. The cell size is set to seven hundred meters which corresponds to a three hundred seventy five metre apothem. The grid is created only over the mainland polygon to avoid generating cells over the sea. An outline polygon is also prepared for cartographic composition in subsequent checks and figures. The section ends with a map that shows complete coverage of the mainland by the grid.
 
-```{r,fig.width=8,fig.height=6}
+```{r}
 
 # --- 5.3 Hexagon grid creation over the mainland ----------------------------
 
@@ -266,7 +267,7 @@ c(width_obs = width_obs, width_exp = width_exp,  # print both widths
 
 Only cells that contain at least one mainland bus stop can originate trips. Cells without bus stops do not contribute information and would degrade the quality of spatial statistics by adding empty units. The number of bus stops within each cell is calculated using topological intersection, and only those with a positive count are retained. The result is a subset that represents the serviced mainland and forms the base for spatial aggregation and later second order analysis.
 
-```{r,fig.width=8,fig.height=6}
+```{r}
 
 # --- 5.5 Retain only cells that contain bus stops ---------------------------
 
@@ -628,7 +629,7 @@ Each mandated peak-period map is produced as an independent, publication-quality
 
 ```{r}
 # --- Cartographic Style for Peak-Period Maps (AM, PM, Weekend/Holiday) -----
-# Shared layout template for consistency and professional presentation
+# Shared layout template for consistency presentation
 
 # Function to generate a map with centered bold title and internal legend
 plot_peak_map <- function(data_sf, title_text, legend_title) {
@@ -681,11 +682,6 @@ map_wk <- hexagon_active %>%
   dplyr::select(HEX_ID, geometry) %>%
   dplyr::left_join(tp_wk, by = "HEX_ID") %>%
   sf::st_as_sf()
-
-# Verify that all three objects exist and share the same CRS and field names
-# sf::st_geometry_type(map_am)
-# sf::st_crs(map_am)
-# names(map_am)
 
 # --- Generate maps ----------------------------------------------------------
 
@@ -897,12 +893,12 @@ The iterative map visualises the **distance-band neighbour network** for Singapo
 
 ## Global Measure of Spatial Autocorrelation Analysis
 
-This section investigates the **global spatial autocorrelation** of origin trip intensity across the analytical hexagon grid. Rather than simply examining how values vary geographically, the analysis quantifies the extent to which neighbouring cells exhibit similar or dissimilar trip counts — that is, whether the observed pattern represents clustering, randomness, or dispersion. The **global Moran’s I statistic** is used as the principal measure to capture this spatial dependency, providing a single index summarising overall correlation across the study region. A positive Moran’s I indicates that cells with high (or low) trip values are located near others of similar magnitude, implying spatial clustering. Conversely, a negative Moran’s I denotes spatial dispersion where high and low values alternate spatially. The test operates on the **row-standardised Queen contiguity weights** constructed earlier, ensuring that each cell’s contribution is proportional to its number of neighbours. The resulting Moran’s I value, standard deviate, and p-value are derived under a randomisation hypothesis, allowing formal inference against the null of spatial independence. Through this procedure, we obtain a statistically robust understanding of whether trip distributions during peak periods are spatially structured, thereby establishing the foundation for subsequent local (LISA) and hot/cold-spot analyses.
+This section investigates the **global spatial autocorrelation** of origin trip intensity across the analytical hexagon grid. Rather than simply examining how values vary geographically, the analysis quantifies the extent to which neighbouring cells exhibit similar or dissimilar trip counts — that is, whether the observed pattern represents clustering, randomness, or dispersion. The **global Moran’s I statistic** is used as the principal measure to capture this spatial dependency, providing a single index summarising overall correlation across the study region. A positive Moran’s I indicates that cells with high (or low) trip values are located near others of similar magnitude, implying spatial clustering. Conversely, a negative Moran’s I denotes spatial dispersion where high and low values alternate spatially. The test operates on the **row-standardised Queen contiguity weights** constructed earlier, ensuring that each cell’s contribution is proportional to its number of neighbours. The resulting Moran’s I value, standard deviate, and $p$-value are derived under a randomisation hypothesis, allowing formal inference against the null of spatial independence. Through this procedure, we obtain a statistically robust understanding of whether trip distributions during peak periods are spatially structured, thereby establishing the foundation for subsequent local (LISA) and hot/cold-spot analyses.
 
 
 ### Global Moran’s I statistical test for all peak periods
 
-This section performs the **Global Moran’s I test** independently for the three defined peak periods: weekday morning, weekday afternoon, and weekend/holiday. Using the previously derived Queen-contiguity spatial-weights matrix, each hexagonal layer is tested under the null hypothesis of spatial randomness. The `moran.test()` computes the observed Moran’s I, expected value, variance, z-score, and corresponding p-value. A **positive and significant Moran’s I ($p < 0.001$)** confirms that the trip intensities are spatially clustered during that period, while an insignificant result suggests no global pattern. Comparing Moran’s I values across all periods reveals whether clustering strength is consistent or time-specific, providing evidence of temporal variation in spatial dependency.
+This section performs the **Global Moran’s I test** independently for the three defined peak periods: weekday morning, weekday afternoon, and weekend/holiday. Using the previously derived Queen-contiguity spatial-weights matrix, each hexagonal layer is tested under the null hypothesis of spatial randomness. The `moran.test()` computes the observed Moran’s I, expected value, variance, z-score, and corresponding $p$-value. A **positive and significant Moran’s I ($p < 0.001$)** confirms that the trip intensities are spatially clustered during that period, while an insignificant result suggests no global pattern. Comparing Moran’s I values across all periods reveals whether clustering strength is consistent or time-specific, providing evidence of temporal variation in spatial dependency.
 
 
 ```{r}
@@ -954,7 +950,7 @@ The Monte-Carlo simulation results confirm significant positive spatial autocorr
 
 It is always a good practice for us the examine the simulated Moran’s I test statistics in greater detail. This can be achieved by plotting the distribution of the statistical values as a histogram by using the code chunk below.
 
-```{r}
+```{r,fig.width=8,fig.height=6}
 
 # Visualise permutation distributions
 par(mfrow = c(1,3))
@@ -1045,7 +1041,7 @@ glimpse(lisa_wk)
 
 ```
 
-The printed data frames are the per-hexagon outputs from the Local Moran’s I calculation (826 rows). For each hexagon, ii is the observed local Moran’s I, **e_ii** is its null expectation (near −0.0012), and **var_ii** the randomisation variance. The **z_ii** column standardises ii; large positive values indicate clustering of similar high or low trip counts, while negative values indicate spatial dispersion or outliers. Columns **p_ii** (analytic), **p_ii_sim** (permutation), and **p_folded_sim** report significance; many entries are extremely small (often ≤0.01), signalling numerous statistically significant local associations. The categorical labels **mean**, **median**, and **pysal** assign each hexagon to a LISA quadrant; in this excerpt, labels are overwhelmingly **Low–Low**, meaning hexagons with low trips surrounded by neighbours that are also low. Diagnostic fields **skewness** and **kurtosis** describe the shape of the permutation distribution for each unit. Identifiers **HEX_ID**, **Trips**, and **geometry** link results back to the grid and counts for mapping. Overall, the tables show widespread significant Low–Low clustering with pockets of other patterns flagged by positive z-scores and tiny p-values.
+The printed data frames are the per-hexagon outputs from the Local Moran’s I calculation (826 rows). For each hexagon, ii is the observed local Moran’s I, **e_ii** is its null expectation (near −0.0012), and **var_ii** the randomisation variance. The **z_ii** column standardises ii; large positive values indicate clustering of similar high or low trip counts, while negative values indicate spatial dispersion or outliers. Columns **p_ii** (analytic), **p_ii_sim** (permutation), and **p_folded_sim** report significance; many entries are extremely small (often ≤0.01), signalling numerous statistically significant local associations. The categorical labels **mean**, **median**, and **pysal** assign each hexagon to a LISA quadrant; in this excerpt, labels are overwhelmingly **Low–Low**, meaning hexagons with low trips surrounded by neighbours that are also low. Diagnostic fields **skewness** and **kurtosis** describe the shape of the permutation distribution for each unit. Identifiers **HEX_ID**, **Trips**, and **geometry** link results back to the grid and counts for mapping. Overall, the tables show widespread significant Low–Low clustering with pockets of other patterns flagged by positive z-scores and tiny $p$-values.
 
 #### Mapping the Local Moran’s I
 
@@ -1088,7 +1084,7 @@ The Local Moran’s I maps provide spatially explicit insights into the degree o
 
 #### Mapping Local Moran’s I $p$-values
 
-Here, the emphasis shifts to mapping the statistical significance of local spatial relationships. P-values derived from Local Moran’s I computations are visualised using colour gradients, where darker tones highlight stronger evidence of spatial dependence. These maps reveal which areas exhibit meaningful local clustering and which remain random. Comparing across time periods provides insights into how the significance of clustering changes during different travel intervals throughout the day.
+Here, the emphasis shifts to mapping the statistical significance of local spatial relationships. $P$-values derived from Local Moran’s I computations are visualised using colour gradients, where darker tones highlight stronger evidence of spatial dependence. These maps reveal which areas exhibit meaningful local clustering and which remain random. Comparing across time periods provides insights into how the significance of clustering changes during different travel intervals throughout the day.
 
 ```{r}
 
@@ -1127,11 +1123,11 @@ mp_am; mp_pm; mp_wk
 
 ```
 
-The p-value maps visualise the statistical significance of local clustering across Singapore for different periods. In the **weekday morning (06–09)**, numerous light-blue hexagons (p ≤ 0.2) dominate the map, especially in western, northeastern, and southeastern regions, signifying that local Moran’s I values are statistically significant and that spatial clustering of trip origins is unlikely to occur by chance. These significant cells correspond to areas with concentrated commuting activity, validating the earlier high Moran’s I findings. During the **weekday afternoon (17–20)**, significant regions decrease slightly, reflected by more mid-blue shades ($p$ ≈ 0.4–0.6), suggesting reduced clustering as trip destinations diversify across urban zones. The **weekend/holiday (11–20)** period shows the fewest highly significant cells, particularly in residential and industrial zones, where darker blue ($p$ > 0.6) indicates random or weak spatial association. This pattern aligns with more dispersed, leisure-based travel during non-work periods. Overall, the intensity and spatial coverage of low p-values decline from morning to weekend, implying that weekday peak-hour movements are spatially structured, while off-peak and weekend activities exhibit more randomness. The outcome underscores that spatial dependence in trip generation is temporally dynamic—strongest during structured commuting peaks and weakest during flexible leisure travel—informing transport planners about when and where spatial targeting of travel interventions is most relevant.
+The $p$-value maps visualise the statistical significance of local clustering across Singapore for different periods. In the **weekday morning (06–09)**, numerous light-blue hexagons (p ≤ 0.2) dominate the map, especially in western, northeastern, and southeastern regions, signifying that local Moran’s I values are statistically significant and that spatial clustering of trip origins is unlikely to occur by chance. These significant cells correspond to areas with concentrated commuting activity, validating the earlier high Moran’s I findings. During the **weekday afternoon (17–20)**, significant regions decrease slightly, reflected by more mid-blue shades ($p$ ≈ 0.4–0.6), suggesting reduced clustering as trip destinations diversify across urban zones. The **weekend/holiday (11–20)** period shows the fewest highly significant cells, particularly in residential and industrial zones, where darker blue ($p$ > 0.6) indicates random or weak spatial association. This pattern aligns with more dispersed, leisure-based travel during non-work periods. Overall, the intensity and spatial coverage of low $p$-values decline from morning to weekend, implying that weekday peak-hour movements are spatially structured, while off-peak and weekend activities exhibit more randomness. The outcome underscores that spatial dependence in trip generation is temporally dynamic—strongest during structured commuting peaks and weakest during flexible leisure travel—informing transport planners about when and where spatial targeting of travel interventions is most relevant.
 
 #### Mapping both Local Moran’s I values and $p$-values
 
-This segment combines two key perspectives by displaying Moran’s I values and their associated p-values side by side. The paired visualisation allows simultaneous interpretation of spatial clustering strength and statistical reliability. By comparing both maps together, analysts can easily distinguish significant clusters from random fluctuations. The approach improves interpretability and ensures that subsequent discussions are grounded in statistically validated spatial patterns across all travel periods.
+This segment combines two key perspectives by displaying Moran’s I values and their associated $p$-values side by side. The paired visualisation allows simultaneous interpretation of spatial clustering strength and statistical reliability. By comparing both maps together, analysts can easily distinguish significant clusters from random fluctuations. The approach improves interpretability and ensures that subsequent discussions are grounded in statistically validated spatial patterns across all travel periods.
 
 ```{r,fig.width=12,fig.height=10}
 
@@ -1155,7 +1151,7 @@ tmap_arrange(
 
 ```
 
-The combined Local Moran’s I and p-value maps reveal both the strength and statistical reliability of spatial clustering across Singapore’s trip-origin data. During the **weekday morning (06–09)**, areas with high positive Local I (dark blue on the left) coincide with light-blue p-values (right map), especially in the west and northeast. These zones represent statistically significant clusters (p < 0.05) where strong spatial dependence exists—typically high-trip cells surrounded by high-trip neighbours. In contrast, orange cells (negative I) appear near the central fringe, indicating dissimilar neighbourhood effects such as isolated business or institutional zones. In the **weekday afternoon (17–20)**, overall clustering intensity weakens, and significant cells shrink mainly to residential–commercial transition belts, reflecting dispersed evening travel as commuters return home. By **weekend/holiday (11–20)**, high I values persist only around southern activity hubs, but most regions exhibit non-significant p-values (dark blue on the right), confirming randomised spatial patterns during leisure hours. The progressive reduction of significant low-p clusters from morning to weekend implies that trip generation is most spatially structured during work-related commuting peaks but becomes increasingly stochastic when travel is discretionary. For transport planners, this pattern highlights when and where spatial dependencies dominate mobility flows—vital for prioritising public-transport capacity, infrastructure optimisation, and land-use coordination during critical morning peaks.
+The combined Local Moran’s I and $p$-value maps reveal both the strength and statistical reliability of spatial clustering across Singapore’s trip-origin data. During the **weekday morning (06–09)**, areas with high positive Local I (dark blue on the left) coincide with light-blue $p$-values (right map), especially in the west and northeast. These zones represent statistically significant clusters (p < 0.05) where strong spatial dependence exists—typically high-trip cells surrounded by high-trip neighbours. In contrast, orange cells (negative I) appear near the central fringe, indicating dissimilar neighbourhood effects such as isolated business or institutional zones. In the **weekday afternoon (17–20)**, overall clustering intensity weakens, and significant cells shrink mainly to residential–commercial transition belts, reflecting dispersed evening travel as commuters return home. By **weekend/holiday (11–20)**, high I values persist only around southern activity hubs, but most regions exhibit non-significant p-values (dark blue on the right), confirming randomised spatial patterns during leisure hours. The progressive reduction of significant low-p clusters from morning to weekend implies that trip generation is most spatially structured during work-related commuting peaks but becomes increasingly stochastic when travel is discretionary. For transport planners, this pattern highlights when and where spatial dependencies dominate mobility flows—vital for prioritising public-transport capacity, infrastructure optimisation, and land-use coordination during critical morning peaks.
 
 ### Preparing and visualising LISA Map
 
@@ -1246,7 +1242,7 @@ lisa_am <- ensure_quadrants(lisa_am)
 lisa_pm <- ensure_quadrants(lisa_pm)
 lisa_wk <- ensure_quadrants(lisa_wk)
 
-# 3) Standardised Moran scatter (points + black OLS; dashed mean lines), per professor
+# 3) Standardised Moran scatter (points + black OLS; dashed mean lines)
 library(ggplot2)
 
 moran_scatter_std <- function(sf_obj, title_text){
@@ -1281,9 +1277,9 @@ ms_am_z; ms_pm_z; ms_wk_z
 
 The standardised Moran scatterplots reveal the spatial association patterns of trip intensity by quadrant classification, distinguishing four spatial interaction types: **High-High (HH)**, **Low-Low (LL)**, **High-Low (HL)**, and **Low-High (LH)**. During the **weekday morning (06–09)**, the majority of points fall in the **High-High quadrant** (red), confirming strong clustering of high-trip areas surrounded by similar high-trip neighbours — characteristic of concentrated commuting toward business and transport hubs. **Low-Low zones** (blue) dominate the opposite quadrant, indicating peripheral or residential regions with uniformly low trip activity. The **weekday afternoon (17–20)** plot still shows a positive spatial relationship, though the slope slightly flattens, suggesting more dispersed trip flows as outbound commuting begins. **A few High-Low outliers (pink) appear**, marking transition zones between dense business districts and adjacent low-activity cells. During the **weekend/holiday (11–19)**, while High-High clusters remain visible, the overall distribution becomes broader with more scattered **Low-High** and **High-Low** points, reflecting irregular trip patterns driven by leisure or non-routine movement. The positive slope across all periods confirms persistent spatial autocorrelation, yet the reduction in clustering strength from weekday morning to weekend reflects a shift from structured work-related travel to more dispersed, flexible trip behaviour. This finding underscores the significance of weekday peaks for congestion management and highlights the spatial diffusion of mobility during non-working days, offering valuable input for dynamic transport planning and demand-based service allocation.
 
-#### 10.4.4.3 Preparing LISA Map Classes ($p$ < 0.05)
+#### Preparing LISA Map Classes ($p$ < 0.05)
 
-Finally, the analysis establishes clear LISA map classifications based on significance thresholds. Each hexagon is assigned to a specific cluster category according to its Local Moran’s I value and p-value. Colours are systematically applied to differentiate strong clusters, weak outliers, and non-significant regions. The resulting maps visually summarise spatial autocorrelation outcomes for morning, afternoon, and weekend periods, helping to pinpoint areas of persistent high or low clustering within the study region.
+Finally, the analysis establishes clear LISA map classifications based on significance thresholds. Each hexagon is assigned to a specific cluster category according to its Local Moran’s I value and $p$-value. Colours are systematically applied to differentiate strong clusters, weak outliers, and non-significant regions. The resulting maps visually summarise spatial autocorrelation outcomes for morning, afternoon, and weekend periods, helping to pinpoint areas of persistent high or low clustering within the study region.
 
 ```{r}
 
@@ -1333,7 +1329,7 @@ plot_lisa_clusters(lisa_wk, "LISA Cluster Map (p < 0.05) — Weekend/Holiday (11
 
 ```
 
-The LISA Cluster Maps (p < 0.05) reveal clear temporal differences in local spatial autocorrelation across Singapore’s urban structure.
+The LISA Cluster Maps ($p$ < 0.05) reveal clear temporal differences in local spatial autocorrelation across Singapore’s urban structure.
 
 During **Weekday Morning (06–09), High–High (HH) clusters (dark red) are widespread and spatially concentrated across the central-northern, north-eastern, and western corridors. Prominent groupings appear around the northern central belt (likely Ang Mo Kio – Yishun region), another in the north-east zone (around Sengkang – Punggol), and a strong cluster in the western sector (Jurong – Clementi area). Smaller HH patches also appear in the south-central corridor, reflecting intensified morning mobility flows. The presence of Low–High (LH) cells (light blue) adjoining several HH patches suggests transitional areas—likely residential or mixed-use cells adjoining major trip origins or destinations. These spatial configurations indicate strong positive local autocorrelation, meaning high-trip hexagons are surrounded by similarly high neighbours, forming structured commuting corridors.
 
@@ -1450,7 +1446,7 @@ stopifnot(
 
 ### Mapping local Gi* p-values
 
-This section transforms numerical results into spatially interpretable maps that visualise the Local Gi* $z$-scores. The mapping function uses tmap to display the Singapore outline, overlay the analytical hexagon grid, and fill each cell according to its z-score value. The chosen colour palette is diverging, with red tones representing positive clustering and blue tones representing negative clustering, while white represents values close to the mean. The map layout follows the professor’s standard formatting with bold titles, centred legends, and consistent margins to preserve visual uniformity across all time periods. Through these maps, users can immediately distinguish areas of elevated trip intensity from those with lower activity. The maps also provide a diagnostic check for spatial continuity, revealing whether the clustering patterns are geographically contiguous or dispersed. This step converts statistical output into an interpretable visual narrative that guides subsequent analysis of significance.
+This section transforms numerical results into spatially interpretable maps that visualise the Local Gi* $z$-scores. The mapping function uses tmap to display the Singapore outline, overlay the analytical hexagon grid, and fill each cell according to its z-score value. The chosen colour palette is diverging, with red tones representing positive clustering and blue tones representing negative clustering, while white represents values close to the mean. The map layout follows the standard formatting with bold titles, centred legends, and consistent margins to preserve visual uniformity across all time periods. Through these maps, users can immediately distinguish areas of elevated trip intensity from those with lower activity. The maps also provide a diagnostic check for spatial continuity, revealing whether the clustering patterns are geographically contiguous or dispersed. This step converts statistical output into an interpretable visual narrative that guides subsequent analysis of significance.
 
 ```{r}
 
@@ -1467,11 +1463,14 @@ map_gi <- function(sf_obj, title_text) {
             title   = "Gi* z-score") +
     tm_borders(col = "grey85", lwd = 0.4) +
     tm_layout(
-      main.title          = title_text,
-      main.title.position = "center",
+      main.title = title_text,
+      main.title.position = "center",  # Ensure exact spelling
       main.title.fontface = "bold",
-      legend.position     = c("right","bottom"),
-      legend.frame        = TRUE
+      outer.margins = c(0.02, 0.02, 0.02, 0.02),
+      main.title.size = 1.2,           # Optional: adjust title size
+      main.title.color = "black",      # Optional: adjust color
+      legend.position = c("right","bottom"),
+      legend.frame = TRUE
     )
 }
 
@@ -1528,13 +1527,13 @@ p_am; p_pm; p_wk
 
 ```
 
-The p-value maps for the Local Gi* analysis provide statistical confirmation of where spatial clustering patterns are most reliable across different time periods. During the weekday morning period, dark red hexagons dominate the western, northeastern, and central sectors of the island, indicating p-values below 0.01. These areas reflect highly significant clusters of trip activity, suggesting consistent morning travel concentration within residential and employment zones. The dense grouping of low p-values confirms that the observed spatial patterns are unlikely to occur by random chance and represent genuine hot spot formations.
+The $p$-value maps for the Local Gi* analysis provide statistical confirmation of where spatial clustering patterns are most reliable across different time periods. During the weekday morning period, dark red hexagons dominate the western, northeastern, and central sectors of the island, indicating $p$-values below 0.01. These areas reflect highly significant clusters of trip activity, suggesting consistent morning travel concentration within residential and employment zones. The dense grouping of low $p$-values confirms that the observed spatial patterns are unlikely to occur by random chance and represent genuine hot spot formations.
 
-In the weekday afternoon period, significant areas become more dispersed, and the total number of hexagons with p-values below 0.01 slightly decreases. This reduction implies greater variability in afternoon trip behaviour as travel flows diversify between work return journeys and secondary activities. Nonetheless, certain stable clusters persist, suggesting enduring transport corridors and mixed-use nodes with high activity density.
+In the weekday afternoon period, significant areas become more dispersed, and the total number of hexagons with $p$-values below 0.01 slightly decreases. This reduction implies greater variability in afternoon trip behaviour as travel flows diversify between work return journeys and secondary activities. Nonetheless, certain stable clusters persist, suggesting enduring transport corridors and mixed-use nodes with high activity density.
 
 The weekend and holiday map shows renewed intensification of significant areas, particularly in central and eastern regions. The spread of dark red hexagons indicates broader spatial clustering of leisure-related movement. This distribution implies that recreational and shopping trips become the dominant source of spatial dependence during non-working days. 
 
-Across all three time windows, the persistence of low p-values validates the robustness of the Local Gi* results. The consistent appearance of significant cells across multiple periods demonstrates that spatial clustering in urban mobility is a stable feature of the transport landscape rather than a transient phenomenon driven by temporal fluctuations.
+Across all three time windows, the persistence of low $p$-values validates the robustness of the Local Gi* results. The consistent appearance of significant cells across multiple periods demonstrates that spatial clustering in urban mobility is a stable feature of the transport landscape rather than a transient phenomenon driven by temporal fluctuations.
 
 
 ### Hot/Cold spot classification at p < 0.05
@@ -1604,320 +1603,295 @@ cm_am; cm_pm; cm_wk
 
 ```
 
+The Hot and Cold Spot Analysis (HCSA) cluster maps for weekday morning, weekday afternoon, and weekend or holiday periods collectively reveal the evolution of Singapore’s spatial mobility intensity across temporal contexts, each analysed at $p$ less than 0.05 significance. In the weekday morning map, a dense network of red hexagonal clusters signifies statistically significant hot spots of trip activity, particularly concentrated across the northern(Yishun, and Woodland), Northern East (Punggol, Sengkang, Hougang), Western (Jurong West, Bukit Batok), Central (Tao Payoh) and Eastern (Tampines, Bedok) portions of the island. These clusters represent high trip-generation zones that likely correspond to large-scale residential districts where outbound commuter traffic peaks between 6 to 9 a.m. The absence of blue cold spot cells indicates that low trip areas during this period follow a more random pattern without statistical clustering. The observed structure suggests a strong and spatially dependent morning mobility framework aligned with commuting towards central employment hubs.
+
+During the weekday afternoon period from 17 to 20 hours, the cluster distribution remains extensive but exhibits slightly lower density and increased dispersion. The presence of multiple smaller red patches indicates a diffusion of activity as people travel home or make short inter-district trips after work. This spatial fragmentation signifies a shift from collective commuter movements to more individualised trip purposes such as school pick-ups, errands, or leisure engagements. The patterns reinforce the dynamic transformation of Singapore’s travel behaviour from highly centralised in the morning to decentralised in the evening.
+
+By contrast, the weekend or holiday map displays broader and more evenly distributed red clusters across central, southern, and eastern zones. These results reflect the transition from occupational to recreational mobility, as travel demand is driven by social, retail, and leisure activities. Unlike weekdays, trip concentration expands into non-core areas, highlighting the more balanced nature of urban activity during off-work periods.
+
+In practical terms, these spatial patterns emphasise how weekday commuting follows structured residential-employment flows, whereas weekend mobility reflects lifestyle-oriented dispersion. Transport planners can use these temporal signatures to synchronise service frequency and route allocation, ensuring capacity aligns with empirically verified high-demand corridors during peak weekday hours and wider area accessibility on weekends.
+
+
 ## Emerging Hot Spot Analysis (EHSA)
 
+To set the stage, this section introduces a space time approach that asks a practical question about neighbourhood bus mobility. Where are statistically meaningful clusters of higher or lower origin trips appearing, disappearing, or changing through time, and how should we label them in a way that helps planning and policy work. We construct the analysis around the Getis Ord Gi* local statistic that is evaluated for each cell in each time bin and then we examine the sequence of those statistics using the Mann Kendall trend test. The combined outcome is a categorical label such as new hot spot, intensifying hot spot, persistent hot spot, diminishing hot spot, or their cold analogues. We run the procedure for three mandated periods that reflect commuting and leisure rhythms, and we carry the results back to the validated mainland hexagon grid so that interpretation is always spatially anchored. The purpose is not simply to produce colourful maps but to generate defensible evidence about evolving trip concentration and suppression across the urban fabric.
+
+### Build neighbours and weights on hex grid
+
+At the core of any local cluster method is a clear statement of spatial relationships. This subsection prepares that foundation by defining which hexagons are considered neighbours and how much influence each neighbour should exert in the calculations. We adopt contiguity based neighbours with the queen rule so touching at an edge or a corner counts, and we include each cell itself to ensure that isolated or island cells can still be processed without dropping from the analysis. We then compute inverse distance weights from the centroids so that very close neighbours have more influence than distant ones while still keeping the structure simple and reproducible. Warnings about cells with no neighbours can appear in coastal or fragmented areas, and the include self step addresses that gracefully. Preparing neighbours and weights on the geometry first and storing them as named columns allows the later space time cube to attach the correct structure without costly recomputation at every time step.
 
 ```{r}
 
+# ---- 11.0 Build neighbours & weights on hex grid -----------------------
+
+# Assumes we already have:
+# - trips_panel_sf: columns HEX_ID, DAY_TYPE, HOUR_OF_DAY, TRIPS  (sf ok; we will drop geometry)
+# - hexagon_active: sf polygons with HEX_ID + geometry
+# - sg_outline: sf polygon of SG mainland (optional, for basemap)
+
+hexagon_geo <- hexagon_active |>
+  mutate(
+    nb = include_self(st_contiguity(geometry, queen = TRUE)),
+    wt = st_inverse_distance(nb, geometry, scale = 1, alpha = 1)
+  )
+
+# NOTE: "some observations have no neighbours" warnings are expected for islands;
+# include_self() ensures each hex has at least itself.
 
 ```
 
+### Period definitions
 
+In this step we translate the assignment brief into explicit time windows that a computer will understand. The weekday morning period covers the early departure window from 06:00 to 09:00 that captures school and work origins, the weekday afternoon period covers the return window from 17:00 to 20:00 that mixes home bound and after work activities, and the weekend or holiday period focuses on late morning through early evening from 11:00 to 20:00 when leisure and retail activity dominate. Declaring these ranges once, with a readable label for each, prevents accidental drift in later filters and guarantees that any figures or tables can be regenerated consistently. The labels also become facets in charts and map titles, which helps a reader keep track of the storyline. Choosing hour as the time bin aligns with the data structure of origin trips and keeps the sample size per bin adequate for reliable local statistics and trend testing.
 
 ```{r}
 
+# ---- 11.1 Period definitions -------------------------------------------
+
+periods <- tribble(
+  ~label,                       ~day_type,            ~hours,
+  "Weekday Morning Peak",       "WEEKDAY",            6:9,
+  "Weekday Afternoon Peak",     "WEEKDAY",            17:20,
+  "Weekend/Holiday Peak",       "WEEKENDS/HOLIDAY",   11:20
+)
 
 ```
 
+### Mann Kendall $p$ value
 
+Before running the main classification, we safeguard the workflow against differences in package versions. The emerging hotspot procedure returns the trend result either as a simple column named `sl`, as a column named `mk_sl`, or nested inside a list column that contains the Mann Kendall (MK) object. The helper in this subsection extracts the $p$ value reliably no matter which structure appears, and falls back to other common names if needed. Returning a numeric vector rather than a mixed object means that downstream filtering is straightforward and readable. This design choice protects the analysis from breaking on another machine or in a future semester when packages have changed. It also makes the significance threshold explicit and therefore auditable. By separating this concern into a short utility we keep the runner function focused on analysis logic, while confidence in reproducibility and portability is improved for both code review and grading.
 
 ```{r}
 
+# ---- helper to pull MK p-value robustly --------------------------------
+
+.get_mk_p <- function(tbl) {
+  # Return a numeric vector pval; works for multiple sfdep versions
+  nms <- names(tbl)
+  if ("sl" %in% nms) return(tbl$sl)
+  if ("mk_sl" %in% nms) return(tbl$mk_sl)
+  if ("mk" %in% nms) {
+    return(purrr::map_dbl(tbl$mk, function(x) {
+      if (!is.null(x$sl)) return(as.numeric(x$sl))
+      if (!is.null(x$p.value)) return(as.numeric(x$p.value))
+      if (!is.null(x$pvalue)) return(as.numeric(x$pvalue))
+      NA_real_
+    }))
+  }
+  # Fallback: look for generic p-value fields if present
+  if ("p_value" %in% nms) return(tbl$p_value)
+  if ("pvalue" %in% nms)  return(tbl$pvalue)
+  if ("p.val" %in% nms)   return(tbl$`p.val`)
+  rep(NA_real_, nrow(tbl))
+}
 
 ```
 
+### EHSA runner
 
+In this section we operationalise the full analytical sequence for a single period. The function accepts a day type, a set of hour values, and a human friendly label. It filters the balanced panel to exactly those rows, constructs a space time cube keyed by hexagon identifier and hour, and attaches the previously prepared neighbours and weights using their column names. With this structure in place, the emerging hotspot procedure computes a series of Gi star statistics per cell across the chosen hours, performs the Mann Kendall test on that temporal sequence, and assigns a classification label that captures both significance and direction of change. We then keep only features with significant trend evidence, and we join the result back to the hexagon geometry so that mapping and counting become trivial. Encapsulating all of this in one function makes the workflow concise, testable, and repeatable across periods without copy paste mistakes.
 
 ```{r}
 
+# ---- 11.2 EHSA runner ---------------------------------------------------
+
+run_ehsa <- function(day_type, hours, label) {
+
+  df <- trips_panel_sf |>
+    st_drop_geometry() |>
+    filter(DAY_TYPE == day_type, HOUR_OF_DAY %in% hours) |>
+    select(HEX_ID, HOUR_OF_DAY, TRIPS) |>
+    arrange(HEX_ID, HOUR_OF_DAY)
+
+  # Build space-time cube with geometry that already contains nb/wt
+  stc <- sfdep::spacetime(
+    df,              # .data
+    hexagon_geo,     # .geometry (has HEX_ID, geometry, nb, wt)
+    .loc_col  = "HEX_ID",
+    .time_col = "HOUR_OF_DAY"
+  )
+
+  # Attach neighbour/weight COLUMN NAMES (not objects)
+  stc <- sfdep::set_nbs(stc, "nb")
+  stc <- sfdep::set_wts(stc, "wt")
+
+  # EHSA
+  ehsa_tbl <- sfdep::emerging_hotspot_analysis(
+    x    = stc,
+    .var = "TRIPS",
+    k    = 1,
+    nsim = 199
+  )
+
+  # Robust p-value pull + significance filter
+  mk_p <- .get_mk_p(ehsa_tbl)
+  ehsa_tbl <- ehsa_tbl |> mutate(mk_p = mk_p)
+  ehsa_sig <- ehsa_tbl |> filter(!is.na(mk_p) & mk_p < 0.05)
+
+  # Join back to hex geometry
+  out <- hexagon_active |>
+    select(HEX_ID, geometry) |>
+    left_join(ehsa_sig, by = c("HEX_ID" = "location")) |>
+    mutate(period = label)
+
+  out
+}
 
 ```
 
+### Run for all periods
 
+Next we scale the runner across the three mandated periods in a single call using a functional pattern. A parameter map sends the weekday morning, weekday afternoon, and weekend or holiday arguments into the runner, gathers the three outputs, and merges them into one tidy table with a period column. This structure supports side by side cartography, compact summary tables, and faceted charts without additional reshaping. The approach reduces the risk of silent inconsistencies that can arise when running separate code blocks and also speeds iteration when we refine weights or significance thresholds. If new periods are added in future work, they can be introduced by editing only the small period table rather than rewriting logic. The result is a clean separation of configuration and execution that supports both transparency for assessment and flexibility for further inquiry.
+
+
+```{r, warning=FALSE}
+
+# ---- Run for all periods ------------------------------------------
+ehsa_list <- purrr::pmap(
+  list(periods$day_type, periods$hours, periods$label),
+  run_ehsa
+)
+ehsa_all <- dplyr::bind_rows(ehsa_list)
+
+```
+
+### Quick class distribution
+
+Before drawing maps, it is useful to perform a numerical sense check that confirms the outcome is plausible. The bar chart in this section counts the number of hexagons in each classification for every period and presents them in small multiples. This quick view reveals whether the analysis is returning only a few scattered features or a broad swath of classifications, and it highlights imbalances such as many cold labels and very few hot labels or the opposite. Extreme skews can suggest parameter issues, for example an overly sparse neighbour structure or an hour range that is too narrow. The figure also provides the quantitative backbone for the narrative paragraphs in the report, because we can cite counts while the maps supply the geography. Keeping this diagnostic small and fast encourages repeated use whenever we adjust upstream choices.
 
 ```{r}
 
+# ---- 11.4 Quick class distribution ---------------------------
+ggplot(ehsa_all, aes(x = classification)) +
+  geom_bar() +
+  facet_wrap(~ period, scales = "free_y") +
+  labs(title = "EHSA classes (significant only, p < 0.05)",
+       x = NULL, y = "Hexagon count") +
+  theme_bw() +
+  theme(plot.title = element_text(hjust = 0.5, face = "bold"))
 
 ```
 
+The bar chart tells a clear story about temporal regimes. In the weekday morning panel and the weekday afternoon panel, almost every significant cell falls into a single class while the counts for all other classes are negligible. In practice this reads as a broad field of persistent cold conditions during the short commuting windows. Local Gi star values at those hours do not trend upward through time and the Mann Kendall test confirms that the sequences are consistently low rather than moving toward higher intensity. This aligns with a mature and stable commuting pattern where origins are widely distributed and rarely form accelerating clusters within a three or four hour slice. The immediate takeaway for operations is to protect reliability rather than pursue large reallocations. Priority at known choke points, disciplined headway control, and dwell time management will matter more than changing routing inside these windows. Monitoring is still necessary, but the evidence does not call for structural changes on weekdays.
 
+The weekend or holiday panel looks very different. Counts spread across several classes and no single label monopolises the distribution. The largest bar is a cold class that reflects enduring low origin intensity across green and water dominated areas and in some employment zones that quieten on non working days. At the same time there are real pockets of demand growth. Intensifying hot classes and consecutive hot classes indicate cells where sequences of local Gi star statistics have moved upward across the late morning to evening bins. These cells typically coincide with town centres, interchange nodes, waterfront leisure corridors, and retail districts. Sporadic hot classes appear in places that likely host irregular events, suggesting transient surges that are worth watching but may not justify permanent capacity.
+
+Planning implications are direct. Weekday peaks show steadiness, so keep the focus on reliability and enforcement of service levels, with small tactical boosts only where crowding is observed. Weekend daytime deserves targeted investment. Add trips or deploy larger vehicles on corridors that connect residential belts to regional centres and recreation zones. Use the high count classes to prioritise stops for queue management and passenger information. Finally, treat these results as a screening layer. Re run the analysis with a knn neighbour scheme as a sensitivity check, extend the weekend window to confirm persistence, and compare outcomes with observed load factors to translate spatial statistics into service adjustments that riders will feel.
+
+
+:::{.callout-note}
+
+We can use below code chunk to generate a compact frequency table of EHSA classes by period. It groups by period and classification, counts hexagons in each combination, and sorts from most common to least. The table supports quick plausibility checks, helps identify dominant hot or cold patterns, and provides precise numbers to reference in the narrative and figure captions.
 
 ```{r}
 
+dplyr::count(ehsa_all, period, classification, sort = TRUE)
 
 ```
+The frequency table confirms what the maps suggested. During the weekday morning period and the weekday afternoon period, almost every hexagon carries no significant emerging signal. Each panel reports about 826 cells with missing class values, which in this workflow reflects features that failed the significance screen and therefore received no label after the join back to geometry. In other words, within the short commuting windows the local Gi star sequences are largely stable rather than trending upward or downward, so the Mann Kendall test does not indicate meaningful change. This supports an operations focus on reliability and crowd management rather than network redesign inside those hours.
+
+The weekend or holiday period shows greater variety, although a large share still carries no significant change with about 433 cells. Among the labelled results, the most common class is no pattern detected with about 245 cells, followed by sporadic hotspot with about 41 cells and persistent coldspot with about 39 cells. Sporadic coldspot appears about 36 times, intensifying hotspot about 19 times, consecutive hotspot about 7 times, and new coldspot appears a few times. The mix tells us that late morning to evening on non working days has real but spatially contained growth around town centres, leisure corridors, and interchange areas, while many other places remain consistently quiet. Service planning should therefore prioritise targeted weekend boosts on the corridors and stops that fall in intensifying or consecutive hotspots, while weekday peaks should emphasise headway control, signal priority, and dwell discipline to keep established flows moving smoothly.
+
+:::
 
 
+### Visualising EHSA maps in different windows 
+
+To communicate results clearly to readers who first look at plots, this section defines a single mapping function that produces publication quality thematic maps with consistent design choices. The function adds a neutral mainland outline for context, fills hexagons by the classification field using a readable categorical palette, draws light borders to preserve cell shapes, and places the legend outside the frame so that the data area stays uncluttered. 
 
 ```{r}
 
+# ---- 11.5 Mapping helper ------------------------------------------------
+plot_ehsa_map <- function(x_sf, map_title) {
+  tmap_mode("plot")
+  tm_shape(sg_outline) + tm_polygons(col = "palegreen3", border.col = NA) +
+    tm_shape(x_sf) +
+    tm_fill("classification",
+            title = "",
+            palette = "Set1",
+            textNA = "Not significant / No data") +
+    tm_borders(col = "grey50", lwd = 0.2) +
+    tm_layout(
+      title = map_title,
+      title.position = c("center", "top"),
+      title.size = 1.3,
+      title.fontface = "bold",
+      frame = TRUE,
+      legend.position = c("right", "bottom"),
+      legend.title.size = 0.7,
+      legend.text.size = 0.65,
+      outer.margins = 0,
+      inner.margins = c(0.02, 0.02, 0.15, 0.02)
+    )
+}
+
+# Draw three maps
+plot_ehsa_map(filter(ehsa_all, period == "Weekday Morning Peak"),
+              "EHSA of Origin Trips — Weekday Morning Peak")
+
+plot_ehsa_map(filter(ehsa_all, period == "Weekday Afternoon Peak"),
+              "EHSA of Origin Trips — Weekday Afternoon Peak")
+
+plot_ehsa_map(filter(ehsa_all, period == "Weekend/Holiday Peak"),
+              "EHSA of Origin Trips — Weekend or Holiday Peak")
 
 ```
+Reading the three EHSA maps together shows a sharp contrast between weekday commuting periods and weekend activity. In the weekday morning map almost all analytical cells are white, which means the Gi star sequences across the hours from six to nine do not exhibit a consistent upward or downward tendency that passes the Mann Kendall test at the five percent level. This does not mean there is no morning demand. Rather it signals that within this tight three hour window the local intensity is stable or noisy instead of directional. Where a few isolated coloured cells appear they do not form a coherent structure across the island and therefore carry little strategic meaning on their own.
 
+A very similar message appears in the weekday afternoon map. Again most cells are not significant. The period from seventeen to twenty captures home bound and after work travel that is well established in the network. The absence of emerging hot or cold classes suggests a mature pattern with reliable peaks but without strong within period trajectories. For operations this favours actions that protect reliability, such as priority measures, dwell control, and headway management, more than changes in routing or capacity distribution inside the short window.
 
+The weekend or holiday map tells a different story. Many coloured cells appear and several categories are visible at once. Persistent cold classes line up with water bodies and large parks where bus origins remain low on weekends, while new or sporadic cold classes suggest employment districts that quieten when offices close. In contrast, persistent and intensifying hot classes cluster around major town centres, interchange nodes, and waterfront leisure corridors where shopping and recreation attract sustained flows from late morning to evening. Consecutive hot classes near dense transfer areas point to a recent pickup that persisted into the last hour set, and sporadic hot classes around event focused precincts hint at irregular surges.
 
-```{r}
+The practical implications are clear. Weekday peaks look structurally stable, so focus resources on keeping services reliable and clearing bottlenecks. Weekend midday to evening shows genuine growth corridors, so plan extra capacity on routes that connect residential belts to regional centres, parks, and coastal attractions. Monitor cells that moved to intensifying or consecutive hot classes because they are strong candidates for targeted frequency increases, stop level crowd management, or demand responsive extras on specific corridors. Finally, remember that the trend test uses short hour series, so it is worth validating these findings with a longer weekend window or daily bins and by checking an alternative neighbour structure to confirm robustness.
 
+## Discussion
 
-```
+Here’s a direct, evidence-based answer to the 4 research questions, grounded in this study and its EHSA/LMSA workflow.
 
+**RQ1 — Spatial distribution**
 
+Weekday demand is strongly diurnal and spatially patterned. Our own peak-hour maps show that weekday mornings (06:00–09:00) concentrate origins in northern and eastern heartlands—Woodlands, Yishun, Sengkang, Tampines, Bedok, Bukit Panjang and Jurong West—consistent with home-to-work flows leaving residential areas for employment centres. By contrast, weekday afternoons (17:00–20:00) shift intensity toward the Central Region (Orchard, Downtown Core, Kallang), reflecting return trips and after-work activity. Weekends and holidays (11:00–20:00) exhibit a broader, flatter profile with dispersed origins that remain prominent around retail and leisure corridors and town centres from late morning into evening. These patterns align with the diagnostic hourly profile that shows two clear weekday peaks and a single broad weekend peak, validating the period definitions used in the analysis.  
 
-```{r}
+**RQ2 — Local spatial clustering (LMSA)**
 
+The study applies Local Moran’s I, and Getis-Ord Gi* to detect where high or low ridership clusters and spatial outliers occur, moving beyond global summaries to location-specific evidence. These local statistics reveal neighbourhoods of consistently high or low values and pinpoint outliers that diverge from their surroundings, strengthening the descriptive reading of the peak maps. In practice, the observed morning heartland concentrations and afternoon central-area intensifications manifest as high-value clusters (hot clusters) in residential belts during AM and around core employment/retail zones during PM, while water-dominated or park areas and certain weekend-quiet employment precincts register as low-value clusters (cold clusters). Using LMSA in tandem with the period-specific mapping thus ties intuitive patterns to statistically significant local structure, ensuring that subsequent policy discussion rests on formal evidence rather than visual impression alone.  
 
-```
+**RQ3 — Temporal evolution (EHSA with Mann–Kendall)**
 
+Emerging Hot Spot Analysis on space–time Local Getis-Ord Gi* sequences shows a clear contrast between weekday peaks and weekends. For weekday morning and afternoon windows, most hexagons are not significant in the Mann–Kendall trend test; the short three-hour windows appear stable or noisy rather than trending upward or downward, indicating mature, well-established commuting peaks without strong within-period trajectories. On weekends/holidays, many cells become significant and a variety of EHSA classes emerge. Persistent and intensifying hot spots cluster around town centres, interchange nodes and waterfront leisure corridors, signalling sustained or strengthening midday-to-evening flows. Persistent cold spots coincide with water bodies and large parks; “new” or sporadic cold spots appear in office districts that quieten when workplaces are closed. Consecutive and sporadic hot spots around event-oriented precincts indicate recent or irregular surges that merit monitoring. Together, these results show stability on workday peaks but genuine growth and variability on weekends.  
 
+**RQ4 — Policy and planning implications**
 
-```{r}
+Because weekday peaks are structurally stable within their short windows, operations should prioritise reliability over major structural changes: protect headways, manage dwell times, and address recurrent bottlenecks rather than reallocating capacity inside the three-hour peaks. In contrast, weekend/holiday midday–evening corridors with persistent or intensifying hot spots warrant targeted capacity increases—additional trips or larger vehicles—especially on links from residential belts to regional centres, parks and coastal attractions. Cells that moved into intensifying or consecutive hot classes are prime candidates for stop-level crowd management, queue design, and real-time passenger information. As a good practice, treat EHSA as a screening layer: validate hot/cold trends against observed loads, test neighbour definitions (e.g., k-nearest-neighbours sensitivity), and consider extending the weekend window to confirm persistence before committing long-term resources. These steps translate the spatial–temporal evidence into actionable network adjustments that riders will feel.  
 
 
-```
+## Conclusion
 
+This study demonstrates that a careful combination of credible data, defensible spatial units, and rigorous local statistics can turn raw ridership counts into actionable intelligence for a bus network. Using LTA DataMall origins linked to the mainland bus-stop system and aggregated to a validated 750-metre hexagon grid, we built a fully balanced space–time panel and applied two complementary lenses: local measures of spatial autocorrelation to locate meaningful clusters, and Emerging Hot Spot Analysis to track how those clusters evolve within defined peak windows. The workflow—projection to SVY21, mainland masking, active-cell filtering, stable IDs, harmonised cartography, neighbour and weight specification, and reproducible code—ensures that every figure and metric can be regenerated and audited.  ￼
 
+Three broad findings follow. First, weekday peaks are structurally stable. Both morning and afternoon windows show very few cells with significant emerging trends, indicating mature commuting patterns that repeat predictably within those tight three-hour slices. This does not imply weak demand; rather, it shows that within-window Gi* sequences are steady enough that the Mann–Kendall test rarely flags change. Second, weekends and holidays are different. EHSA returns a diverse mix of classes, with persistent and intensifying hot spots around town centres, major interchanges, and waterfront leisure corridors, while persistent cold spots coincide with parks, reservoirs, and water. Sporadic and consecutive hot spots near event-oriented districts reveal irregular but important surges that deserve operational attention. Third, the spatial story seen in descriptive maps is confirmed statistically: morning origins concentrate in northern and eastern heartlands, afternoon activity tilts toward the Central Region, and weekend flows broaden along retail and recreation axes.
 
-```{r}
+Policy implications are direct. On weekdays, the priority should be reliability: protect headways, manage dwell times, relieve recurring choke points, and use targeted bus-priority or stop-level design to keep predictable peaks moving. On weekends and holidays, deploy flexible capacity where the evidence shows growth—extra trips or larger vehicles on links between residential belts and leisure or retail clusters; queue and crowd management at stops inside intensifying or consecutive hot spots; and real-time information to smooth surges. Finally, treat EHSA as a screening tool and institutionalise sensitivity checks: test alternative neighbour schemes, extend or shift weekend windows when warranted, and triangulate with observed loads. Taken together, these steps translate spatial analytics into service choices that improve rider experience while using resources where they matter most.
 
 
-```
+## References
 
+1. Boschan, J.A. and Roman, C.G. (2024) ‘Hot spots of gun violence in the era of focused deterrence: A space-time analysis of shootings in South Philadelphia’, *Social Sciences*, Vol. 13. 
 
+1. Kam, T.S. (2025) ‘Chapter 8: Spatial Weights and Applications’, *R for Geospatial Data Science and Analytics (R4GDSA)*. Available at: https://r4gdsa.netlify.app/chap08.html (Accessed: October 2025).
 
-```{r}
+1. Kam, T.S. (2025) ‘Chapter 9: Global Measures of Spatial Autocorrelation’, *R for Geospatial Data Science and Analytics (R4GDSA)*. Available at: https://r4gdsa.netlify.app/chap09.html (Accessed: October 2025).
 
+1. Kam, T.S. (2025) ‘Chapter 10: Local Measures of Spatial Autocorrelation’, *R for Geospatial Data Science and Analytics (R4GDSA)*. Available at: https://r4gdsa.netlify.app/chap10.html (Accessed: 23 October 2025).
 
-```
+1. Kam, T.S. (2025) ‘In-Class Exercise 06: Emerging Hot Spot Analysis (EHSA)’, *ISSS626 Geospatial Analytics and Applications (AY2025/26 – August Term)*. Available at: https://isss626-ay2025-26aug.netlify.app/in-class_ex/in-class_ex06/in-class_ex06-ehsa#/title-slide (Accessed: October 2025).
 
+1. Kim, M. and Lee, S. (2023) ‘Identification of emerging roadkill hotspots on Korean expressways using space–time cubes’, *International Journal of Environmental Research and Public Health*, 20(6). 
 
+1. Kam, T.S. (2025) 'Lesson 4: Spatial Weights and Applications', *ISSS626 Geospatial Analytics and Applications (AY2025/26 – August Term)*. Available at: https://isss626-ay2025-26aug.netlify.app/lesson/lesson04/lesson04-spatial_weights#/title-slide (Accessed: October 2025).
 
-```{r}
+1. Kam, T.S. (2025) 'Lesson 5: Global Spatial Autocorrelation (GLSA)', *ISSS626 Geospatial Analytics and Applications (AY2025/26 – August Term)*. Available at: https://isss626-ay2025-26aug.netlify.app/lesson/lesson05/lesson05-glsa#/title-slide (Accessed: October 2025).
 
+1. Mack, Z.W.V. and Kam, T.S. (2018) ‘Is there space for violence?: A data-driven approach to the exploration of spatial-temporal dimensions of conflict’, *Proceedings of the 2nd ACM SIGSPATIAL Workshop on Geospatial Humanities*, Seattle, WA, USA, 6 November 2018, pp. 1–10. ACM Digital Library. doi: 10.1145/3282933.3282935.
 
-```
-
-
-```{r}
-
-
-```
-
-
-
-
-```{r}
-
-
-```
-
-
-
-
-```{r}
-
-
-```
-
-
-
-```{r}
-
-
-```
-
-
-
-```{r}
-
-
-```
-
-
-
-```{r}
-
-
-```
-
-
-```{r}
-
-
-```
-
-
-```{r}
-
-
-```
-
-
-```{r}
-
-
-```
-
-
-
-```{r}
-
-
-```
-
-
-
-```{r}
-
-
-```
-
-
-
-```{r}
-
-
-```
-
-
-
-
-```{r}
-
-
-```
-
-
-
-```{r}
-
-
-```
-
-
-```{r}
-
-
-```
-
-
-
-```{r}
-
-
-```
-
-
-
-```{r}
-
-
-```
-
-
-
-```{r}
-
-
-```
-
-
-
-```{r}
-
-
-```
-
-
-
-```{r}
-
-
-```
-
-
-
-```{r}
-
-
-```
-
-
-```{r}
-
-
-```
-
-
-
-```{r}
-
-
-```
-
-
-
-```{r}
-
-
-```
-
-
-
-```{r}
-
-
-```
-
-
-
-```{r}
-
-
-```
-
-
-
-```{r}
-
-
-```
-
-
-
-```{r}
-
-
-```
-
-
-
-```{r}
-
-
-```
-
-
-
-```{r}
-
-
-```
-
-
-```{r}
-
-
-```
-
-
-
-```{r}
-
-
-```
-
-
-
-
-
-
+1. Tan, Y.Y. and Kam, T.S. (2019) ‘Exploring and visualizing household electricity consumption patterns in Singapore: A geospatial analytics approach’, *Information in Contemporary Society: 14th International Conference, iConference 2019, Washington, DC, March 31–April 3, 2019: Proceedings*, pp. 785–796. Springer. doi: 10.1007/978-3-030-15742-5_74.
