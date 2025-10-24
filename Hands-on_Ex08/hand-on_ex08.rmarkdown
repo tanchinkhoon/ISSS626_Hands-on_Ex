@@ -210,7 +210,7 @@ gwr_adaptive <- GWmodel::gwr.basic(
 )
 
 # Save the fitted GWR object
-readr::write_rds(gwr_adaptive, "chap14/data/model/gwr_adaptive.rds")
+readr::write_rds(gwr_adaptive, "/Users/cktan/Desktop/SMU/01_Geospatial Analytics (ISSS626)/Hands-on_Ex/Hands-on_Ex08/data/model/gwr_adaptive.rds")
 
 ```
 
