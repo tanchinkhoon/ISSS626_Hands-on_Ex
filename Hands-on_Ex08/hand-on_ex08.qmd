@@ -1,0 +1,546 @@
+---
+title: "Hands-on Ex08"
+author: "TAN Chin Khoon"
+date: "24 October 2025"
+date-modified: "24 October 2025"
+---
+
+# 14 Geographically Weighted Predictive Models
+
+This practical reproduces the complete workflow to build **geographically weighted predictive models** (GWR and Geographically Weighted Random Forest), alongside **non-spatial baselines** (Multiple Linear Regression and Random Forest). Follow each subsection in order.
+
+## 14.1 Overview
+
+Predictive modelling estimates an unknown outcome (e.g., resale price) from known predictors (e.g., floor area, amenities). When observations are georeferenced, relationships may vary across space due to infrastructure, socio-economic and environmental context. Geographically weighted models allow coefficients or model structure to change by location, capturing local effects that global models miss.
+
+By the end, we will:
+
+-   prepare train/test datasets with proper sampling,\
+-   check collinearity,\
+-   fit and save MLR, GWR, RF, and GW-RF models,\
+-   generate out-of-sample predictions,\
+-   compute RMSE and visualise prediction quality.
+
+## 14.2 The Data
+
+we will work with:
+
+-   Aspatial table: HDB resale transactions (CSV → converted to sf during preprocessing).\
+-   Geospatial layers: URA 2014 Master Plan Planning Subzones (polygon sf).\
+-   Locational factors with coordinates: eldercare, hawker centres, parks, supermarkets,\
+-   MRT/LRT stations, bus stops, kindergartens, childcare (shapefile/GeoJSON).\
+-   Locational factors without coordinates: CBD centroid (derived), shopping malls, primary school rankings (CSV/other).
+
+## 14.3 Installing and Loading R Packages
+
+```{r}
+
+# Create/load all required packages in one shot
+pacman::p_load(
+  sf,            # spatial vector data (simple features)
+  spdep,         # spatial dependence utilities (used by some workflows)
+  GWmodel,       # Geographically Weighted Regression
+  SpatialML,     # Geographically Weighted Random Forest (grf)
+  tmap,          # cartography (not central here but part of the stack)
+  rsample,       # train/test splitting (tidymodels)
+  Metrics,       # RMSE and other metrics
+  tidyverse      # dplyr, ggplot2, readr, purrr, etc.
+)
+
+```
+
+## 14.4 Preparing Data
+
+### 14.4.1 Reading data file to rds
+
+```{r}
+
+# Read the prepared modelling dataset (sf object)
+mdata <- readr::read_rds("/Users/cktan/Desktop/SMU/01_Geospatial Analytics (ISSS626)/Hands-on_Ex/Hands-on_Ex08/data/rawdata/mdata.rds")
+
+```
+
+### 14.4.2 Data Sampling
+
+The entire data are split into training and test data sets with 65% and 35% respectively by using initial_split() of rsample package. rsample is one of the package of tigymodels.
+
+```{r}
+
+# Set seed to make the split reproducible
+set.seed(1234)
+
+# Split into 65% training and 35% testing using rsample
+resale_split <- rsample::initial_split(mdata, prop = 6.5/10)
+
+# Extract the two partitions
+train_data <- rsample::training(resale_split)
+test_data  <- rsample::testing(resale_split)
+
+```
+
+
+```{r}
+
+# Persist the splits for reuse
+readr::write_rds(train_data, "/Users/cktan/Desktop/SMU/01_Geospatial Analytics (ISSS626)/Hands-on_Ex/Hands-on_Ex08/data/model/train_data.rds")
+readr::write_rds(test_data,  "/Users/cktan/Desktop/SMU/01_Geospatial Analytics (ISSS626)/Hands-on_Ex/Hands-on_Ex08/data/model/test_data.rds")
+
+```
+
+## 14.5 Computing Correlation Matrix
+
+Before loading the predictors into a predictive model, it is always a good practice to use correlation matrix to examine if there is sign of multicolinearity.
+
+```{r}
+
+# Remove geometry to compute numeric correlations only
+mdata_nogeo <- mdata %>% sf::st_drop_geometry()
+
+# Draw an upper-triangle correlation matrix with numbers
+corrplot::corrplot(
+  cor(mdata_nogeo[, 2:17]), # adjust columns to your numeric predictors
+  diag   = FALSE,           # do not draw the diagonal
+  order  = "AOE",           # sort for visual clarity
+  tl.pos = "td",            # variable labels on top diagonal
+  tl.cex = 0.5,             # smaller labels
+  method = "number",        # show correlation values
+  type   = "upper"          # only the upper triangle
+)
+
+```
+
+:::{.callout-note}
+
+If all absolute correlations are below ~0.8, severe multicollinearity is unlikely.
+
+:::
+
+## 14.6 Retrieving the Stored Data
+
+```{r}
+# Reload saved splits when resuming work
+train_data <- readr::read_rds("/Users/cktan/Desktop/SMU/01_Geospatial Analytics (ISSS626)/Hands-on_Ex/Hands-on_Ex08/data/model/train_data.rds")
+test_data  <- readr::read_rds("/Users/cktan/Desktop/SMU/01_Geospatial Analytics (ISSS626)/Hands-on_Ex/Hands-on_Ex08/data/model/test_data.rds")
+
+```
+
+## 14.7 Building a Non-Spatial Multiple Linear Regression
+
+```{r}
+
+# Fit a global (non-spatial) linear regression as a baseline
+price_mlr <- lm(
+  resale_price ~ floor_area_sqm +
+    storey_order + remaining_lease_mths +
+    PROX_CBD + PROX_ELDERLYCARE + PROX_HAWKER +
+    PROX_MRT + PROX_PARK + PROX_MALL +
+    PROX_SUPERMARKET +
+    WITHIN_350M_KINDERGARTEN + WITHIN_350M_CHILDCARE +
+    WITHIN_350M_BUS + WITHIN_1KM_PRISCH,
+  data = train_data
+)
+
+# Inspect coefficients and diagnostics
+summary(price_mlr)
+
+```
+
+
+
+
+
+
+
+
+
+```{r}
+
+# Save the fitted model
+readr::write_rds(price_mlr, "/Users/cktan/Desktop/SMU/01_Geospatial Analytics (ISSS626)/Hands-on_Ex/Hands-on_Ex08/data/model/price_mlr.rds")
+
+```
+
+## 14.8 GWR Predictive Method
+
+In this section, you will learn how to calibrate a model to predict HDB resale price by using geographically weighted regression method of GWmodel package.
+
+
+
+```{r}
+
+
+
+```
+
+
+
+
+```{r}
+
+
+
+```
+
+
+
+```{r}
+
+
+
+```
+
+
+
+```{r}
+
+
+
+```
+
+
+
+
+```{r}
+
+
+
+```
+
+
+
+```{r}
+
+
+
+```
+
+
+
+```{r}
+
+
+
+```
+
+
+
+```{r}
+
+
+
+```
+
+
+
+```{r}
+
+
+
+```
+
+
+
+
+```{r}
+
+
+
+```
+
+
+
+```{r}
+
+
+
+```
+
+
+
+
+```{r}
+
+
+
+```
+
+
+
+
+```{r}
+
+
+
+```
+
+
+
+```{r}
+
+
+
+```
+
+
+
+
+```{r}
+
+
+
+```
+
+
+
+
+```{r}
+
+
+
+```
+
+
+
+```{r}
+
+
+
+```
+
+
+
+
+```{r}
+
+
+
+```
+
+
+
+```{r}
+
+
+
+```
+
+
+
+
+```{r}
+
+
+
+```
+
+
+
+```{r}
+
+
+
+```
+
+
+
+```{r}
+
+
+
+```
+
+
+
+```{r}
+
+
+
+```
+
+
+```{r}
+
+
+
+```
+
+```{r}
+
+
+
+```
+
+
+```{r}
+
+
+
+```
+
+
+
+```{r}
+
+
+
+```
+
+
+
+
+```{r}
+
+
+
+```
+
+
+
+```{r}
+
+
+
+```
+
+
+
+
+```{r}
+
+
+
+```
+
+
+
+```{r}
+
+
+
+```
+
+
+
+```{r}
+
+
+
+```
+
+
+
+```{r}
+
+
+
+```
+
+
+
+```{r}
+
+
+
+```
+
+
+
+```{r}
+
+
+
+```
+
+
+
+```{r}
+
+
+
+```
+
+
+
+```{r}
+
+
+
+```
+
+
+
+
+```{r}
+
+
+
+```
+
+
+
+```{r}
+
+
+
+```
+
+
+
+
+```{r}
+
+
+
+```
+
+
+
+```{r}
+
+
+
+```
+
+
+
+```{r}
+
+
+
+```
+
+
+
+
+```{r}
+
+
+
+```
+
+
+
+
+```{r}
+
+
+
+```
+
+
+
+
+```{r}
+
+
+
+```
+
+
+
+
+```{r}
+
+
+
+```
