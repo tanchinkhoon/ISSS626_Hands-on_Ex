@@ -28,6 +28,8 @@ website:
             href: Hands-on_Ex01/Hand-on_Ex01.qmd
       - text: "In-class Exercise"
         menu:
+          - text: "In-class Exercise 8"
+            href: In-Class_Ex08/in-class_ex08   
           - text: "In-class Exercise 7"
             href: In-Class_Ex07/in-class_ex07   
           - text: "In-class Exercise 6"

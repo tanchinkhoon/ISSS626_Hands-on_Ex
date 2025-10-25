@@ -18,11 +18,12 @@ Welcome to **Geospatial Analytics and Application (ISSS626)**. This website coll
 
 (Refer to the drop-down menus above for complete list of assignment submissions)
 
+-   👉 **In-class Exercise 8**: [Open the assignment](in-class_ex08/in-class_ex08)
 -   👉 **Hands-on Exercise 8**: [Open the assignment](Hands-on_Ex08/hand-on_ex08)
 -   👉 **Take-home Exercise 2**: [Open the assignment](Take-home_Ex02/take-home_ex02)
 -   👉 **In-class Exercise 7**: [Open the assignment](in-class_ex07/in-class_ex07)
 -   👉 **Hands-on Exercise 7**: [Open the assignment](Hands-on_Ex07/hand-on_ex07)
--   👉 **In-class Exercise 6**: [Open the assignment](in-class_ex06/in-class_ex06)
+
 
 
 ## Objectives:
