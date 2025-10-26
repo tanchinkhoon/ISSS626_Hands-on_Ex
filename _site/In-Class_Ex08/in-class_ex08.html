@@ -265,42 +265,54 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#installing-and-loading-r-packages" id="toc-installing-and-loading-r-packages" class="nav-link active" data-scroll-target="#installing-and-loading-r-packages">Installing and Loading R Packages</a></li>
-  <li><a href="#geocoding-for-geometric" id="toc-geocoding-for-geometric" class="nav-link" data-scroll-target="#geocoding-for-geometric">Geocoding for Geometric</a></li>
-  <li><a href="#supplement-to-hands-on-exercise-8" id="toc-supplement-to-hands-on-exercise-8" class="nav-link" data-scroll-target="#supplement-to-hands-on-exercise-8">Supplement to Hands-on Exercise 8</a>
+  <li><a href="#installing-and-loading-r-packages" id="toc-installing-and-loading-r-packages" class="nav-link active" data-scroll-target="#installing-and-loading-r-packages"><span class="header-section-number">1</span> Installing and Loading R Packages</a></li>
+  <li><a href="#geocoding-for-geometric" id="toc-geocoding-for-geometric" class="nav-link" data-scroll-target="#geocoding-for-geometric"><span class="header-section-number">2</span> Geocoding for Geometric</a>
   <ul>
-  <li><a href="#data-import" id="toc-data-import" class="nav-link" data-scroll-target="#data-import">Data import</a></li>
-  <li><a href="#data-sampling" id="toc-data-sampling" class="nav-link" data-scroll-target="#data-sampling">Data sampling</a></li>
-  <li><a href="#checking-of-overlapping-point" id="toc-checking-of-overlapping-point" class="nav-link" data-scroll-target="#checking-of-overlapping-point">Checking of overlapping point</a></li>
-  <li><a href="#spatial-jittler" id="toc-spatial-jittler" class="nav-link" data-scroll-target="#spatial-jittler">Spatial jittler</a></li>
-  <li><a href="#data-sampling-1" id="toc-data-sampling-1" class="nav-link" data-scroll-target="#data-sampling-1">Data Sampling</a></li>
-  <li><a href="#multicollinearity-check" id="toc-multicollinearity-check" class="nav-link" data-scroll-target="#multicollinearity-check">Multicollinearity check</a></li>
-  <li><a href="#building-a-non-spatial-multiple-linear-regression" id="toc-building-a-non-spatial-multiple-linear-regression" class="nav-link" data-scroll-target="#building-a-non-spatial-multiple-linear-regression">Building a non-spatial multiple linear regression</a></li>
-  <li><a href="#multicollinearity-check-with-vif" id="toc-multicollinearity-check-with-vif" class="nav-link" data-scroll-target="#multicollinearity-check-with-vif">Multicollinearity check with VIF</a></li>
-  <li><a href="#predictive-modelling-with-gwr" id="toc-predictive-modelling-with-gwr" class="nav-link" data-scroll-target="#predictive-modelling-with-gwr">Predictive Modelling with gwr</a></li>
-  <li><a href="#model-calibration" id="toc-model-calibration" class="nav-link" data-scroll-target="#model-calibration">Model calibration</a></li>
-  <li><a href="#predictive-modelling-with-mlr" id="toc-predictive-modelling-with-mlr" class="nav-link" data-scroll-target="#predictive-modelling-with-mlr">Predictive Modelling with MLR</a>
+  <li><a href="#importing-data" id="toc-importing-data" class="nav-link" data-scroll-target="#importing-data"><span class="header-section-number">2.1</span> Importing data</a></li>
+  <li><a href="#reducing-and-filtering-the-dataset" id="toc-reducing-and-filtering-the-dataset" class="nav-link" data-scroll-target="#reducing-and-filtering-the-dataset"><span class="header-section-number">2.2</span> Reducing and filtering the dataset</a></li>
+  <li><a href="#geodata-pre-processing-and-cleaning" id="toc-geodata-pre-processing-and-cleaning" class="nav-link" data-scroll-target="#geodata-pre-processing-and-cleaning"><span class="header-section-number">2.3</span> Geodata pre-processing and cleaning</a>
   <ul class="collapse">
-  <li><a href="#predictive-modelling-with-mlr-1" id="toc-predictive-modelling-with-mlr-1" class="nav-link" data-scroll-target="#predictive-modelling-with-mlr-1">Predictive Modelling with MLR</a></li>
+  <li><a href="#address-normalisation-matters" id="toc-address-normalisation-matters" class="nav-link" data-scroll-target="#address-normalisation-matters"><span class="header-section-number">2.3.1</span> Address normalisation matters</a></li>
+  <li><a href="#function-to-convert-address-to-coordinates-latitude-and-longitudey" id="toc-function-to-convert-address-to-coordinates-latitude-and-longitudey" class="nav-link" data-scroll-target="#function-to-convert-address-to-coordinates-latitude-and-longitudey"><span class="header-section-number">2.3.2</span> Function to convert address to coordinates (LATITUDE and LONGITUDEY)</a></li>
+  <li><a href="#perform-minimal-unitsmoke-test" id="toc-perform-minimal-unitsmoke-test" class="nav-link" data-scroll-target="#perform-minimal-unitsmoke-test"><span class="header-section-number">2.3.3</span> Perform minimal unit/smoke test</a></li>
   </ul></li>
-  <li><a href="#predictive-modelling-rf-method" id="toc-predictive-modelling-rf-method" class="nav-link" data-scroll-target="#predictive-modelling-rf-method">Predictive Modelling: RF method</a>
+  <li><a href="#merge-the-latitude-and-longitude-to-dataset" id="toc-merge-the-latitude-and-longitude-to-dataset" class="nav-link" data-scroll-target="#merge-the-latitude-and-longitude-to-dataset"><span class="header-section-number">2.4</span> Merge the LATITUDE and LONGITUDE to dataset</a></li>
+  <li><a href="#convert-to-sf-object" id="toc-convert-to-sf-object" class="nav-link" data-scroll-target="#convert-to-sf-object"><span class="header-section-number">2.5</span> Convert to sf object</a></li>
+  </ul></li>
+  <li><a href="#supplement-to-hands-on-exercise-8" id="toc-supplement-to-hands-on-exercise-8" class="nav-link" data-scroll-target="#supplement-to-hands-on-exercise-8"><span class="header-section-number">3</span> Supplement to Hands-on Exercise 8</a>
+  <ul>
+  <li><a href="#data-import" id="toc-data-import" class="nav-link" data-scroll-target="#data-import"><span class="header-section-number">3.1</span> Data import</a></li>
+  <li><a href="#data-sampling" id="toc-data-sampling" class="nav-link" data-scroll-target="#data-sampling"><span class="header-section-number">3.2</span> Data sampling</a></li>
+  <li><a href="#checking-of-overlapping-point" id="toc-checking-of-overlapping-point" class="nav-link" data-scroll-target="#checking-of-overlapping-point"><span class="header-section-number">3.3</span> Checking of overlapping point</a></li>
+  <li><a href="#spatial-jittler" id="toc-spatial-jittler" class="nav-link" data-scroll-target="#spatial-jittler"><span class="header-section-number">3.4</span> Spatial jittler</a></li>
+  <li><a href="#data-sampling-1" id="toc-data-sampling-1" class="nav-link" data-scroll-target="#data-sampling-1"><span class="header-section-number">3.5</span> Data Sampling</a></li>
+  <li><a href="#multicollinearity-check" id="toc-multicollinearity-check" class="nav-link" data-scroll-target="#multicollinearity-check"><span class="header-section-number">3.6</span> Multicollinearity check</a></li>
+  <li><a href="#building-a-non-spatial-multiple-linear-regression" id="toc-building-a-non-spatial-multiple-linear-regression" class="nav-link" data-scroll-target="#building-a-non-spatial-multiple-linear-regression"><span class="header-section-number">3.7</span> Building a non-spatial multiple linear regression</a></li>
+  <li><a href="#multicollinearity-check-with-vif" id="toc-multicollinearity-check-with-vif" class="nav-link" data-scroll-target="#multicollinearity-check-with-vif"><span class="header-section-number">3.8</span> Multicollinearity check with VIF</a></li>
+  <li><a href="#predictive-modelling-with-gwr" id="toc-predictive-modelling-with-gwr" class="nav-link" data-scroll-target="#predictive-modelling-with-gwr"><span class="header-section-number">3.9</span> Predictive Modelling with gwr</a></li>
+  <li><a href="#model-calibration" id="toc-model-calibration" class="nav-link" data-scroll-target="#model-calibration"><span class="header-section-number">3.10</span> Model calibration</a></li>
+  <li><a href="#predictive-modelling-with-mlr" id="toc-predictive-modelling-with-mlr" class="nav-link" data-scroll-target="#predictive-modelling-with-mlr"><span class="header-section-number">3.11</span> Predictive Modelling with MLR</a>
   <ul class="collapse">
-  <li><a href="#data-preparation" id="toc-data-preparation" class="nav-link" data-scroll-target="#data-preparation">Data Preparation</a></li>
-  <li><a href="#calibrating-rf-model" id="toc-calibrating-rf-model" class="nav-link" data-scroll-target="#calibrating-rf-model">Calibrating RF model</a></li>
-  <li><a href="#model-output" id="toc-model-output" class="nav-link" data-scroll-target="#model-output">Model output</a></li>
+  <li><a href="#predictive-modelling-with-mlr-1" id="toc-predictive-modelling-with-mlr-1" class="nav-link" data-scroll-target="#predictive-modelling-with-mlr-1"><span class="header-section-number">3.11.1</span> Predictive Modelling with MLR</a></li>
   </ul></li>
-  <li><a href="#predictive-modelling-spatialml-method" id="toc-predictive-modelling-spatialml-method" class="nav-link" data-scroll-target="#predictive-modelling-spatialml-method">Predictive Modelling: SpatialML method</a>
+  <li><a href="#predictive-modelling-rf-method" id="toc-predictive-modelling-rf-method" class="nav-link" data-scroll-target="#predictive-modelling-rf-method"><span class="header-section-number">3.12</span> Predictive Modelling: RF method</a>
   <ul class="collapse">
-  <li><a href="#determining-bandwidth" id="toc-determining-bandwidth" class="nav-link" data-scroll-target="#determining-bandwidth">Determining bandwidth</a></li>
-  <li><a href="#calibrating-with-grf" id="toc-calibrating-with-grf" class="nav-link" data-scroll-target="#calibrating-with-grf">Calibrating with grf</a></li>
+  <li><a href="#data-preparation" id="toc-data-preparation" class="nav-link" data-scroll-target="#data-preparation"><span class="header-section-number">3.12.1</span> Data Preparation</a></li>
+  <li><a href="#calibrating-rf-model" id="toc-calibrating-rf-model" class="nav-link" data-scroll-target="#calibrating-rf-model"><span class="header-section-number">3.12.2</span> Calibrating RF model</a></li>
+  <li><a href="#model-output" id="toc-model-output" class="nav-link" data-scroll-target="#model-output"><span class="header-section-number">3.12.3</span> Model output</a></li>
   </ul></li>
-  <li><a href="#predicting-by-using-the-test-data" id="toc-predicting-by-using-the-test-data" class="nav-link" data-scroll-target="#predicting-by-using-the-test-data">Predicting by using the test data</a>
+  <li><a href="#predictive-modelling-spatialml-method" id="toc-predictive-modelling-spatialml-method" class="nav-link" data-scroll-target="#predictive-modelling-spatialml-method"><span class="header-section-number">3.13</span> Predictive Modelling: SpatialML method</a>
   <ul class="collapse">
-  <li><a href="#preparing-the-test-data" id="toc-preparing-the-test-data" class="nav-link" data-scroll-target="#preparing-the-test-data">Preparing the test data</a></li>
-  <li><a href="#predicting-with-the-test-data" id="toc-predicting-with-the-test-data" class="nav-link" data-scroll-target="#predicting-with-the-test-data">Predicting with the test data</a></li>
-  <li><a href="#creating-df" id="toc-creating-df" class="nav-link" data-scroll-target="#creating-df">Creating DF</a></li>
+  <li><a href="#determining-bandwidth" id="toc-determining-bandwidth" class="nav-link" data-scroll-target="#determining-bandwidth"><span class="header-section-number">3.13.1</span> Determining bandwidth</a></li>
+  <li><a href="#calibrating-with-grf" id="toc-calibrating-with-grf" class="nav-link" data-scroll-target="#calibrating-with-grf"><span class="header-section-number">3.13.2</span> Calibrating with grf</a></li>
   </ul></li>
-  <li><a href="#visualising-the-predicted-values" id="toc-visualising-the-predicted-values" class="nav-link" data-scroll-target="#visualising-the-predicted-values">Visualising the predicted values</a></li>
+  <li><a href="#predicting-by-using-the-test-data" id="toc-predicting-by-using-the-test-data" class="nav-link" data-scroll-target="#predicting-by-using-the-test-data"><span class="header-section-number">3.14</span> Predicting by using the test data</a>
+  <ul class="collapse">
+  <li><a href="#preparing-the-test-data" id="toc-preparing-the-test-data" class="nav-link" data-scroll-target="#preparing-the-test-data"><span class="header-section-number">3.14.1</span> Preparing the test data</a></li>
+  <li><a href="#predicting-with-the-test-data" id="toc-predicting-with-the-test-data" class="nav-link" data-scroll-target="#predicting-with-the-test-data"><span class="header-section-number">3.14.2</span> Predicting with the test data</a></li>
+  <li><a href="#creating-df" id="toc-creating-df" class="nav-link" data-scroll-target="#creating-df"><span class="header-section-number">3.14.3</span> Creating DF</a></li>
+  </ul></li>
+  <li><a href="#visualising-the-predicted-values" id="toc-visualising-the-predicted-values" class="nav-link" data-scroll-target="#visualising-the-predicted-values"><span class="header-section-number">3.15</span> Visualising the predicted values</a></li>
   </ul></li>
   </ul>
 </nav>
@@ -345,15 +357,17 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<section id="installing-and-loading-r-packages" class="level2">
-<h2 class="anchored" data-anchor-id="installing-and-loading-r-packages">Installing and Loading R Packages</h2>
+<section id="installing-and-loading-r-packages" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="installing-and-loading-r-packages"><span class="header-section-number">1</span> Installing and Loading R Packages</h2>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create/load all required packages in one shot</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>pacman<span class="sc">::</span><span class="fu">p_load</span>(httr,tidyverse, sf, tmap,jsonlite, progress, spdep,GWmodel, SpatialML, rsample, Metrics, knitr, kableExtra, spatialRF, randomForestExplainer)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
-<section id="geocoding-for-geometric" class="level2">
-<h2 class="anchored" data-anchor-id="geocoding-for-geometric">Geocoding for Geometric</h2>
+<section id="geocoding-for-geometric" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="geocoding-for-geometric"><span class="header-section-number">2</span> Geocoding for Geometric</h2>
+<section id="importing-data" class="level3" data-number="2.1">
+<h3 data-number="2.1" class="anchored" data-anchor-id="importing-data"><span class="header-section-number">2.1</span> Importing data</h3>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Downloading the raw data from data.gov.sg. </span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Data source: Resale flat prices based on registration date from Jan-2017 onwards</span></span>
@@ -370,69 +384,134 @@ dbl (3): floor_area_sqm, lease_commence_date, resale_price
 ℹ Use `spec()` to retrieve the full column specification for this data.
 ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
 </div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Inspect the loading data</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(HDBresale_raw)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Rows: 218,083
+Columns: 11
+$ month               &lt;chr&gt; "2017-01", "2017-01", "2017-01", "2017-01", "2017-…
+$ town                &lt;chr&gt; "ANG MO KIO", "ANG MO KIO", "ANG MO KIO", "ANG MO …
+$ flat_type           &lt;chr&gt; "2 ROOM", "3 ROOM", "3 ROOM", "3 ROOM", "3 ROOM", …
+$ block               &lt;chr&gt; "406", "108", "602", "465", "601", "150", "447", "…
+$ street_name         &lt;chr&gt; "ANG MO KIO AVE 10", "ANG MO KIO AVE 4", "ANG MO K…
+$ storey_range        &lt;chr&gt; "10 TO 12", "01 TO 03", "01 TO 03", "04 TO 06", "0…
+$ floor_area_sqm      &lt;dbl&gt; 44, 67, 67, 68, 67, 68, 68, 67, 68, 67, 68, 67, 67…
+$ flat_model          &lt;chr&gt; "Improved", "New Generation", "New Generation", "N…
+$ lease_commence_date &lt;dbl&gt; 1979, 1978, 1980, 1980, 1980, 1981, 1979, 1976, 19…
+$ remaining_lease     &lt;chr&gt; "61 years 04 months", "60 years 07 months", "62 ye…
+$ resale_price        &lt;dbl&gt; 232000, 250000, 262000, 265000, 265000, 275000, 28…</code></pre>
 </div>
+</div>
+</section>
+<section id="reducing-and-filtering-the-dataset" class="level3" data-number="2.2">
+<h3 data-number="2.2" class="anchored" data-anchor-id="reducing-and-filtering-the-dataset"><span class="header-section-number">2.2</span> Reducing and filtering the dataset</h3>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># find the most recent month that has 4 ROOM</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>month_choice <span class="ot">&lt;-</span> HDBresale_raw <span class="sc">%&gt;%</span></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(flat_type <span class="sc">==</span> <span class="st">"4 ROOM"</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(month, <span class="at">name =</span> <span class="st">"n"</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(n <span class="sc">&gt;</span> <span class="dv">0</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(month)) <span class="sc">%&gt;%</span></span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice</span>(<span class="dv">1</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>(month)</span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>month_choice</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># find the most recent month that has 4 ROOM</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>month_choice <span class="ot">&lt;-</span> HDBresale_raw <span class="sc">%&gt;%</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(flat_type <span class="sc">==</span> <span class="st">"4 ROOM"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(month, <span class="at">name =</span> <span class="st">"n"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(n <span class="sc">&gt;</span> <span class="dv">0</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(month)) <span class="sc">%&gt;%</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice</span>(<span class="dv">1</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>(month)</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a><span class="co">#Inspect the output</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>month_choice</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] "2025-10"</code></pre>
 </div>
 </div>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># filter to that month</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>HDBresale <span class="ot">&lt;-</span> HDBresale_raw <span class="sc">%&gt;%</span></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(flat_type <span class="sc">==</span> <span class="st">"4 ROOM"</span>, month <span class="sc">==</span> month_choice)</span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="fu">nrow</span>(HDBresale)   <span class="co"># should be greater than zero</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># filter to that month</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>HDBresale <span class="ot">&lt;-</span> HDBresale_raw <span class="sc">%&gt;%</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(flat_type <span class="sc">==</span> <span class="st">"4 ROOM"</span>, month <span class="sc">==</span> month_choice)</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="fu">nrow</span>(HDBresale)   <span class="co"># should be greater than zero</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 458</code></pre>
 </div>
 </div>
+</section>
+<section id="geodata-pre-processing-and-cleaning" class="level3" data-number="2.3">
+<h3 data-number="2.3" class="anchored" data-anchor-id="geodata-pre-processing-and-cleaning"><span class="header-section-number">2.3</span> Geodata pre-processing and cleaning</h3>
+<section id="address-normalisation-matters" class="level4" data-number="2.3.1">
+<h4 data-number="2.3.1" class="anchored" data-anchor-id="address-normalisation-matters"><span class="header-section-number">2.3.1</span> Address normalisation matters</h4>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># street name fix</span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>HDBresale<span class="sc">$</span>street_name <span class="ot">&lt;-</span> <span class="fu">gsub</span>(<span class="st">"ST</span><span class="sc">\\</span><span class="st">."</span>, <span class="st">"SAINT"</span>, HDBresale<span class="sc">$</span>street_name)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># street name fix</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>HDBresale<span class="sc">$</span>street_name <span class="ot">&lt;-</span> <span class="fu">gsub</span>(<span class="st">"ST</span><span class="sc">\\</span><span class="st">."</span>, <span class="st">"SAINT"</span>, HDBresale<span class="sc">$</span>street_name)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The <code>gsub()</code> function performs a global substitution (find and replace) in text.</p>
+</div>
+</div>
+</section>
+<section id="function-to-convert-address-to-coordinates-latitude-and-longitudey" class="level4" data-number="2.3.2">
+<h4 data-number="2.3.2" class="anchored" data-anchor-id="function-to-convert-address-to-coordinates-latitude-and-longitudey"><span class="header-section-number">2.3.2</span> Function to convert address to coordinates (LATITUDE and LONGITUDEY)</h4>
+<p>Below is the code chunk used to build a function that will convert address to coordinates</p>
+<ul>
+<li>The function sends a live API request to OneMap Singapore to obtain geographic coordinates (latitude and longitude) for each given HDB address.<br>
+</li>
+<li>Explicit UTF-8 encoding is included to eliminate the “No encoding supplied” warning and ensure correct text handling for special characters.<br>
+</li>
+<li>Always returns a tibble with columns LATITUDE and LONGITUDE, even when no match is found, to prevent pipeline breaks during unnesting.<br>
+</li>
+<li>Only retrieves the first match from the API (pageNum = “1”), which increases speed but may ignore alternative results for ambiguous addresses.<br>
+</li>
+<li>Requires street name standardisation (e.g., “ST.” changed to “SAINT”) before calling the function to improve matching accuracy.<br>
+</li>
+<li>Coordinates returned by OneMap are based on WGS84 (EPSG 4326), so conversion to SVY21 (EPSG 3414) is needed for metric-based distance analysis.<br>
+</li>
+<li>Each function call makes a separate HTTP request; for large datasets, use progress tracking, pauses (Sys.sleep), and checkpoint saving to avoid rate limits.<br>
+</li>
+<li>Wrapping the function with tryCatch or purrr::safely prevents process interruption if a request fails or the API returns an unexpected response.<br>
+</li>
+<li>A test call such as geocode(“101”,“JURONG EAST STREET 13”) is recommended before batch processing to confirm valid numeric coordinates are returned.<br>
+</li>
+<li>For reproducibility and efficiency, store results (block, street, LATITUDE, LONGITUDE) in a CSV file to reuse in future runs without re-querying the API.</li>
+</ul>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># professor geocode</span></span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Reference: https://www.onemap.gov.sg/apidocs/coordinate</span></span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>geocode <span class="ot">&lt;-</span> <span class="cf">function</span>(block, streetname) {</span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>  base_url <span class="ot">&lt;-</span> <span class="st">"https://onemap.gov.sg/api/common/elastic/search"</span></span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>  address  <span class="ot">&lt;-</span> <span class="fu">paste</span>(block, streetname, <span class="at">sep =</span> <span class="st">" "</span>)</span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>  query <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
-<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">searchVal =</span> address,</span>
-<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">returnGeom =</span> <span class="st">"Y"</span>,</span>
-<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">getAddrDetails =</span> <span class="st">"N"</span>,</span>
-<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">pageNum =</span> <span class="st">"1"</span></span>
-<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>  res     <span class="ot">&lt;-</span> httr<span class="sc">::</span><span class="fu">GET</span>(base_url, <span class="at">query =</span> query)</span>
-<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>  restext <span class="ot">&lt;-</span> httr<span class="sc">::</span><span class="fu">content</span>(res, <span class="at">as =</span> <span class="st">"text"</span>)</span>
-<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>  out     <span class="ot">&lt;-</span> jsonlite<span class="sc">::</span><span class="fu">fromJSON</span>(restext)</span>
-<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">length</span>(out<span class="sc">$</span>results) <span class="sc">==</span> <span class="dv">0</span>) {</span>
-<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>    <span class="fu">tibble</span>(<span class="at">LATITUDE =</span> <span class="cn">NA_real_</span>, <span class="at">LONGITUDE =</span> <span class="cn">NA_real_</span>)</span>
-<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> {</span>
-<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a>    <span class="fu">tibble</span>(</span>
-<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a>      <span class="at">LATITUDE  =</span> <span class="fu">as.numeric</span>(out<span class="sc">$</span>results<span class="sc">$</span>LATITUDE[<span class="dv">1</span>]),</span>
-<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a>      <span class="at">LONGITUDE =</span> <span class="fu">as.numeric</span>(out<span class="sc">$</span>results<span class="sc">$</span>LONGITUDE[<span class="dv">1</span>])</span>
-<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb9-25"><a href="#cb9-25" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># professor geocode</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Reference: https://www.onemap.gov.sg/apidocs/coordinate</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>geocode <span class="ot">&lt;-</span> <span class="cf">function</span>(block, streetname) {                          <span class="co"># define a function that takes block and street name and returns coordinates</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>  base_url <span class="ot">&lt;-</span> <span class="st">"https://onemap.gov.sg/api/common/elastic/search"</span>   <span class="co"># store the OneMap search endpoint as a constant for reuse</span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>  address  <span class="ot">&lt;-</span> <span class="fu">paste</span>(block, streetname, <span class="at">sep =</span> <span class="st">" "</span>)                 <span class="co"># build a single query string such as 118 ANG MO KIO AVENUE 4</span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>  query <span class="ot">&lt;-</span> <span class="fu">list</span>(                                                  <span class="co"># create a named list of query parameters for the HTTP request</span></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">searchVal     =</span> address,                                      <span class="co"># the address string to search</span></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">returnGeom    =</span> <span class="st">"Y"</span>,                                          <span class="co"># ask the service to return geometry fields</span></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">getAddrDetails=</span> <span class="st">"N"</span>,                                          <span class="co"># do not request extra address fields to keep reply small</span></span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">pageNum       =</span> <span class="st">"1"</span>                                           <span class="co"># take the first page only for a single best match</span></span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>  )                                                               <span class="co"># end of query parameter list</span></span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>  res     <span class="ot">&lt;-</span> httr<span class="sc">::</span><span class="fu">GET</span>(base_url, <span class="at">query =</span> query)                   <span class="co"># send a GET request to OneMap with the query parameters</span></span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>  restext <span class="ot">&lt;-</span> httr<span class="sc">::</span><span class="fu">content</span>(res, <span class="at">as =</span> <span class="st">"text"</span>, <span class="at">encoding =</span> <span class="st">"UTF-8"</span>)  <span class="co"># read the response body as text with UTF8 to avoid encoding warnings</span></span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>  out     <span class="ot">&lt;-</span> jsonlite<span class="sc">::</span><span class="fu">fromJSON</span>(restext)                          <span class="co"># parse the JSON text into an R list or data frame</span></span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">length</span>(out<span class="sc">$</span>results) <span class="sc">==</span> <span class="dv">0</span>) {                                 <span class="co"># if the service returns no match for this address</span></span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a>    <span class="fu">tibble</span>(<span class="at">LATITUDE =</span> <span class="cn">NA_real_</span>, <span class="at">LONGITUDE =</span> <span class="cn">NA_real_</span>)             <span class="co"># return a tibble with missing numeric coordinates</span></span>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> {                                                        <span class="co"># otherwise when there is at least one match</span></span>
+<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a>    <span class="fu">tibble</span>(                                                              </span>
+<span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a>      <span class="at">LATITUDE  =</span> <span class="fu">as.numeric</span>(out<span class="sc">$</span>results<span class="sc">$</span>LATITUDE[<span class="dv">1</span>]),            <span class="co"># take the first result latitude and coerce to numeric</span></span>
+<span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a>      <span class="at">LONGITUDE =</span> <span class="fu">as.numeric</span>(out<span class="sc">$</span>results<span class="sc">$</span>LONGITUDE[<span class="dv">1</span>])            <span class="co"># take the first result longitude and coerce to numeric</span></span>
+<span id="cb11-24"><a href="#cb11-24" aria-hidden="true" tabindex="-1"></a>    )                                                             <span class="co"># end tibble creation</span></span>
+<span id="cb11-25"><a href="#cb11-25" aria-hidden="true" tabindex="-1"></a>  }                                                               <span class="co"># end branch</span></span>
+<span id="cb11-26"><a href="#cb11-26" aria-hidden="true" tabindex="-1"></a>}                                                                 <span class="co"># end function</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
+</section>
+<section id="perform-minimal-unitsmoke-test" class="level4" data-number="2.3.3">
+<h4 data-number="2.3.3" class="anchored" data-anchor-id="perform-minimal-unitsmoke-test"><span class="header-section-number">2.3.3</span> Perform minimal unit/smoke test</h4>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Test with a single known HDB address</span></span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="fu">geocode</span>(<span class="st">"101"</span>, <span class="st">"JURONG EAST STREET 13"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stderr">
-<pre><code>No encoding supplied: defaulting to UTF-8.</code></pre>
-</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Test with a single known HDB address</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="fu">geocode</span>(<span class="st">"101"</span>, <span class="st">"JURONG EAST STREET 13"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 1 × 2
   LATITUDE LONGITUDE
@@ -440,472 +519,18 @@ dbl (3): floor_area_sqm, lease_commence_date, resale_price
 1     1.34      104.</code></pre>
 </div>
 </div>
+</section>
+</section>
+<section id="merge-the-latitude-and-longitude-to-dataset" class="level3" data-number="2.4">
+<h3 data-number="2.4" class="anchored" data-anchor-id="merge-the-latitude-and-longitude-to-dataset"><span class="header-section-number">2.4</span> Merge the LATITUDE and LONGITUDE to dataset</h3>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># create LATITUDE and LONGITUDE and merge into the table</span></span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>HDBresale <span class="ot">&lt;-</span> HDBresale <span class="sc">%&gt;%</span></span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">geo =</span> purrr<span class="sc">::</span><span class="fu">map2</span>(block, street_name, geocode)) <span class="sc">%&gt;%</span></span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>  tidyr<span class="sc">::</span><span class="fu">unnest</span>(geo)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stderr">
-<pre><code>No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.
-No encoding supplied: defaulting to UTF-8.</code></pre>
-</div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(HDBresale)   <span class="co"># now includes LATITUDE and LONGITUDE</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># create LATITUDE and LONGITUDE and merge into the table</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>HDBresale <span class="ot">&lt;-</span> HDBresale <span class="sc">%&gt;%</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">geo =</span> purrr<span class="sc">::</span><span class="fu">map2</span>(block, street_name, geocode)) <span class="sc">%&gt;%</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>  tidyr<span class="sc">::</span><span class="fu">unnest</span>(geo)</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="do">### </span></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(HDBresale)   <span class="co"># now includes LATITUDE and LONGITUDE</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Rows: 458
 Columns: 13
@@ -924,11 +549,33 @@ $ LATITUDE            &lt;dbl&gt; 1.363594, 1.364453, 1.366971, 1.367421, 1.3670
 $ LONGITUDE           &lt;dbl&gt; 103.8518, 103.8537, 103.8539, 103.8459, 103.8457, …</code></pre>
 </div>
 </div>
+</section>
+<section id="convert-to-sf-object" class="level3" data-number="2.5">
+<h3 data-number="2.5" class="anchored" data-anchor-id="convert-to-sf-object"><span class="header-section-number">2.5</span> Convert to sf object</h3>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Convert to sf object</span></span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>HDBresale_sf <span class="ot">&lt;-</span> HDBresale <span class="sc">%&gt;%</span></span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_as_sf</span>(<span class="at">coords =</span> <span class="fu">c</span>(<span class="st">"LONGITUDE"</span>, <span class="st">"LATITUDE"</span>), <span class="at">crs =</span> <span class="dv">4326</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_transform</span>(<span class="at">crs =</span> <span class="dv">3414</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Convert to sf object</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>HDBresale_sf <span class="ot">&lt;-</span> HDBresale <span class="sc">%&gt;%</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_as_sf</span>(<span class="at">coords =</span> <span class="fu">c</span>(<span class="st">"LONGITUDE"</span>, <span class="st">"LATITUDE"</span>), <span class="at">crs =</span> <span class="dv">4326</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_transform</span>(<span class="at">crs =</span> <span class="dv">3414</span>)</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Inspect and verify the  </span></span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(HDBresale_sf)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Rows: 458
+Columns: 12
+$ month               &lt;chr&gt; "2025-10", "2025-10", "2025-10", "2025-10", "2025-…
+$ town                &lt;chr&gt; "ANG MO KIO", "ANG MO KIO", "ANG MO KIO", "ANG MO …
+$ flat_type           &lt;chr&gt; "4 ROOM", "4 ROOM", "4 ROOM", "4 ROOM", "4 ROOM", …
+$ block               &lt;chr&gt; "336", "415", "438", "301", "302", "327", "212", "…
+$ street_name         &lt;chr&gt; "ANG MO KIO AVE 1", "ANG MO KIO AVE 10", "ANG MO K…
+$ storey_range        &lt;chr&gt; "07 TO 09", "07 TO 09", "01 TO 03", "10 TO 12", "1…
+$ floor_area_sqm      &lt;dbl&gt; 91, 92, 92, 98, 98, 98, 81, 92, 99, 91, 99, 91, 90…
+$ flat_model          &lt;chr&gt; "New Generation", "New Generation", "New Generatio…
+$ lease_commence_date &lt;dbl&gt; 1982, 1979, 1979, 1978, 1978, 1977, 1977, 1978, 19…
+$ remaining_lease     &lt;chr&gt; "55 years 04 months", "52 years 11 months", "52 ye…
+$ resale_price        &lt;dbl&gt; 570000, 562000, 465000, 638000, 580000, 600000, 54…
+$ geometry            &lt;POINT [m]&gt; POINT (30055.03 38404.8), POINT (30263.23 38…</code></pre>
+</div>
 </div>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Check the CRS (Coordinate Reference System)</span></span>
@@ -978,17 +625,18 @@ PROJCRS["SVY21 / Singapore TM",
 </div>
 </div>
 </section>
-<section id="supplement-to-hands-on-exercise-8" class="level2">
-<h2 class="anchored" data-anchor-id="supplement-to-hands-on-exercise-8">Supplement to Hands-on Exercise 8</h2>
-<section id="data-import" class="level3">
-<h3 class="anchored" data-anchor-id="data-import">Data import</h3>
+</section>
+<section id="supplement-to-hands-on-exercise-8" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="supplement-to-hands-on-exercise-8"><span class="header-section-number">3</span> Supplement to Hands-on Exercise 8</h2>
+<section id="data-import" class="level3" data-number="3.1">
+<h3 data-number="3.1" class="anchored" data-anchor-id="data-import"><span class="header-section-number">3.1</span> Data import</h3>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Read the prepared modelling dataset (sf object)</span></span>
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>mdata <span class="ot">&lt;-</span> readr<span class="sc">::</span><span class="fu">read_rds</span>(<span class="st">"/Users/cktan/Desktop/SMU/01_Geospatial Analytics (ISSS626)/Hands-on_Ex/Hands-on_Ex08/data/rawdata/mdata.rds"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
-<section id="data-sampling" class="level3">
-<h3 class="anchored" data-anchor-id="data-sampling">Data sampling</h3>
+<section id="data-sampling" class="level3" data-number="3.2">
+<h3 data-number="3.2" class="anchored" data-anchor-id="data-sampling"><span class="header-section-number">3.2</span> Data sampling</h3>
 <p>Calibrating predictive models are computational intensive, especially random forest method is used. For quick prototyping, a 10% sample will be selected at random from the data by using the code chunk below.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1234</span>)</span>
@@ -996,8 +644,8 @@ PROJCRS["SVY21 / Singapore TM",
 <span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">sample_n</span>(<span class="dv">1500</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
-<section id="checking-of-overlapping-point" class="level3">
-<h3 class="anchored" data-anchor-id="checking-of-overlapping-point">Checking of overlapping point</h3>
+<section id="checking-of-overlapping-point" class="level3" data-number="3.3">
+<h3 data-number="3.3" class="anchored" data-anchor-id="checking-of-overlapping-point"><span class="header-section-number">3.3</span> Checking of overlapping point</h3>
 <div class="callout callout-style-default callout-warning callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -1017,16 +665,16 @@ Warning
 <span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">overlap =</span> <span class="fu">lengths</span>(<span class="fu">st_equals</span>(., .)) <span class="sc">&gt;</span> <span class="dv">1</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
-<section id="spatial-jittler" class="level3">
-<h3 class="anchored" data-anchor-id="spatial-jittler">Spatial jittler</h3>
+<section id="spatial-jittler" class="level3" data-number="3.4">
+<h3 data-number="3.4" class="anchored" data-anchor-id="spatial-jittler"><span class="header-section-number">3.4</span> Spatial jittler</h3>
 <p>In the code code chunk below, <code>st_jitter()</code> of <strong>sf</strong> package is used to move the point features by 5 meters to avoid overlapping point features.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>HDB_sample <span class="ot">&lt;-</span> HDB_sample <span class="sc">%&gt;%</span></span>
 <span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_jitter</span>(<span class="at">amount =</span> <span class="dv">5</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
-<section id="data-sampling-1" class="level3">
-<h3 class="anchored" data-anchor-id="data-sampling-1">Data Sampling</h3>
+<section id="data-sampling-1" class="level3" data-number="3.5">
+<h3 data-number="3.5" class="anchored" data-anchor-id="data-sampling-1"><span class="header-section-number">3.5</span> Data Sampling</h3>
 <p>The entire data are split into training and test data sets with 65% and 35% respectively by using initial_split() of rsample package. rsample is one of the package of tigymodels.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1234</span>)</span>
@@ -1036,8 +684,8 @@ Warning
 <span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>test_data <span class="ot">&lt;-</span> <span class="fu">testing</span>(resale_split)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
-<section id="multicollinearity-check" class="level3">
-<h3 class="anchored" data-anchor-id="multicollinearity-check">Multicollinearity check</h3>
+<section id="multicollinearity-check" class="level3" data-number="3.6">
+<h3 data-number="3.6" class="anchored" data-anchor-id="multicollinearity-check"><span class="header-section-number">3.6</span> Multicollinearity check</h3>
 <p>In order to avoid multicollineariy. In the code chunk below, <code>ggcorrmat()</code> of <strong>ggstatsplot</strong> is used to plot a correlation matrix to check if there are pairs of highly correlated independent variables.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>mdata_nogeo <span class="ot">&lt;-</span> mdata <span class="sc">%&gt;%</span></span>
@@ -1052,8 +700,8 @@ Warning
 </div>
 </div>
 </section>
-<section id="building-a-non-spatial-multiple-linear-regression" class="level3">
-<h3 class="anchored" data-anchor-id="building-a-non-spatial-multiple-linear-regression">Building a non-spatial multiple linear regression</h3>
+<section id="building-a-non-spatial-multiple-linear-regression" class="level3" data-number="3.7">
+<h3 data-number="3.7" class="anchored" data-anchor-id="building-a-non-spatial-multiple-linear-regression"><span class="header-section-number">3.7</span> Building a non-spatial multiple linear regression</h3>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>price_mlr <span class="ot">&lt;-</span> <span class="fu">lm</span>(resale_price <span class="sc">~</span> floor_area_sqm <span class="sc">+</span></span>
 <span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>                  storey_order <span class="sc">+</span> remaining_lease_mths <span class="sc">+</span></span>
@@ -1112,8 +760,8 @@ WITHIN_350M_KINDERGARTEN      9309.735      2024.293        0.079      4.599    
 </div>
 </div>
 </section>
-<section id="multicollinearity-check-with-vif" class="level3">
-<h3 class="anchored" data-anchor-id="multicollinearity-check-with-vif">Multicollinearity check with VIF</h3>
+<section id="multicollinearity-check-with-vif" class="level3" data-number="3.8">
+<h3 data-number="3.8" class="anchored" data-anchor-id="multicollinearity-check-with-vif"><span class="header-section-number">3.8</span> Multicollinearity check with VIF</h3>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>vif <span class="ot">&lt;-</span> performance<span class="sc">::</span><span class="fu">check_collinearity</span>(price_mlr)</span>
 <span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a><span class="fu">kable</span>(vif, </span>
@@ -1291,8 +939,8 @@ WITHIN_350M_KINDERGARTEN      9309.735      2024.293        0.079      4.599    
 </div>
 </div>
 </section>
-<section id="predictive-modelling-with-gwr" class="level3">
-<h3 class="anchored" data-anchor-id="predictive-modelling-with-gwr">Predictive Modelling with gwr</h3>
+<section id="predictive-modelling-with-gwr" class="level3" data-number="3.9">
+<h3 data-number="3.9" class="anchored" data-anchor-id="predictive-modelling-with-gwr"><span class="header-section-number">3.9</span> Predictive Modelling with gwr</h3>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>bw_adaptive <span class="ot">&lt;-</span> <span class="fu">bw.gwr</span>(resale_price <span class="sc">~</span> floor_area_sqm <span class="sc">+</span></span>
 <span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>                  storey_order <span class="sc">+</span> remaining_lease_mths <span class="sc">+</span></span>
@@ -1330,8 +978,8 @@ Adaptive bandwidth: 19 CV score: 1.515965e+12 </code></pre>
 </div>
 </div>
 </section>
-<section id="model-calibration" class="level3">
-<h3 class="anchored" data-anchor-id="model-calibration">Model calibration</h3>
+<section id="model-calibration" class="level3" data-number="3.10">
+<h3 data-number="3.10" class="anchored" data-anchor-id="model-calibration"><span class="header-section-number">3.10</span> Model calibration</h3>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>gwr_adaptive <span class="ot">&lt;-</span> <span class="fu">gwr.basic</span>(<span class="at">formula =</span> resale_price <span class="sc">~</span></span>
 <span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>                            floor_area_sqm <span class="sc">+</span> storey_order <span class="sc">+</span></span>
@@ -1348,12 +996,12 @@ Adaptive bandwidth: 19 CV score: 1.515965e+12 </code></pre>
 <span id="cb34-13"><a href="#cb34-13" aria-hidden="true" tabindex="-1"></a>                          <span class="at">longlat =</span> <span class="cn">FALSE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
-<section id="predictive-modelling-with-mlr" class="level3">
-<h3 class="anchored" data-anchor-id="predictive-modelling-with-mlr">Predictive Modelling with MLR</h3>
-<section id="predictive-modelling-with-mlr-1" class="level4">
-<h4 class="anchored" data-anchor-id="predictive-modelling-with-mlr-1">Predictive Modelling with MLR</h4>
-<section id="test-data-bw" class="level5">
-<h5 class="anchored" data-anchor-id="test-data-bw">Test data bw</h5>
+<section id="predictive-modelling-with-mlr" class="level3" data-number="3.11">
+<h3 data-number="3.11" class="anchored" data-anchor-id="predictive-modelling-with-mlr"><span class="header-section-number">3.11</span> Predictive Modelling with MLR</h3>
+<section id="predictive-modelling-with-mlr-1" class="level4" data-number="3.11.1">
+<h4 data-number="3.11.1" class="anchored" data-anchor-id="predictive-modelling-with-mlr-1"><span class="header-section-number">3.11.1</span> Predictive Modelling with MLR</h4>
+<section id="test-data-bw" class="level5" data-number="3.11.1.1">
+<h5 data-number="3.11.1.1" class="anchored" data-anchor-id="test-data-bw"><span class="header-section-number">3.11.1.1</span> Test data bw</h5>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>gwr_pred <span class="ot">&lt;-</span> <span class="fu">gwr.predict</span>(<span class="at">formula =</span> resale_price <span class="sc">~</span></span>
 <span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>                          floor_area_sqm <span class="sc">+</span> storey_order <span class="sc">+</span></span>
@@ -1371,8 +1019,8 @@ Adaptive bandwidth: 19 CV score: 1.515965e+12 </code></pre>
 <span id="cb35-14"><a href="#cb35-14" aria-hidden="true" tabindex="-1"></a>                        <span class="at">longlat =</span> <span class="cn">FALSE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
-<section id="predicting" class="level5">
-<h5 class="anchored" data-anchor-id="predicting">Predicting</h5>
+<section id="predicting" class="level5" data-number="3.11.1.2">
+<h5 data-number="3.11.1.2" class="anchored" data-anchor-id="predicting"><span class="header-section-number">3.11.1.2</span> Predicting</h5>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>gwr_pred <span class="ot">&lt;-</span> <span class="fu">gwr.predict</span>(<span class="at">formula =</span> resale_price <span class="sc">~</span></span>
 <span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>                          floor_area_sqm <span class="sc">+</span> storey_order <span class="sc">+</span></span>
@@ -1392,10 +1040,10 @@ Adaptive bandwidth: 19 CV score: 1.515965e+12 </code></pre>
 </section>
 </section>
 </section>
-<section id="predictive-modelling-rf-method" class="level3">
-<h3 class="anchored" data-anchor-id="predictive-modelling-rf-method">Predictive Modelling: RF method</h3>
-<section id="data-preparation" class="level4">
-<h4 class="anchored" data-anchor-id="data-preparation">Data Preparation</h4>
+<section id="predictive-modelling-rf-method" class="level3" data-number="3.12">
+<h3 data-number="3.12" class="anchored" data-anchor-id="predictive-modelling-rf-method"><span class="header-section-number">3.12</span> Predictive Modelling: RF method</h3>
+<section id="data-preparation" class="level4" data-number="3.12.1">
+<h4 data-number="3.12.1" class="anchored" data-anchor-id="data-preparation"><span class="header-section-number">3.12.1</span> Data Preparation</h4>
 <p>Firstly, code chunk below is used to extract the coordinates of training and test data sets</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>coords <span class="ot">&lt;-</span> <span class="fu">st_coordinates</span>(HDB_sample)</span>
@@ -1403,8 +1051,8 @@ Adaptive bandwidth: 19 CV score: 1.515965e+12 </code></pre>
 <span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>coords_test <span class="ot">&lt;-</span> <span class="fu">st_coordinates</span>(test_data)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
-<section id="calibrating-rf-model" class="level4">
-<h4 class="anchored" data-anchor-id="calibrating-rf-model">Calibrating RF model</h4>
+<section id="calibrating-rf-model" class="level4" data-number="3.12.2">
+<h4 data-number="3.12.2" class="anchored" data-anchor-id="calibrating-rf-model"><span class="header-section-number">3.12.2</span> Calibrating RF model</h4>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="co"># set.seed(1234)</span></span>
 <span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a><span class="co"># rf &lt;- ranger(resale_price ~ floor_area_sqm + storey_order + </span></span>
@@ -1416,8 +1064,8 @@ Adaptive bandwidth: 19 CV score: 1.515965e+12 </code></pre>
 <span id="cb38-8"><a href="#cb38-8" aria-hidden="true" tabindex="-1"></a><span class="co">#              data=train_nogeom)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
-<section id="model-output" class="level4">
-<h4 class="anchored" data-anchor-id="model-output">Model output</h4>
+<section id="model-output" class="level4" data-number="3.12.3">
+<h4 data-number="3.12.3" class="anchored" data-anchor-id="model-output"><span class="header-section-number">3.12.3</span> Model output</h4>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>rf</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
@@ -1616,16 +1264,16 @@ Adaptive bandwidth: 19 CV score: 1.515965e+12 </code></pre>
     }
     m
 }
-&lt;bytecode: 0x12fadec50&gt;
+&lt;bytecode: 0x126ada240&gt;
 &lt;environment: namespace:spatialRF&gt;</code></pre>
 </div>
 </div>
 </section>
 </section>
-<section id="predictive-modelling-spatialml-method" class="level3">
-<h3 class="anchored" data-anchor-id="predictive-modelling-spatialml-method">Predictive Modelling: SpatialML method</h3>
-<section id="determining-bandwidth" class="level4">
-<h4 class="anchored" data-anchor-id="determining-bandwidth">Determining bandwidth</h4>
+<section id="predictive-modelling-spatialml-method" class="level3" data-number="3.13">
+<h3 data-number="3.13" class="anchored" data-anchor-id="predictive-modelling-spatialml-method"><span class="header-section-number">3.13</span> Predictive Modelling: SpatialML method</h3>
+<section id="determining-bandwidth" class="level4" data-number="3.13.1">
+<h4 data-number="3.13.1" class="anchored" data-anchor-id="determining-bandwidth"><span class="header-section-number">3.13.1</span> Determining bandwidth</h4>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="co"># set.seed(1234)</span></span>
 <span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a><span class="co"># gwRF_bw &lt;- grf.bw(formula = resale_price ~ floor_area_sqm + </span></span>
@@ -1640,8 +1288,8 @@ Adaptive bandwidth: 19 CV score: 1.515965e+12 </code></pre>
 <span id="cb41-11"><a href="#cb41-11" aria-hidden="true" tabindex="-1"></a><span class="co">#                      coords=coords_train)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
-<section id="calibrating-with-grf" class="level4">
-<h4 class="anchored" data-anchor-id="calibrating-with-grf">Calibrating with grf</h4>
+<section id="calibrating-with-grf" class="level4" data-number="3.13.2">
+<h4 data-number="3.13.2" class="anchored" data-anchor-id="calibrating-with-grf"><span class="header-section-number">3.13.2</span> Calibrating with grf</h4>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="co"># set.seed(1234)</span></span>
 <span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a><span class="co"># gwRF_adaptive &lt;- grf(formula = resale_price ~ floor_area_sqm + </span></span>
@@ -1658,18 +1306,18 @@ Adaptive bandwidth: 19 CV score: 1.515965e+12 </code></pre>
 </div>
 </section>
 </section>
-<section id="predicting-by-using-the-test-data" class="level3">
-<h3 class="anchored" data-anchor-id="predicting-by-using-the-test-data">Predicting by using the test data</h3>
-<section id="preparing-the-test-data" class="level4">
-<h4 class="anchored" data-anchor-id="preparing-the-test-data">Preparing the test data</h4>
+<section id="predicting-by-using-the-test-data" class="level3" data-number="3.14">
+<h3 data-number="3.14" class="anchored" data-anchor-id="predicting-by-using-the-test-data"><span class="header-section-number">3.14</span> Predicting by using the test data</h3>
+<section id="preparing-the-test-data" class="level4" data-number="3.14.1">
+<h4 data-number="3.14.1" class="anchored" data-anchor-id="preparing-the-test-data"><span class="header-section-number">3.14.1</span> Preparing the test data</h4>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="co"># test_data_nogeom &lt;- cbind(</span></span>
 <span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a><span class="co">#   test_data, coords_test) %&gt;%</span></span>
 <span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a><span class="co">#   st_drop_geometry()</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
-<section id="predicting-with-the-test-data" class="level4">
-<h4 class="anchored" data-anchor-id="predicting-with-the-test-data">Predicting with the test data</h4>
+<section id="predicting-with-the-test-data" class="level4" data-number="3.14.2">
+<h4 data-number="3.14.2" class="anchored" data-anchor-id="predicting-with-the-test-data"><span class="header-section-number">3.14.2</span> Predicting with the test data</h4>
 <p>In the code chunk below, <code>predict.grf()</code> of <strong>spatialML</strong> for predicting re-sale prices in the <strong>test data</strong> set (i.e.&nbsp;test_data_nogeom)</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
@@ -1681,8 +1329,8 @@ Adaptive bandwidth: 19 CV score: 1.515965e+12 </code></pre>
 <span id="cb44-7"><a href="#cb44-7" aria-hidden="true" tabindex="-1"></a><span class="co">#                            global.w=0)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
-<section id="creating-df" class="level4">
-<h4 class="anchored" data-anchor-id="creating-df">Creating DF</h4>
+<section id="creating-df" class="level4" data-number="3.14.3">
+<h4 data-number="3.14.3" class="anchored" data-anchor-id="creating-df"><span class="header-section-number">3.14.3</span> Creating DF</h4>
 <p>Next, the code chunk below is used to convert the output from <code>predict.grf()</code> into a data.frame.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="co"># GRF_pred_df &lt;- as.data.frame(gwRF_pred)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -1694,8 +1342,8 @@ Adaptive bandwidth: 19 CV score: 1.515965e+12 </code></pre>
 </div>
 </section>
 </section>
-<section id="visualising-the-predicted-values" class="level3">
-<h3 class="anchored" data-anchor-id="visualising-the-predicted-values">Visualising the predicted values</h3>
+<section id="visualising-the-predicted-values" class="level3" data-number="3.15">
+<h3 data-number="3.15" class="anchored" data-anchor-id="visualising-the-predicted-values"><span class="header-section-number">3.15</span> Visualising the predicted values</h3>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ggplot(data = test_data_pred,</span></span>
 <span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a><span class="co">#        aes(x = GRF_pred,</span></span>

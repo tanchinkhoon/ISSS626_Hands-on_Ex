@@ -2,6 +2,7 @@
 title: "In-class Ex08: Take-home Exercise 3 Kick Starter"
 author: "TAN Chin Khoon"
 date: "25 October 2025"
+number-sections: true
 date-modified: "5 October 2025"
 ---
 
@@ -16,6 +17,8 @@ pacman::p_load(httr,tidyverse, sf, tmap,jsonlite, progress, spdep,GWmodel, Spati
 
 ## Geocoding for Geometric
 
+### Importing data 
+
 ```{r}
 
 # Downloading the raw data from data.gov.sg. 
@@ -24,7 +27,13 @@ pacman::p_load(httr,tidyverse, sf, tmap,jsonlite, progress, spdep,GWmodel, Spati
 # load full table once
 HDBresale_raw <- read_csv("/Users/cktan/Desktop/SMU/01_Geospatial Analytics (ISSS626)/Hands-on_Ex/In-Class_Ex08/data/rawdata/ResaleflatpricesbasedonregistrationdatefromJan2017onwards.csv")
 
+# Inspect the loading data
+glimpse(HDBresale_raw)
+
+
 ```
+
+### Reducing and filtering the dataset
 
 ```{r}
 
@@ -37,6 +46,7 @@ month_choice <- HDBresale_raw %>%
   slice(1) %>%
   pull(month)
 
+#Inspect the output
 month_choice
 
 ```
@@ -52,45 +62,70 @@ nrow(HDBresale)   # should be greater than zero
 
 ```
 
+### Geodata pre-processing and cleaning
+
+#### Address normalisation matters
 
 ```{r}
 
 # street name fix
 HDBresale$street_name <- gsub("ST\\.", "SAINT", HDBresale$street_name)
 
-
 ```
 
+:::{.callout-note}
+
+The `gsub()` function performs a global substitution (find and replace) in text.
+
+:::
+
+#### Function to convert address to coordinates (LATITUDE and LONGITUDEY)
+
+Below is the code chunk used to build a function that will convert address to coordinates
+
+- The function sends a live API request to OneMap Singapore to obtain geographic coordinates (latitude and longitude) for each given HDB address.  
+- Explicit UTF-8 encoding is included to eliminate the “No encoding supplied” warning and ensure correct text handling for special characters.  
+- Always returns a tibble with columns LATITUDE and LONGITUDE, even when no match is found, to prevent pipeline breaks during unnesting.  
+- Only retrieves the first match from the API (pageNum = "1"), which increases speed but may ignore alternative results for ambiguous addresses.  
+- Requires street name standardisation (e.g., “ST.” changed to “SAINT”) before calling the function to improve matching accuracy.  
+- Coordinates returned by OneMap are based on WGS84 (EPSG 4326), so conversion to SVY21 (EPSG 3414) is needed for metric-based distance analysis.  
+- Each function call makes a separate HTTP request; for large datasets, use progress tracking, pauses (Sys.sleep), and checkpoint saving to avoid rate limits.  
+- Wrapping the function with tryCatch or purrr::safely prevents process interruption if a request fails or the API returns an unexpected response.  
+- A test call such as geocode("101","JURONG EAST STREET 13") is recommended before batch processing to confirm valid numeric coordinates are returned.  
+- For reproducibility and efficiency, store results (block, street, LATITUDE, LONGITUDE) in a CSV file to reuse in future runs without re-querying the API.
 
 ```{r}
 
 # professor geocode
 # Reference: https://www.onemap.gov.sg/apidocs/coordinate
 
-geocode <- function(block, streetname) {
-  base_url <- "https://onemap.gov.sg/api/common/elastic/search"
-  address  <- paste(block, streetname, sep = " ")
-  query <- list(
-    searchVal = address,
-    returnGeom = "Y",
-    getAddrDetails = "N",
-    pageNum = "1"
-  )
-  res     <- httr::GET(base_url, query = query)
-  restext <- httr::content(res, as = "text")
-  out     <- jsonlite::fromJSON(restext)
 
-  if (length(out$results) == 0) {
-    tibble(LATITUDE = NA_real_, LONGITUDE = NA_real_)
-  } else {
-    tibble(
-      LATITUDE  = as.numeric(out$results$LATITUDE[1]),
-      LONGITUDE = as.numeric(out$results$LONGITUDE[1])
-    )
-  }
-}
+geocode <- function(block, streetname) {                          # define a function that takes block and street name and returns coordinates
+  base_url <- "https://onemap.gov.sg/api/common/elastic/search"   # store the OneMap search endpoint as a constant for reuse
+  address  <- paste(block, streetname, sep = " ")                 # build a single query string such as 118 ANG MO KIO AVENUE 4
+  query <- list(                                                  # create a named list of query parameters for the HTTP request
+    searchVal     = address,                                      # the address string to search
+    returnGeom    = "Y",                                          # ask the service to return geometry fields
+    getAddrDetails= "N",                                          # do not request extra address fields to keep reply small
+    pageNum       = "1"                                           # take the first page only for a single best match
+  )                                                               # end of query parameter list
+  res     <- httr::GET(base_url, query = query)                   # send a GET request to OneMap with the query parameters
+  restext <- httr::content(res, as = "text", encoding = "UTF-8")  # read the response body as text with UTF8 to avoid encoding warnings
+  out     <- jsonlite::fromJSON(restext)                          # parse the JSON text into an R list or data frame
+
+  if (length(out$results) == 0) {                                 # if the service returns no match for this address
+    tibble(LATITUDE = NA_real_, LONGITUDE = NA_real_)             # return a tibble with missing numeric coordinates
+  } else {                                                        # otherwise when there is at least one match
+    tibble(                                                              
+      LATITUDE  = as.numeric(out$results$LATITUDE[1]),            # take the first result latitude and coerce to numeric
+      LONGITUDE = as.numeric(out$results$LONGITUDE[1])            # take the first result longitude and coerce to numeric
+    )                                                             # end tibble creation
+  }                                                               # end branch
+}                                                                 # end function
 
 ```
+
+#### Perform minimal unit/smoke test
 
 ```{r}
 
@@ -99,18 +134,21 @@ geocode("101", "JURONG EAST STREET 13")
 
 ```
 
+### Merge the LATITUDE and LONGITUDE to dataset
 
-```{r,warning=FALSE}
+```{r}
 
 # create LATITUDE and LONGITUDE and merge into the table
 HDBresale <- HDBresale %>%
   mutate(geo = purrr::map2(block, street_name, geocode)) %>%
   tidyr::unnest(geo)
 
+### 
 glimpse(HDBresale)   # now includes LATITUDE and LONGITUDE
 
 ```
 
+### Convert to sf object
 
 ```{r}
 
@@ -119,9 +157,9 @@ HDBresale_sf <- HDBresale %>%
   st_as_sf(coords = c("LONGITUDE", "LATITUDE"), crs = 4326) %>%
   st_transform(crs = 3414)
 
+# Inspect and verify the  
+glimpse(HDBresale_sf)
 ```
-
-
 ```{r}
 
 # Check the CRS (Coordinate Reference System)
