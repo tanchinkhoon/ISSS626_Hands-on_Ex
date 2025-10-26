@@ -3,7 +3,7 @@ title: "In-class Ex08: Take-home Exercise 3 Kick Starter"
 author: "TAN Chin Khoon"
 date: "25 October 2025"
 number-sections: true
-date-modified: "5 October 2025"
+date-modified: "25 October 2025"
 ---
 
 ## Installing and Loading R Packages
