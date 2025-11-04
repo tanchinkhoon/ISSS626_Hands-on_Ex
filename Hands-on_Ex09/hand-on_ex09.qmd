@@ -155,11 +155,11 @@ ODMatrix <- read_csv("/Users/cktan/Desktop/SMU/01_Geospatial Analytics (ISSS626)
 
 The imported ODMatrix organised the distance matrix columnwise.
 
-![](images/Screenshot%202025-11-05%20at%203.21.31%20AM.png)
+![](1.png)
 
 On the other hands, most of the modelling packages in R is expecting a matrix look similar to the figure below.
 
-![](images/Screenshot%202025-11-05%20at%203.21.55%20AM.png)
+![](2.png)
 
 The rows represent **origins** (i.e. also know as **from** field) and the columns represent **destination** (i.e. also known as **to** field.)
 
@@ -240,7 +240,7 @@ hexagon_Hansen <- bind_cols(hexagons, acc_Hansen) # geometry from hexagons plus 
 
 Notice that hexagon_Hansen is a simple feature data frame and not a typical tibble data frame.
 
-![](images/Screenshot 2025-11-05 at 3.39.01 AM.png)
+![](3.png)
 
 We can also run the entire sequence in one block as shown next. This alternative uses a different power value as demonstrated in the source.
 
@@ -260,7 +260,7 @@ hexagon_Hansen <- bind_cols(hexagons, acc_Hansen) # join to geometry
 
 ```
 
-### 17.6.2 Visualising Hansen’s accessibility
+### 17.6.2 Visualising Hansen's accessibility
 
 #### 17.6.2.1 Extracting map extent
 
@@ -299,7 +299,7 @@ tm_shape(hexagon_Hansen, bbox = mapex) +           # set the data and map extent
 
 ### 17.6.3 Statistical graphic visualisation
 
-In this section, we are going to compare the distribution of Hansen’s accessibility values by URA Planning Region.
+In this section, we are going to compare the distribution of Hansen's accessibility values by URA Planning Region.
 
 Firstly, we need to add the planning region field into haxegon_Hansen simple feature data frame by using the code chunk below.
 
@@ -329,11 +329,11 @@ ggplot(data = hexagon_Hansen,    # use the joined sf object
 
 ## 17.7 Modelling and visualising accessibility using KD2SFCA method
 
-### 17.7.1 Computing KD2SFCA’s accessibility
+### 17.7.1 Computing KD2SFCA's accessibility
 
 In this section, you are going to repeat most of the steps you had learned in previous section to perform the analysis. However, some of the codes will be combined into one code chunk.
 
-The code chunk below calculates Hansen’s accessibility using ac() of **SpatialAcc** and `data.frame()` is used to save the output in a data frame called **acc_KD2SFCA**. Notice that **KD2SFCA** is used for family argument.
+The code chunk below calculates Hansen's accessibility using ac() of **SpatialAcc** and `data.frame()` is used to save the output in a data frame called **acc_KD2SFCA**. Notice that **KD2SFCA** is used for family argument.
 
 ```{r}
 
@@ -352,10 +352,9 @@ hexagon_KD2SFCA <- bind_cols(hexagons, acc_KD2SFCA) # join to hexagon geometry
 
 ```
 
-### 17.7.2 Visualising KD2SFCA’s accessibility
+### 17.7.2 Visualising KD2SFCA's accessibility
 
 The code chunk below uses a collection of mapping fucntions of tmap package to create a high cartographic quality accessibility to eldercare centre in Singapore. Notice that **mapex** is reused for bbox argument.
-
 
 ```{r}
 
@@ -411,7 +410,7 @@ ggplot(data = hexagon_KD2SFCA,  # KD2SFCA results
 
 In this section, you are going to repeat most of the steps you had learned in previous section to perform the analysis. However, some of the codes will be combined into one code chunk.
 
-The code chunk below calculates Hansen’s accessibility using `ac()` of **SpatialAcc** and `data.frame()` is used to save the output in a data frame called **acc_SAM**. Notice that **SAM** is used for family argument.
+The code chunk below calculates Hansen's accessibility using `ac()` of **SpatialAcc** and `data.frame()` is used to save the output in a data frame called **acc_SAM**. Notice that **SAM** is used for family argument.
 
 ```{r}
 
@@ -430,7 +429,7 @@ hexagon_SAM <- bind_cols(hexagons, acc_SAM)   # join to geometry
 
 ```
 
-### 17.8.2 Visualising SAM’s accessibility
+### 17.8.2 Visualising SAM's accessibility
 
 The code chunk below uses a collection of mapping fucntions of tmap package to create a high cartographic quality accessibility to eldercare centre in Singapore. Notice that **mapex** is reused for bbox argument.
 

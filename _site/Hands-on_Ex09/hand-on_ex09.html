@@ -557,9 +557,9 @@ dbl (6): origin_id, destination_id, entry_cost, network_cost, exit_cost, tot...
 <section id="tidying-distance-matrix" class="level3">
 <h3 class="anchored" data-anchor-id="tidying-distance-matrix">17.5.2 Tidying distance matrix</h3>
 <p>The imported ODMatrix organised the distance matrix columnwise.</p>
-<p><img src="images/Screenshot 2025-11-05 at 3.21.31 AM.png" class="img-fluid"></p>
+<p><img src="1.png" class="img-fluid"></p>
 <p>On the other hands, most of the modelling packages in R is expecting a matrix look similar to the figure below.</p>
-<p><img src="images/Screenshot 2025-11-05 at 3.21.55 AM.png" class="img-fluid"></p>
+<p><img src="2.png" class="img-fluid"></p>
 <p>The rows represent <strong>origins</strong> (i.e.&nbsp;also know as <strong>from</strong> field) and the columns represent <strong>destination</strong> (i.e.&nbsp;also known as <strong>to</strong> field.)</p>
 <p>The code chunk below uses <code>spread()</code> of <strong>tidyr</strong> package is used to transform the O-D matrix from a thin format into a fat format.</p>
 <div class="cell">
@@ -623,7 +623,7 @@ Note
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>hexagon_Hansen <span class="ot">&lt;-</span> <span class="fu">bind_cols</span>(hexagons, acc_Hansen) <span class="co"># geometry from hexagons plus new column</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>Notice that hexagon_Hansen is a simple feature data frame and not a typical tibble data frame.</p>
-<p><img src="images/Screenshot 2025-11-05 at 3.39.01 AM.png" class="img-fluid"></p>
+<p><img src="3.png" class="img-fluid"></p>
 <p>We can also run the entire sequence in one block as shown next. This alternative uses a different power value as demonstrated in the source.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># alternate single block version as shown in the source</span></span>
