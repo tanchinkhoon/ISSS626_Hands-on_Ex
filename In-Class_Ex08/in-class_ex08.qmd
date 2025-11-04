@@ -6,6 +6,13 @@ number-sections: true
 date-modified: "25 October 2025"
 ---
 
+## Learning Outcomes
+
+By the end of this in-class exercise, students will master the skill of:
+
+- prepare and geocode HDB resale price data for geospatial modelling; and
+- perform proximity analysis to count the number of geographic entities located within a defined distance from each HDB property.
+
 ## Installing and Loading R Packages
 
 ```{r}
@@ -148,7 +155,28 @@ glimpse(HDBresale)   # now includes LATITUDE and LONGITUDE
 
 ```
 
-### Convert to sf object
+## Proximity Analysis
+
+In this section, you will learn how to count the number of geographic entities located within a defined distance from each HDB property.
+
+For the purpose of this exercise, we are interested to count the number of preschools located with 350m of each resale HDB unit.
+
+### Convert to an sf object
+
+Before performing proximity analysis, it is important to ensure that:
+
+- both input data sets must be in sf objects, and
+- they must be in similar projected coordinates systems.
+
+:::{.callout-note}
+
+In the code chunk below,
+
+- `st_as_sf()` is used to convert HDBresale tibble data.frame to sf object by using values from LONGITUDE and LATITUDE columns to form the geometry features.
+- `st_transform()` is then used to transform the sf object into svy21 projected coordinates system.
+- the output sf object is called HDBresale_sf. It is in sf **data.frame** format.
+
+:::
 
 ```{r}
 
@@ -159,6 +187,7 @@ HDBresale_sf <- HDBresale %>%
 
 # Inspect and verify the  
 glimpse(HDBresale_sf)
+
 ```
 ```{r}
 
@@ -167,364 +196,68 @@ st_crs(HDBresale_sf)
 
 ```
 
+### Locate, download and import Preschool Location data
 
-## Supplement to Hands-on Exercise 8
+Next, we will locate and download Pre-Schools Location data from Singapore’s open data portal. There are both geojson and kml version. In this exercise, the kml version will be used.
 
-### Data import
-
-```{r}
-
-# Read the prepared modelling dataset (sf object)
-mdata <- readr::read_rds("/Users/cktan/Desktop/SMU/01_Geospatial Analytics (ISSS626)/Hands-on_Ex/Hands-on_Ex08/data/rawdata/mdata.rds")
-
-```
-
-
-### Data sampling
-
-Calibrating predictive models are computational intensive, especially random forest method is used. For quick prototyping, a 10% sample will be selected at random from the data by using the code chunk below.
+Then, code chunk below will be used to import the preschool location data into R environment by using `st_read()` of **readr** package.
 
 ```{r}
 
-set.seed(1234)
-HDB_sample <- mdata %>%
-  sample_n(1500)
+preschool = st_read(
+  "/Users/cktan/Desktop/SMU/01_Geospatial Analytics (ISSS626)/Hands-on_Ex/In-Class_Ex08/data/geospatial/PreSchoolsLocation.kml") %>%
+  st_transform(crs= 3414)
 
 ```
 
+:::{.callout-note}
 
-### Checking of overlapping point
-
-:::{.callout-warning}
-
-When using GWmodel to calibrate explanatory or predictive models, it is very important to ensure that there are no overlapping point features
+`st-transform()` of **sf** package is used to transform the preschool sf dataframe from wgs84 geographic coodinates system to svy21 projected coordinates system (i.e. EPSG: 3414)
 
 :::
 
-The code chunk below is used to check if there are overlapping point features.
+### Counting number of preschools
+
+Lastly, code chunk below will be used to count the number of pre-schools located within 350m of each HDB property.
 
 ```{r}
 
-overlapping_points <- HDB_sample %>%
-  mutate(overlap = lengths(st_equals(., .)) > 1)
+within_350m <- st_is_within_distance(
+  HDBresale_sf, preschool, dist = 350)
+
+HDBresale_sf <- HDBresale_sf %>%
+  mutate(WITHIN_350M_PRISCHOOL = map_int(within_350m, length))
 
 ```
 
+:::{.callout-note}
 
-### Spatial jittler
+- `st_is_within_distance()` of **sf** package is used to determines whether two spatial objects (HDB property and preschool) are within 350m distance of each other. It returns a logical matrix (or a sparse list of indices if sparse = TRUE) indicating for each geometry in HDB property which geometries in preschool are within 350m distance.
+- `mutate()` of dplyr is used to create a new field called ***WITHIN_350M_PRISCHOOL***.
+- `map_int()` of **purr** package is used to the number of preschools found in the newly created ***WITHIN_350M_PRISCHOOL*** field.
 
-In the code code chunk below, `st_jitter()` of **sf** package is used to move the point features by 5 meters to avoid overlapping point features.
+:::
+
+### Computing shortest distance
+
+Instead of counting number of preschools located within 350m of each HDB resale property, code chunk below is used to compute the distance between the nearest preschool from each HDB resale property.
 
 ```{r}
 
-HDB_sample <- HDB_sample %>%
-  st_jitter(amount = 5)
+HDBresale_sf <- HDBresale_sf %>%
+  mutate(
+    PROX_PRESCHOOL = as.numeric(
+      st_distance(geometry,
+                  preschool[st_nearest_feature(
+                    geometry, preschool), ], 
+                  by_element = TRUE)
+      )
+    )
 
 ```
 
+:::{.callout-note}
 
-### Data Sampling
+The proximity values computed are in metres because svy21 projected coordinates system is in metres.
 
-The entire data are split into training and test data sets with 65% and 35% respectively by using initial_split() of rsample package. rsample is one of the package of tigymodels.
-
-```{r}
-
-set.seed(1234)
-resale_split <- initial_split(HDB_sample, 
-                              prop = 6.67/10,)
-train_data <- training(resale_split)
-test_data <- testing(resale_split)
-
-```
-
-
-### Multicollinearity check
-
-In order to avoid multicollineariy. In the code chunk below, `ggcorrmat()` of **ggstatsplot** is used to plot a correlation matrix to check if there are pairs of highly correlated independent variables.
-
-```{r,fig.width=12,fig.height=10}
-
-mdata_nogeo <- mdata %>%
-  st_drop_geometry()
-ggstatsplot::ggcorrmat(mdata_nogeo[, 2:17])
-
-```
-
-
-### Building a non-spatial multiple linear regression
-
-```{r}
-
-price_mlr <- lm(resale_price ~ floor_area_sqm +
-                  storey_order + remaining_lease_mths +
-                  PROX_CBD + PROX_ELDERLYCARE + PROX_HAWKER +
-                  PROX_MRT + PROX_PARK + PROX_MALL + 
-                  PROX_SUPERMARKET + WITHIN_350M_KINDERGARTEN +
-                  WITHIN_350M_CHILDCARE + WITHIN_350M_BUS +
-                  WITHIN_1KM_PRISCH,
-                data=train_data)
-olsrr::ols_regress(price_mlr)
-
-```
-
-
-### Multicollinearity check with VIF
-
-
-```{r}
-
-vif <- performance::check_collinearity(price_mlr)
-kable(vif, 
-      caption = "Variance Inflation Factor (VIF) Results") %>%
-  kable_styling(font_size = 18) 
-
-```
-
-
-```{r}
-
-plot(vif) +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
-
-```
-
-### Predictive Modelling with gwr
-
-```{r}
-
-bw_adaptive <- bw.gwr(resale_price ~ floor_area_sqm +
-                  storey_order + remaining_lease_mths +
-                  PROX_CBD + PROX_ELDERLYCARE + PROX_HAWKER +
-                  PROX_MRT + PROX_PARK + PROX_MALL + 
-                  PROX_SUPERMARKET + WITHIN_350M_KINDERGARTEN +
-                  WITHIN_350M_CHILDCARE + WITHIN_350M_BUS +
-                  WITHIN_1KM_PRISCH,
-                  data=train_data,
-                  approach="CV",
-                  kernel="gaussian",
-                  adaptive=TRUE,
-                  longlat=FALSE)
-
-
-```
-
-```{r}
-
-bw_adaptive
-
-```
-
-
-### Model calibration
-
-
-```{r}
-
-gwr_adaptive <- gwr.basic(formula = resale_price ~
-                            floor_area_sqm + storey_order +
-                            remaining_lease_mths + PROX_CBD + 
-                            PROX_ELDERLYCARE + PROX_HAWKER +
-                            PROX_MRT + PROX_PARK + PROX_MALL + 
-                            PROX_SUPERMARKET + WITHIN_350M_KINDERGARTEN +
-                            WITHIN_350M_CHILDCARE + WITHIN_350M_BUS +
-                            WITHIN_1KM_PRISCH,
-                          data=train_data,
-                          bw=bw_adaptive, 
-                          kernel = 'gaussian', 
-                          adaptive=TRUE,
-                          longlat = FALSE)
-
-
-```
-
-
-### Predictive Modelling with MLR
-
-#### Predictive Modelling with MLR
-
-##### Test data bw
-
-```{r}
-
-gwr_pred <- gwr.predict(formula = resale_price ~
-                          floor_area_sqm + storey_order +
-                          remaining_lease_mths + PROX_CBD + 
-                          PROX_ELDERLYCARE + PROX_HAWKER + 
-                          PROX_MRT + PROX_PARK + PROX_MALL + 
-                          PROX_SUPERMARKET + WITHIN_350M_KINDERGARTEN +
-                          WITHIN_350M_CHILDCARE + WITHIN_350M_BUS + 
-                          WITHIN_1KM_PRISCH, 
-                        data=train_data, 
-                        predictdata = test_data, 
-                        bw=bw_adaptive, 
-                        kernel = 'gaussian', 
-                        adaptive=TRUE, 
-                        longlat = FALSE)
-
-```
-
-##### Predicting
-
-```{r}
-
-gwr_pred <- gwr.predict(formula = resale_price ~
-                          floor_area_sqm + storey_order +
-                          remaining_lease_mths + PROX_CBD + 
-                          PROX_ELDERLYCARE + PROX_HAWKER + 
-                          PROX_MRT + PROX_PARK + PROX_MALL + 
-                          PROX_SUPERMARKET + WITHIN_350M_KINDERGARTEN +
-                          WITHIN_350M_CHILDCARE + WITHIN_350M_BUS + 
-                          WITHIN_1KM_PRISCH, 
-                        data=train_data, 
-                        predictdata = test_data, 
-                        bw=bw_adaptive, 
-                        kernel = 'gaussian', 
-                        adaptive=TRUE, 
-                        longlat = FALSE)
-
-```
-
-
-
-### Predictive Modelling: RF method
-
-#### Data Preparation
-
-Firstly, code chunk below is used to extract the coordinates of training and test data sets
-
-```{r}
-
-coords <- st_coordinates(HDB_sample)
-coords_train <- st_coordinates(train_data)
-coords_test <- st_coordinates(test_data)
-
-```
-
-
-#### Calibrating RF model
-
-```{r}
-
-# set.seed(1234)
-# rf <- ranger(resale_price ~ floor_area_sqm + storey_order + 
-#                remaining_lease_mths + PROX_CBD + PROX_ELDERLYCARE + 
-#                PROX_HAWKER + PROX_MRT + PROX_PARK + PROX_MALL + 
-#                PROX_SUPERMARKET + WITHIN_350M_KINDERGARTEN +
-#                WITHIN_350M_CHILDCARE + WITHIN_350M_BUS + 
-#                WITHIN_1KM_PRISCH,
-#              data=train_nogeom)
-
-```
-
-#### Model output
-
-```{r}
-
-rf
-
-```
-
-### Predictive Modelling: SpatialML method
-
-#### Determining bandwidth
-
-```{r}
-
-# set.seed(1234)
-# gwRF_bw <- grf.bw(formula = resale_price ~ floor_area_sqm + 
-#                        storey_order + remaining_lease_mths + 
-#                        PROX_CBD + PROX_ELDERLYCARE + PROX_HAWKER + 
-#                        PROX_MRT + PROX_PARK + PROX_MALL + 
-#                        PROX_SUPERMARKET + WITHIN_350M_KINDERGARTEN +
-#                        WITHIN_350M_CHILDCARE + WITHIN_350M_BUS +
-#                        WITHIN_1KM_PRISCH,
-#                      dataset=train_data, 
-#                      kernel="adaptive",
-#                      coords=coords_train)
-
-```
-
-#### Calibrating with grf
-
-```{r}
-
-# set.seed(1234)
-# gwRF_adaptive <- grf(formula = resale_price ~ floor_area_sqm + 
-#                        storey_order + remaining_lease_mths + 
-#                        PROX_CBD + PROX_ELDERLYCARE + PROX_HAWKER + 
-#                        PROX_MRT + PROX_PARK + PROX_MALL + 
-#                        PROX_SUPERMARKET + WITHIN_350M_KINDERGARTEN +
-#                        WITHIN_350M_CHILDCARE + WITHIN_350M_BUS +
-#                        WITHIN_1KM_PRISCH,
-#                      dframe=train_data_nogeom, 
-#                      bw=55,
-#                      kernel="adaptive",
-#                      coords=coords_train)
-
-```
-
-
-### Predicting by using the test data
-
-#### Preparing the test data
-
-```{r}
-
-# test_data_nogeom <- cbind(
-#   test_data, coords_test) %>%
-#   st_drop_geometry()
-
-```
-
-
-#### Predicting with the test data
-
-In the code chunk below, `predict.grf()` of **spatialML** for predicting re-sale prices in the **test data** set (i.e. test_data_nogeom)
-
-```{r}
-# 
-# gwRF_pred <- predict.grf(gwRF_adaptive, 
-#                            test_data_nogeom, 
-#                            x.var.name="X",
-#                            y.var.name="Y", 
-#                            local.w=1,
-#                            global.w=0)
-
-```
-
-
-#### Creating DF
-
-Next, the code chunk below is used to convert the output from `predict.grf()` into a data.frame.
-
-```{r}
-
-# GRF_pred_df <- as.data.frame(gwRF_pred)
-
-```
-
-Then, `cbind()` is used to append fields in GRF_pred_df data.frame onto test_data.
-
-```{r}
-
-# test_data_pred <- cbind(test_data, 
-#                         GRF_pred_df)
-
-```
-
-### Visualising the predicted values
-
-```{r}
-
-# ggplot(data = test_data_pred,
-#        aes(x = GRF_pred,
-#            y = resale_price)) +
-#   geom_point()
-
-```
-
-
-
-
-
-
+:::
