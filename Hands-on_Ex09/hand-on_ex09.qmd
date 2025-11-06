@@ -27,7 +27,7 @@ Four data sets are used in this exercise, they are:
 
 -   `MP14_SUBZONE_NO_SEA_PL`: URA Master Plan 2014 subzone boundary GIS data. This data set is downloaded from data.gov.sg.
 
--   `hexagons`: A 250m radius hexagons GIS data. This data set was created by using st_make_grid() of sf package. It is in ESRI shapefile format.
+-   `hexagons`: A 250m radius hexagons GIS data. This data set was created by using `st_make_grid()` of sf package. It is in ESRI shapefile format.
 
 -   `ELDERCARE`: GIS data showing location of eldercare service. This data is downloaded from data.gov.sg. There are two versions. One in ESRI shapefile format. The other one in Google kml file format. For the purpose of this hands-on exercise, ESRI shapefile format is provided.
 
@@ -50,8 +50,8 @@ Install and load required packages. The code uses `pacman::p_load()` to install 
 ```{r}
 
 # install and load required packages in one call
-pacman::p_load(tmap, SpatialAcc, sf,            # mapping, accessibility, simple features
-               ggstatsplot, reshape2,           # statistical graphics, data reshaping
+pacman::p_load(tmap, SpatialAcc, sf,   # mapping, accessibility, simple features
+               ggstatsplot, reshape2,  # statistical graphics, data reshaping
                tidyverse)  
 
 ```
@@ -67,22 +67,26 @@ The code chunk below is used to import these three data sets shapefile by using 
 ```{r}
 
 # read URA subzones as simple features
-mpsz <- st_read(dsn = "/Users/cktan/Desktop/SMU/01_Geospatial Analytics (ISSS626)/Hands-on_Ex/Hands-on_Ex09/data/geospatial", layer = "MP14_SUBZONE_NO_SEA_PL")   # polygon layer
+mpsz <- st_read(dsn = "/Users/cktan/Desktop/SMU/01_Geospatial Analytics (ISSS626)/Hands-on_Ex/Hands-on_Ex09/data/geospatial", 
+                layer = "MP14_SUBZONE_NO_SEA_PL")   # polygon layer
 
 ```
 
 ```{r}
 
 # read hexagon grid as simple features
-hexagons <- st_read(dsn = "/Users/cktan/Desktop/SMU/01_Geospatial Analytics (ISSS626)/Hands-on_Ex/Hands-on_Ex09/data/geospatial", layer = "hexagons") # polygon grid
-
+hexagons <- st_read(
+  dsn = "/Users/cktan/Desktop/SMU/01_Geospatial Analytics (ISSS626)/Hands-on_Ex/Hands-on_Ex09/data/geospatial", 
+  layer = "hexagons") # polygon grid
 
 ```
 
 ```{r}
 
 # read eldercare locations as simple features
-eldercare <- st_read(dsn = "/Users/cktan/Desktop/SMU/01_Geospatial Analytics (ISSS626)/Hands-on_Ex/Hands-on_Ex09/data/geospatial", layer = "ELDERCARE")            # point layer
+eldercare <- st_read(
+  dsn = "/Users/cktan/Desktop/SMU/01_Geospatial Analytics (ISSS626)/Hands-on_Ex/Hands-on_Ex09/data/geospatial", 
+  layer = "ELDERCARE")   # point layer
 
 ```
 
@@ -112,7 +116,7 @@ st_crs(mpsz)
 
 ```
 
-Notice that the EPSG: is indicated as \***3414** now.
+Notice that the EPSG: is indicated as **3414** now.
 
 ### 17.4.3 Cleaning and updating attribute fields of the geospatial data
 
@@ -147,7 +151,10 @@ The code chunk below uses `read_cvs()` of **readr** package to import `OD_Matrix
 ```{r}
 
 # import distance matrix as a tibble
-ODMatrix <- read_csv("/Users/cktan/Desktop/SMU/01_Geospatial Analytics (ISSS626)/Hands-on_Ex/Hands-on_Ex09/data/aspatial/OD_Matrix.csv", skip = 0)  # columns include origin, destination and costs
+ODMatrix <- read_csv(
+  "/Users/cktan/Desktop/SMU/01_Geospatial Analytics (ISSS626)/Hands-on_Ex/Hands-on_Ex09/data/aspatial/OD_Matrix.csv", 
+  skip = 0
+  )  # columns include origin, destination and costs
 
 ```
 
@@ -174,7 +181,7 @@ The code chunk below uses `spread()` of **tidyr** package is used to transform t
 distmat <- ODMatrix %>%
   select(origin_id, destination_id, total_cost) %>%  # pick the three fields we need
   spread(destination_id, total_cost) %>%    # convert thin table to wide table by destination
-  select(c(-c('origin_id')))                # remove origin id column after spreading
+  select(c(-c('origin_id')))    # remove origin id column after spreading
 
 ```
 
@@ -187,7 +194,7 @@ Currently, the distance is measured in metre because SVY21 projected coordinate 
 ```{r}
 
 # convert metres to kilometres and coerce to numeric matrix
-distmat_km <- as.matrix(distmat / 1000)              # numeric matrix required by SpatialAcc::ac
+distmat_km <- as.matrix(distmat / 1000)   # numeric matrix required by SpatialAcc::ac
 
 ```
 
@@ -216,7 +223,7 @@ The default field name is very messy, we will rename it to `accHansen` by using 
 ```{r}
 
 # rename the single output column to a tidy name
-colnames(acc_Hansen) <- "accHansen"              # set a clear column name
+colnames(acc_Hansen) <- "accHansen"   # set a clear column name
 
 ```
 
@@ -225,7 +232,7 @@ Next, we will convert the data table into tibble format by using the code chunk 
 ```{r}
 
 # convert to tibble for nicer printing and dplyr friendliness
-acc_Hansen <- as_tibble(acc_Hansen)               # tibble retains numeric vector with column name
+acc_Hansen <- as_tibble(acc_Hansen)   # tibble retains numeric vector with column name
 
 ```
 
@@ -247,15 +254,15 @@ We can also run the entire sequence in one block as shown next. This alternative
 ```{r}
 
 # alternate single block version as shown in the source
-acc_Hansen <- data.frame(ac(hexagons$demand,     # origin demand
-                            eldercare$capacity,  # destination capacity
-                            distmat_km,          # distance matrix in kilometres
+acc_Hansen <- data.frame(ac(hexagons$demand,    # origin demand
+                            eldercare$capacity, # destination capacity
+                            distmat_km,         # distance matrix in kilometres
                             #d0 = 50,           # optional cut off
-                            power = 0.5,         # alternate decay value used in the example
-                            family = "Hansen"))  # Hansen method
+                            power = 0.5,        # alternate decay value used in the example
+                            family = "Hansen")) # Hansen method
 
-colnames(acc_Hansen) <- "accHansen"              # tidy column name
-acc_Hansen <- as_tibble(acc_Hansen)               # convert to tibble
+colnames(acc_Hansen) <- "accHansen"             # tidy column name
+acc_Hansen <- as_tibble(acc_Hansen)             # convert to tibble
 hexagon_Hansen <- bind_cols(hexagons, acc_Hansen) # join to geometry
 
 ```
@@ -279,20 +286,20 @@ The code chunk below uses a collection of mapping fucntions of tmap package to c
 
 # choropleth of Hansen accessibility with facility locations overlaid
 
-tm_shape(hexagon_Hansen, bbox = mapex) +           # set the data and map extent
-  tm_polygons(fill = "accHansen",                 # fill by accessibility field
-              fill.scale = tm_scale_intervals(     # classify values into intervals
-                style = "quantile",               # equal number of cells per class
-                n = 10,                            # ten classes
-                values = "brewer.blues")) +       # blue palette
-  tm_shape(eldercare) +                            # overlay supply points
-  tm_dots(size = 0.3,                              # small dot size for points
-          fill = "red",                           # red fill for emphasis
-          col = "black") +                        # black outline
+tm_shape(hexagon_Hansen, bbox = mapex) +        # set the data and map extent
+  tm_polygons(fill = "accHansen",               # fill by accessibility field
+              fill.scale = tm_scale_intervals(  # classify values into intervals
+                style = "quantile",             # equal number of cells per class
+                n = 10,                         # ten classes
+                values = "brewer.blues")) +     # blue palette
+  tm_shape(eldercare) +                         # overlay supply points
+  tm_dots(size = 0.3,                           # small dot size for points
+          fill = "red",                         # red fill for emphasis
+          col = "black") +                      # black outline
   tm_title("Accessibility to eldercare  Hansen method") +  # map title
-  tm_layout(frame = TRUE) +                        # draw a neatline frame
-  tm_compass(type = "8star", size = 2) +          # compass for orientation
-  tm_scalebar() +                                  # scale bar in map units
+  tm_layout(frame = TRUE) +                     # draw a neatline frame
+  tm_compass(type = "8star", size = 2) +        # compass for orientation
+  tm_scalebar() +                               # scale bar in map units
   tm_grid(alpha = 0.2)        
 
 ```
@@ -431,7 +438,7 @@ hexagon_SAM <- bind_cols(hexagons, acc_SAM)   # join to geometry
 
 ### 17.8.2 Visualising SAM's accessibility
 
-The code chunk below uses a collection of mapping fucntions of tmap package to create a high cartographic quality accessibility to eldercare centre in Singapore. Notice that **mapex** is reused for bbox argument.
+The code chunk below uses a collection of mapping functions of tmap package to create a high cartographic quality accessibility to eldercare centre in Singapore. Notice that **mapex** is reused for bbox argument.
 
 ```{r}
 

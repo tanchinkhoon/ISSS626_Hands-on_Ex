@@ -1,0 +1,12 @@
+---
+title: "Take-home Ex03"
+author: "TAN Chin Khoon"
+date: "October 23, 2025"
+date-modified: "October 23, 2025"
+number-sections: true
+execute: 
+  eval: true
+  echo: true
+  warning: false
+  freeze: true
+---
