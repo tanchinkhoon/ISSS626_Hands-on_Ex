@@ -10,3 +10,34 @@ execute:
   warning: false
   freeze: true
 ---
+
+![](HDB.png)
+
+
+## Introduction
+
+Public transport is the backbone of Singapore’s urban mobility system, linking homes, workplaces and commercial centres into an integrated city network. Within this system, public buses remain the most extensive and inclusive mode, serving both central and peripheral areas. As Singapore advances toward the Land Transport Master Plan 2040, analysing spatial and temporal variations in bus passenger movement is essential for informed planning. Descriptive statistics and heat maps offer only surface patterns and cannot reveal the deeper spatial relationships among travel zones.
+
+This study applies Global and Local Measures of Spatial Autocorrelation (G/LMSA), including Global and Local Moran I, and Getis Ord Gi Star, to identify clusters and outliers in bus trip intensity across Singapore. These indicators reveal neighbourhoods of consistently high or low ridership and pinpoint areas that diverge from surrounding conditions. To incorporate the temporal dimension, the study employs Emerging Hot Spot Analysis (EMSA) using the Gi Star statistic together with the Mann Kendall (KM) trend test to assess how hot and cold spots evolve during morning, evening and weekend periods.
+
+The results will provide empirical evidence for improving bus network design, enhancing accessibility and promoting a more efficient and equitable transport system that supports sustainable urban development.
+
+## Research Questions
+
+The present study aims to examine spatial and temporal patterns of public bus mobility in Singapore through the application of local spatial statistical methods. Building upon the objectives outlined in the exercise, the research is guided by four interrelated questions that connect theoretical analysis with practical urban transport planning.
+
+**RQ1 – Spatial Distribution:** Where do bus trips concentrate across the city during weekday morning, weekday evening and weekend periods, and what does this reveal about overall mobility intensity?
+
+**RQ2 – Local Spatial Clustering:** Which areas display statistically significant clusters or outliers of bus trip intensity as detected by Local Moran I,  and Getis Ord Gi Star (Gi*)?
+
+**RQ3 – Temporal Evolution:** How do the identified hot and cold spots change over time, and what categories of emerging, intensifying, diminishing or sporadic patterns can be observed through the Mann Kendall trend analysis?
+
+**RQ4 – Policy and Planning Implications:** How can the identified spatial and temporal patterns of bus ridership inform the design of transport policies, allocation of resources and long-term planning for an efficient and inclusive public transport network?
+
+Together these questions structure the analytical framework and ensure direct alignment between the study objectives and subsequent methods.
+
+## The Data
+
+This study uses official datasets from national agencies to analyse spatial and temporal patterns of bus mobility in Singapore. The Land Transport Authority (LTA) DataMall Passenger Volume OD Bus dataset provides detailed records of passenger trips between bus stops, including origin code, destination code, day type, hour and total trip volume. The LTA Bus Stop layer supplies the geographic locations and attributes of all active bus stops, while the Urban Redevelopment Authority (URA) Master Plan 2019 Subzone Boundary defines the official spatial units for aggregation and mapping.
+
+All spatial data are projected to the Singapore SVY21 coordinate system (EPSG 3414) to preserve distance accuracy. The datasets are cleaned and joined in the R environment to generate analytical hexagonal zones containing at least one bus stop. These integrated data support the computation of local spatial statistics and the identification of emerging patterns in public bus ridership.
