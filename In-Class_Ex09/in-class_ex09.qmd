@@ -21,7 +21,7 @@ Install and load required packages. The code uses `pacman::p_load()` to install 
 # install and load required packages in one call
 pacman::p_load(tmap, SpatialAcc, sf,   # mapping, accessibility, simple features
                ggstatsplot, reshape2,  # statistical graphics, data reshaping
-               tidyverse)  
+               tidyverse, ggplot2)  
 
 ```
 
@@ -61,32 +61,6 @@ eldercare <- st_read(
 
 The report above shows that the R object used to contain the imported MP14_SUBZONE_WEB_PL shapefile is called *mpsz* and it is a simple feature object. The geometry type is *multipolygon*. it is also important to note that mpsz simple feature object does not have EPSG information.
 
-### Updating CRS information
-
-The code chunk below updates the newly imported mpsz with the correct ESPG code (i.e. 3414)
-
-```{r}
-
-# # transform layers to EPSG 3414 for consistent units in metres
-# mpsz <- st_transform(mpsz, 3414)           # subzones to SVY21 Singapore TM
-# eldercare <- st_transform(eldercare, 3414) # eldercare points to SVY21 Singapore TM
-# hexagons <- st_transform(hexagons, 3414)   # hexagon grid to SVY21 Singapore TM
-
-```
-
-After transforming the projection metadata, you can verify the projection of the newly transformed ***mpsz_svy21*** by using `st_crs()` of sf package.
-
-The code chunk below will be used to verify the newly transformed ***mpsz_svy21***.
-
-```{r}
-
-# verify the CRS of the subzones object
-st_crs(mpsz)
-
-```
-
-Notice that the EPSG: is indicated as **3414** now.
-
 ### Cleaning and updating attribute fields of the geospatial data
 
 There are many redundant fields in the data tables of both `eldercare` and `hexagons`. The code chunks below will be used to exclude those redundant fields. At the same time, a new field called `demand` and a new field called `capacity` will be added into the data table of `hexagons` and `eldercare` sf data frame respectively. Both fields are derive using `mutate()` of **dplyr** package.
@@ -122,7 +96,7 @@ The code chunk below uses `read_cvs()` of **readr** package to import `OD_Matrix
 
 # import distance matrix as a tibble
 ODMatrix <- read_csv(
-  "/Users/cktan/Desktop/SMU/01_Geospatial Analytics (ISSS626)/Hands-on_Ex/Hands-on_Ex09/data/aspatial/1D_Matrix.csv", 
+  "/Users/cktan/Desktop/SMU/01_Geospatial Analytics (ISSS626)/Hands-on_Ex/Hands-on_Ex09/data/aspatial/OD_Matrix.csv",
   skip = 0
   )  # columns include origin, destination and costs
 
@@ -158,13 +132,12 @@ distmat_km <- as.matrix(distmat / 1000)   # numeric matrix required by SpatialAc
 
 ## Modelling and Visualising Accessibility using Hansen Method
 
-### Evaluate Hansen accessibility at five power settings and plot a single summary graph
+### Evaluate Hansen accessibility at five power settings
 
 ```{r}
 
 # evaluate Hansen accessibility at five power settings and plot a single summary graph
 powers <- c(0.5, 1.0, 1.5, 2.0, 2.5) # the required power values
-
 
 # compute accessibility for each power value and collect results in a long table
 acc_long <- lapply(powers, function(p) {
@@ -179,12 +152,15 @@ family = "Hansen")) # Hansen method
 )
 }) %>% dplyr::bind_rows()
 
+```
+
+###  Plot a single summary graph
+
+Draw a box plot on log scale that is used to compare levels and spread clearly
+
+```{r}
 
 # draw one graph that shows how the distribution changes across power values
-# a box plot on log scale is used so that you can compare levels and spread clearly
-library(ggplot2)
-
-
 ggplot(acc_long, aes(x = factor(power), y = acc)) +
 geom_boxplot() +
 scale_y_log10() +
