@@ -1,0 +1,324 @@
+---
+title: "In-class Ex09"
+author: "TAN Chin Khoon"
+date: "08 November 2025"
+date-modified: "last-modified"
+---
+
+# 17 Modelling Geographical Accessibility
+
+## 17.1 Introduction
+
+In this exercise you will learn to model geographical accessibility in R using packages for simple features, mapping and accessibility computation. You will prepare the data, compute accessibility with three methods and create maps and boxplots to interpret the results.
+
+### 17.1.1 Learning outcomes
+
+-   Import GIS polygon and point data into R as simple feature objects using sf functions
+
+-   Import a distance matrix and prepare it for modelling
+
+-   Compute accessibility using Hansen, KD2SFCA and Spatial Accessibility Measure methods
+
+-   Visualise results with `tmap` and `ggplot2`
+
+## 17.2 The data
+
+Four data sets are used in this exercise, they are:
+
+-   `MP14_SUBZONE_NO_SEA_PL`: URA Master Plan 2014 subzone boundary GIS data. This data set is downloaded from data.gov.sg.
+
+-   `hexagons`: A 250m radius hexagons GIS data. This data set was created by using `st_make_grid()` of sf package. It is in ESRI shapefile format.
+
+-   `ELDERCARE`: GIS data showing location of eldercare service. This data is downloaded from data.gov.sg. There are two versions. One in ESRI shapefile format. The other one in Google kml file format. For the purpose of this hands-on exercise, ESRI shapefile format is provided.
+
+    -   `OD_Matrix`: a distance matrix in csv format. There are six fields in the data file. They are:
+    -   `origin_id`: the unique id values of the origin (i.e. `fid` of hexagon data set.),
+    -   `destination_id`: the unique id values of the destination (i.e. `fid` of `ELDERCARE` data set.),
+    -   `entry_cost`: the perpendicular distance between the origins and the nearest road),
+    -   `network_cost`: the actual network distance from the origin and destination,
+    -   `exit_cost`: the perpendicular distance between the destination and the nearest road), and
+    -   `total_cost`: the summation of `entry_cost`, `network_cost` and `exit_cost`.
+
+::: callout-note
+Except `MP14_SUBZONE_NO_SEA_PL` data set, the other three data set are specially prepared by Prof. Kam for teaching and research purpose. Students taking IS415 Geospatial Analytics and Applications are allowed to use them for hands-on exercise purpose. Please obtain formal approval from Prof. Kam if you want to use them for other courses or usage.
+:::
+
+## 17.3 Getting Started
+
+Install and load required packages. The code uses `pacman::p_load()` to install on demand and load in one step.
+
+```{r}
+
+# install and load required packages in one call
+pacman::p_load(tmap, SpatialAcc, sf,   # mapping, accessibility, simple features
+               ggstatsplot, reshape2,  # statistical graphics, data reshaping
+               tidyverse)  
+
+```
+
+## 17.4 Geospatial data wrangling
+
+### 17.4.1 Importing geospatial data
+
+Three geospatial data will be imported from the **data/geospatial** sub-folder. They are MP14_SUBZONE_NO_SEA_PL, hexagons and ELDERCARE.
+
+The code chunk below is used to import these three data sets shapefile by using `st_read()` of **sf** packages.
+
+```{r}
+
+# read URA subzones as simple features
+mpsz <- st_read(dsn = "/Users/cktan/Desktop/SMU/01_Geospatial Analytics (ISSS626)/Hands-on_Ex/Hands-on_Ex09/data/geospatial", 
+                layer = "MP14_SUBZONE_NO_SEA_PL")   # polygon layer
+
+```
+
+```{r}
+
+# read hexagon grid as simple features
+hexagons <- st_read(
+  dsn = "/Users/cktan/Desktop/SMU/01_Geospatial Analytics (ISSS626)/Hands-on_Ex/Hands-on_Ex09/data/geospatial", 
+  layer = "hexagons") # polygon grid
+
+```
+
+```{r}
+
+# read eldercare locations as simple features
+eldercare <- st_read(
+  dsn = "/Users/cktan/Desktop/SMU/01_Geospatial Analytics (ISSS626)/Hands-on_Ex/Hands-on_Ex09/data/geospatial", 
+  layer = "ELDERCARE")   # point layer
+
+```
+
+The report above shows that the R object used to contain the imported MP14_SUBZONE_WEB_PL shapefile is called *mpsz* and it is a simple feature object. The geometry type is *multipolygon*. it is also important to note that mpsz simple feature object does not have EPSG information.
+
+### 17.4.2 Updating CRS information
+
+The code chunk below updates the newly imported mpsz with the correct ESPG code (i.e. 3414)
+
+```{r}
+
+# transform layers to EPSG 3414 for consistent units in metres
+mpsz <- st_transform(mpsz, 3414)           # subzones to SVY21 Singapore TM
+eldercare <- st_transform(eldercare, 3414) # eldercare points to SVY21 Singapore TM
+hexagons <- st_transform(hexagons, 3414)   # hexagon grid to SVY21 Singapore TM
+
+```
+
+After transforming the projection metadata, you can verify the projection of the newly transformed ***mpsz_svy21*** by using `st_crs()` of sf package.
+
+The code chunk below will be used to verify the newly transformed ***mpsz_svy21***.
+
+```{r}
+
+# verify the CRS of the subzones object
+st_crs(mpsz)
+
+```
+
+Notice that the EPSG: is indicated as **3414** now.
+
+### 17.4.3 Cleaning and updating attribute fields of the geospatial data
+
+There are many redundant fields in the data tables of both `eldercare` and `hexagons`. The code chunks below will be used to exclude those redundant fields. At the same time, a new field called `demand` and a new field called `capacity` will be added into the data table of `hexagons` and `eldercare` sf data frame respectively. Both fields are derive using `mutate()` of **dplyr** package.
+
+```{r}
+
+# keep only id and address then add constant capacity field for supply locations
+eldercare <- eldercare %>%
+  select(fid, ADDRESSPOS) %>%   # retain unique id and address
+  mutate(capacity = 100)        # placeholder capacity for each facility
+
+```
+
+```{r}
+
+# keep only id then add constant demand field for each hexagon cell
+hexagons <- hexagons %>%
+  select(fid) %>%       # retain unique id of each grid cell
+  mutate(demand = 100)  # placeholder demand for each cell
+
+```
+
+Notice that for the purpose of this hands-on exercise, a constant value of 100 is used. In practice, actual demand of the hexagon and capacity of the eldercare centre should be used.
+
+## 17.5 Apsaital Data Handling and Wrangling
+
+### 17.5.1 Importing Distance Matrix
+
+The code chunk below uses `read_cvs()` of **readr** package to import `OD_Matrix.csv` into RStudio. The imported object is a tibble data.frame called `ODMatrix`.
+
+```{r}
+
+# import distance matrix as a tibble
+ODMatrix <- read_csv(
+  "/Users/cktan/Desktop/SMU/01_Geospatial Analytics (ISSS626)/Hands-on_Ex/Hands-on_Ex09/data/aspatial/OD_Matrix.csv", 
+  skip = 0
+  )  # columns include origin, destination and costs
+
+```
+
+### 17.5.2 Tidying distance matrix
+
+The imported ODMatrix organised the distance matrix columnwise.
+
+![](1.png)
+
+On the other hands, most of the modelling packages in R is expecting a matrix look similar to the figure below.
+
+![](2.png)
+
+The rows represent **origins** (i.e. also know as **from** field) and the columns represent **destination** (i.e. also known as **to** field.)
+
+The code chunk below uses `spread()` of **tidyr** package is used to transform the O-D matrix from a thin format into a fat format.
+
+```{r}
+
+# build a wide distance matrix using total_cost
+# select needed columns then spread destination ids to wide columns
+# finally drop the origin_id column once it has become the row id
+
+distmat <- ODMatrix %>%
+  select(origin_id, destination_id, total_cost) %>%  # pick the three fields we need
+  spread(destination_id, total_cost) %>%    # convert thin table to wide table by destination
+  select(c(-c('origin_id')))    # remove origin id column after spreading
+
+```
+
+::: callout-note
+Since tidyr version 1.0 a new function called `pivot_wider()` is introduce. You should use `pivot_wider()` instead of `spread()`
+:::
+
+Currently, the distance is measured in metre because SVY21 projected coordinate system is used. The code chunk below will be used to convert the unit f measurement from metre to kilometre.
+
+```{r}
+
+# convert metres to kilometres and coerce to numeric matrix
+distmat_km <- as.matrix(distmat / 1000)   # numeric matrix required by SpatialAcc::ac
+
+```
+
+## 17.6 Modelling and Visualising Accessibility using Hansen Method
+
+### 17.6.1 Computing Hansen's accessibility
+
+Now, we ready to compute Hansen's accessibility by using `ac()` of **SpatialAcc** package. Before getting started, you are encourage to read the **arguments** of the function at least once in order to ensure that the required inputs are available.
+
+The code chunk below calculates Hansen's accessibility using `ac()` of **SpatialAcc** and `data.frame()` is used to save the output in a data frame called **acc_Handsen**.
+
+```{r}
+
+# compute Hansen accessibility values per origin cell
+acc_Hansen <- data.frame(ac(hexagons$demand,     # vector of origin demands
+                            eldercare$capacity,  # vector of destination capacities
+                            distmat_km,          # distance matrix in kilometres
+                            #d0 = 50,            # optional cut off distance in kilometres if needed
+                            power = 2,           # distance decay parameter for Hansen
+                            family = "Hansen"))  # choose the Hansen method
+
+```
+
+The default field name is very messy, we will rename it to `accHansen` by using the code chunk below.
+
+```{r}
+
+# rename the single output column to a tidy name
+colnames(acc_Hansen) <- "accHansen"   # set a clear column name
+
+```
+
+Next, we will convert the data table into tibble format by using the code chunk below.
+
+```{r}
+
+# convert to tibble for nicer printing and dplyr friendliness
+acc_Hansen <- as_tibble(acc_Hansen)   # tibble retains numeric vector with column name
+
+```
+
+Lastly, `bind_cols()` of dplyr will be used to join the `acc_Hansen` tibble data frame with the hexagons simple feature data frame. The output is called **hexagon_Hansen**.
+
+```{r}
+
+# attach the accessibility values to the hexagon sf object
+hexagon_Hansen <- bind_cols(hexagons, acc_Hansen) # geometry from hexagons plus new column
+
+```
+
+Notice that hexagon_Hansen is a simple feature data frame and not a typical tibble data frame.
+
+![](3.png)
+
+We can also run the entire sequence in one block as shown next. This alternative uses a different power value as demonstrated in the source.
+
+```{r}
+
+# alternate single block version as shown in the source
+acc_Hansen <- data.frame(ac(hexagons$demand,    # origin demand
+                            eldercare$capacity, # destination capacity
+                            distmat_km,         # distance matrix in kilometres
+                            #d0 = 50,           # optional cut off
+                            power = 0.5,        # alternate decay value used in the example
+                            family = "Hansen")) # Hansen method
+
+colnames(acc_Hansen) <- "accHansen"             # tidy column name
+acc_Hansen <- as_tibble(acc_Hansen)             # convert to tibble
+hexagon_Hansen <- bind_cols(hexagons, acc_Hansen) # join to geometry
+
+```
+
+
+```{r}
+
+# evaluate Hansen accessibility at five power settings and plot a single summary graph
+powers <- c(0.5, 1.0, 1.5, 2.0, 2.5) # the required power values
+
+
+# compute accessibility for each power value and collect results in a long table
+acc_long <- lapply(powers, function(p) {
+tibble::tibble(
+power = p, # record the power value used
+acc = as.numeric( # coerce to numeric vector
+SpatialAcc::ac(hexagons$demand, # demand at each origin cell
+eldercare$capacity, # capacity at each supply point
+distmat_km, # distance matrix in kilometres
+power = p, # current power value
+family = "Hansen")) # Hansen method
+)
+}) %>% dplyr::bind_rows()
+
+
+# draw one graph that shows how the distribution changes across power values
+# a box plot on log scale is used so that you can compare levels and spread clearly
+library(ggplot2)
+
+
+ggplot(acc_long, aes(x = factor(power), y = acc)) +
+geom_boxplot() +
+scale_y_log10() +
+labs(title = "Hansen accessibility across power values",
+x = "Power",
+y = "Accessibility value log scale")
+
+```
+
+### Insight and implication
+
+Here is what the box plot is telling us.
+
+1. As power increases from 0.5 to 2.5 the median accessibility drops steadily. A larger power applies stronger distance decay, so far facilities contribute far less. The system becomes dominated by very near supply.
+
+1. The spread expands toward very small values as power rises. Many cells fall to extremely low accessibility once distance is penalised more strongly. In other words, places that rely on distant facilities become the most disadvantaged when power is large.
+
+1. A small set of cells near facilities keep relatively high values even at larger power. This shows that the index increasingly rewards immediate proximity as distance sensitivity grows.
+
+**Implications for analysis and planning**
+
+1. Ranking of cells is model sensitive. Reports should state the chosen power and show a sensitivity band across the five settings, since policy conclusions may change if a different decay is assumed.
+
+1. Equity signals sharpen with larger power. Peripheral or poorly served neighbourhoods look much worse when travel impedance matters more. Target these for new capacity or improved transport links.
+
+1. Site selection logic changes with the setting. Smaller power spreads benefits widely and is suitable when people are willing to travel farther. Larger power prioritises very local access and is suitable when travel is difficult or costly for the users.
+
+1. Choose power using evidence. Calibrate with observed travel behaviour or expert judgement, then confirm that conclusions are stable across nearby values.
+
