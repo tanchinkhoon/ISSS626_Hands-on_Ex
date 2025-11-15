@@ -10,66 +10,17 @@ number-sections: true
 
 ## Overview
 
-Market area analysis (also known as Trade Area Analysis) is the process of defining and studying the geographical area from which a business draws its customers. It involves analyzing data on consumer demographics, spending habits, and competitors to understand market viability, identify opportunities, and inform decisions about location, marketing, and expansion. It often combines empirical observation, like customer spotting, with mathematical models to identify market segments and understand customer behavior.
-
-Huff model is a geospatial analysis method commonly used in market area analysis to predict the probability that a consumer from a specific area will patronize a particular store, based on the store's attractiveness and distance relative to competitors. It calculates a store's market share by considering factors like size or sales for attractiveness and distance or travel time, with the probability decreasing as distance or competition increases. This tool helps businesses assess potential revenue, define trade areas, and make informed decisions about site selection
-
-### Learning Outcome
-
-In this hands-on exercise, you will gain hands-on experience on how to perform market area analysis by using Huff model of [**MCI**](https://cran.r-project.org/web/packages/MCI/) packages.
-
-By the end of this hands-on exercise, you will be able:
-
--   to import GIS data into R and save them as simple feature data frame by using appropriate functions of sf package of R;
--   to import aspatial data into R and save them as simple feature data frame by using appropriate functions of sf package of R;
--   to clean and tidy the data sets so that they are ready for the analysis,
--   to compute distance matrix between the origins (i.e. villages) and destinations (i.e stores),
--   to computer interaction probability using Huff model, and
--   to visualise the market area by using tmap and ggplot2 packages.
-
-### Setting the scene
-
-A fast-food franchise is a business model in which an individual (the franchisee) acquires the rights to operate a restaurant under an established brand owned by a franchisor. This arrangement typically involves franchise fees and adherence to standardized operational procedures. Key considerations prior to investment include the scale of initial capital outlay, the strength of the brand, and the strategic importance of store location. Capital investment requirements vary significantly, generally ranging from approximately \$200,000 to more than \$2 million. Major global fast-food franchise brands include McDonald's, Burger King, Pizza Hut, KFC, and Taco Bell.
-
-In this exercise, you will assume the role of a data analyst within the business development team of a fast-food franchise. Your objective is to delineate the trade areas of existing stores in Taichung City and to produce corresponding spatial maps to support market analysis and strategic decision-making.
-
-### The data
-
-Four data sets will be used in this hands-on exercise, they are:
-
--   Geospatial data
-
-    -   STORES_TN, store locations data in ESRI shapefile format.
-    -   VILLAGE_TN, village boundary data in ESRI shapefile format.
-
--   Aspatial data
-
-    -   pop2019.csv, population data of Taichung City in 2019. H_CNT, P_CNT, M_CNT, and F_CNT indicate Number of household, Total population, Male population and Female population respectively.
-    -   Store_sales_data.csv provides store sales data, and
+Market area analysis defines and studies where customers originate, using demographics, spending, competition, and observation to guide location, marketing, and expansion decisions. The Huff model estimates store choice probabilities and market share from attractiveness and distance, helping businesses delineate trade areas and forecast revenue among competing outlets and potential profitability.
 
 ## Getting Started
 
 Before we getting started, it is important for us to install the necessary R packages and launch them into RStudio environment.
 
-The R packages need for this exercise are as follows:
-
--   sf for handling geospatial data and performing geoprocessing function such as computing distance matrix,
--   MCI for performing Huff and MCI modelling,
--   tidyverse for performing data science tasks including visualisation,
--   ggstatsplot, an R package that extends the ggplot2 visualization package to combine data visualization with statistical analysis, creating plots that include statistical test results directly, and
--   tmap for plotting cartographic quality thematic maps.
-
-The code chunk below installs and launches these R packages into RStudio environment.
-
 ```{r}
 pacman::p_load(sf, tidyverse, MCI, tmap, ggstatsplot)
 ```
 
-## Importing Data
-
-### Importing geospatial data
-
-First, `st_read()` of sf package will be used to import the three geospatial data sets into R environment by using the code chunk below.
+## Importing geospatial data
 
 ```{r}
 stores <- st_read(
@@ -102,7 +53,7 @@ tm_shape(stores) +
 tmap_mode("plot")
 ```
 
-### Importing aspatial data
+## Importing aspatial data
 
 Next, `read_csv()` of **readr** package will be used to import the two aspatial data sets into R environment.
 
@@ -152,8 +103,6 @@ summary(stores)
 
 ### Tidying pop2019 data.frame
 
-We are planning to append data in pop2019 data.frame onto village sf data.frame. Before we can do so, it is wise to check in to values in the join field are the same.
-
 ```{r}
 glimpse(pop2019)
 ```
@@ -183,8 +132,6 @@ village <- village %>%
 
 ### Check for missing or zero values
 
-Code chunk below is used to check in any records with missing values.
-
 ```{r}
 summary(village)
 ```
@@ -207,7 +154,7 @@ any(is.na(village$F_CNT))
 
 ## Computing Distance Matrix
 
-Instead of calculate the distance between the villages and stores, we will calculate the centroid of each village using the code chunk below. Then, compute the distance between the centroids of the villages and the stores.
+We will calculate the centroid of each village using the code chunk below. Then, compute the distance between the centroids of the villages and the stores.
 
 ```{r}
 village_center <- st_point_on_surface(village)
