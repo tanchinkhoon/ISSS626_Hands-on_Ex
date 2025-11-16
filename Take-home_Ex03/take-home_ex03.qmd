@@ -1,5 +1,5 @@
 ---
-title: "Take-home Ex03"
+title: "Take-home Ex03: Modelling HDB Resale Prices with Geographically Weighted Methods"
 author: "TAN Chin Khoon"
 date: "November 16, 2025"
 date-modified: "November 16, 2025"
@@ -15,7 +15,7 @@ execute:
 
 ## Introduction
 
-This study examines the determinants of Housing and Development Board resale prices in Singapore using an explanatory spatial modelling framework. We focus on **4** room flats during 1 January 2025 to 30 September 2025 to maintain comparability and reflect current family preferences for this size category (Renovation Contractor Singapore, 2025). The objective is to identify structural and locational attributes associated with transaction prices and to reveal how those associations vary across space. Structural variables include floor area in square meters, floor level, age in years, and remaining lease in years. Locational variables include proximity to rail transit, parks and open space, primary schools including selected high performing schools, childcare and preschool supply, supermarkets, shopping malls, and bus stops. Count variables are computed within 350 meters and 1,000 meters buffers, and point to point proximity is measured in meters after projecting all layers to SVY21. The remainder of this report states the research questions, documents reproducible data preparation, specifies the global and geographically weighted models, and presents spatially explicit findings with concise implications.
+This study examines the determinants of Housing and Development Board resale prices in Singapore using an explanatory spatial modelling framework. We focus on **4** room flats during **1 January 2025 to 30 September 2025** to maintain comparability and reflect current family preferences for this size category (EdgeProp Singapore, 2024). The objective is to identify structural and locational attributes associated with transaction prices and to reveal how those associations vary across space. Structural variables include floor area in square meters, floor level, age in years, and remaining lease in years. Locational variables include proximity to rail transit, parks and open space, primary schools including selected high performing schools, childcare and preschool supply, supermarkets, shopping malls, and bus stops. Count variables are computed within 350 meters and 1,000 meters buffers, and point to point proximity is measured in meters after projecting all layers to SVY21. The remainder of this report states the research questions, documents reproducible data preparation, specifies the global and geographically weighted models, and presents spatially explicit findings with concise implications.
 
 ## Research Questions
 
@@ -100,7 +100,7 @@ data_sources <- tibble::tibble(
     mk_link("data.gov.sg","https://data.gov.sg/datasets/d_5d668e3f544335f8028f546827b773b4/view"),
     mk_link("data.gov.sg","https://data.gov.sg/datasets/d_7fe9a72b1afff18e48111772c8d0fd39/view"),
     mk_link("Land Transport DataMall","https://datamall.lta.gov.sg/content/dam/datamall/datasets/Geospatial/BusStopLocation_Aug2025.zip"),
-    mk_link("data.gov.sg",""),
+    mk_link("data.gov.sg","https://data.gov.sg/datasets/d_0900fdcfdb4666fe2a630f37a532fc06/view"),
     mk_link("OneMap","https://www.onemap.gov.sg/docs/")
   )
 )
@@ -149,7 +149,6 @@ pacman::p_load(
   olsrr,        # building OLS and performing diagnostics tests 
   qqplotr,
   corrplot      # multivariate data visualisation and analysis
-  # ggstatsplot
 )
 
 # set reproducibility and friendly numeric printing
@@ -443,7 +442,7 @@ dplyr::glimpse(dplyr::select(HDBresale_sf, storey_range, FLOOR_LEVEL, geometry))
 
 #### Age of the unit in years
 
-e compute Age as 2025 minus lease_commence_date. Negative or missing values are set to NA.
+The compute Age as 2025 minus lease_commence_date. Negative or missing values are set to NA.
 
 ```{r}
 
@@ -708,7 +707,7 @@ To make later sections fast and deterministic, we save each prepared POINT layer
 ```{r}
 
 # save every prepared layer to RDS for quick reuse
-readr::write_rds(mrt_pt,           "data/rds/mrt_pt.rds")
+readr::write_rds(mrt_pt,            "data/rds/mrt_pt.rds")
 readr::write_rds(primary_schools_sf,"data/rds/primary_schools_pt.rds")
 readr::write_rds(elite_primary_sf,  "data/rds/elite_primary_pt.rds")
 readr::write_rds(kindergartens_pt,  "data/rds/kindergartens_pt.rds")
@@ -1442,9 +1441,9 @@ In practical terms, nearby condominiums tend to share similar overpricing or und
 
 Hedonic effects rarely act uniformly across a city. Prices respond to amenities, disamenities, and building attributes in ways that vary with location. This section introduces a spatially varying coefficient approach that relaxes the constant effect assumption of global OLS. We calibrate geographically weighted regressions that estimate location specific parameters while keeping the same dependent and predictor sets established earlier. Two bandwidth strategies are contrasted to control the spatial kernel: a single optimal distance for all locations and an adaptive neighbor count that expands or contracts with point density. We then convert model outputs to spatial objects, map local fit and coefficients, and prepare the ground for interpreting spatial heterogeneity with care.
 
-### Building Fixed Bandwidth GWR Model
+### Building fixed bandwidth Geographically-Weighted Regression (GWR) model
 
-Begin with a practical baseline. A fixed bandwidth holds the kernel distance constant across the study area, so each local regression uses neighbors within the same radius. The method is straightforward to tune with cross validation and yields parameters that can be compared directly across places. We will compute the optimal fixed bandwidth, run the model with the specified predictors, and review the global back check that GWmodel reports for reference before moving on to spatial diagnostic
+Begin with a practical baseline. A fixed bandwidth holds the kernel distance constant across the study area, so each local regression uses neighbours within the same radius. The method is straightforward to tune with cross validation and yields parameters that can be compared directly across places. We will compute the optimal fixed bandwidth, run the model with the specified predictors, and review the global back check that GWmodel reports for reference before moving on to spatial diagnostic
 
 #### Computing fixed bandwith
 
@@ -1644,7 +1643,7 @@ tm_shape(analysis.sf.adaptive) +
 tmap_mode("plot")
 ```
 
-The Local $R^2$ map shows that the adaptive GWR explains condo prices very well in most neighbourhoods. Darker blue clusters (Local $R^2$ between 0.8 and 1.0) dominate the island, meaning the local regressions capture more than 80 percent of price variation in these areas. Here, the chosen structural and accessibility variables provide an excellent description of market behaviour and the global conclusions are strongly supported.
+The Local $R^2$ map shows that the adaptive GWR explains condo prices very well in most neighbourhoods. Darker blue clusters (Local $R^2$ between 0.8 and 1.0) dominate the island, meaning the local regressions capture more than 80% of price variation in these areas. Here, the chosen structural and accessibility variables provide an excellent description of market behaviour and the global conclusions are strongly supported.
 
 Lighter patches (Local $R^2$ between 0.5 and 0.7) appear only in a few planning subzones. In these locations the model leaves more unexplained variation, suggesting that additional local factors such as project specific amenities, tenure mix, redevelopment expectations, or micro environmental qualities may be important. These areas are prime candidates for further refinement, either by enriching the covariate set or exploring alternative spatial scales. Overall, the map confirms that the adaptive GWR greatly improves explanatory power across Singapore while also revealing a small number of neighbourhoods where current predictors are less adequate and targeted model extensions are warranted.
 
@@ -1677,11 +1676,11 @@ tmap_mode("plot")
 
 ```
 
-The paired maps show both the precision and the strength of the local MRT effect. On the left, most standard errors for the MRT distance coefficient are small and spatially even, so local estimates are quite precise across the island. Larger standard errors only appear in a few peripheral clusters where data are sparse. On the right, local t values are strongly negative over wide areas, confirming that greater distance from MRT stations is associated with significantly lower resale prices in most neighbourhoods. Small or near zero t values in a few zones indicate weaker and possibly unstable MRT effects there. Together, these maps suggest that MRT accessibility is a robust and spatially pervasive price driver, but its influence is not uniform, so transport planning and valuation should account for local variation in how strongly buyers capitalise rail access.
+The paired maps show both the precision and the strength of the local MRT effect. On the left, most standard errors for the MRT distance coefficient are small and spatially even, so local estimates are quite precise across the island. Larger standard errors (SE) only appear in a few peripheral clusters where data are sparse. On the right, local $t$ values are strongly negative over wide areas, confirming that greater distance from MRT stations is associated with significantly lower resale prices in most neighbourhoods. Small or near zero $t$ values in a few zones indicate weaker and possibly unstable MRT effects there. Together, these maps suggest that MRT accessibility is a robust and spatially pervasive price driver, but its influence is not uniform, so transport planning and valuation should account for local variation in how strongly buyers capitalise rail access.
 
 ### Case studies of localised HDB re-sale price dynamics: Tampines
 
-What makes Tampines an instructive microcosm for spatial heterogeneity in HDB resale prices is its mix of mature estates, transit connectivity, town centre amenities, and green assets, all within a clear planning area boundary. This case study leverages the adaptive GWR output prepared earlier to examine how explanatory power varies locally and where model fit strengthens or weakens. We isolate the planning area, retain only observations located within it, visualise Local R² patterns to reveal intra town structure, and summarise distributional properties for transparent reporting. The objective is twofold. First, to translate city scale diagnostics into neighbourhood scale insights that aid interpretation. Second, to establish a reproducible template for other towns under identical data and methods.
+What makes Tampines an instructive microcosm for spatial heterogeneity in HDB resale prices is its mix of mature estates, transit connectivity, town centre amenities, and green assets, all within a clear planning area boundary. This case study leverages the adaptive GWR output prepared earlier to examine how explanatory power varies locally and where model fit strengthens or weakens. We isolate the planning area, retain only observations located within it, visualise Local$R^2$ patterns to reveal intra town structure, and summarise distributional properties for transparent reporting. The objective is twofold. First, to translate city scale diagnostics into neighbourhood scale insights that aid interpretation. Second, to establish a reproducible template for other towns under identical data and methods.
 
 #### Selecting the Tampines planning area polygon
 
@@ -1709,7 +1708,7 @@ tampines_pts <- analysis.sf.adaptive[tampines_pa, , op = st_within]
 
 #### Visualising Tampines boundary with points coloured by Local $R^2$
 
-See the pattern before measuring it. This visualization overlays the Tampines boundary and plots each retained transaction coloured by Local R² using quantile classes and an internal legend. The map exposes pockets where the model explains a larger share of variance, often near strong accessibility or amenity gradients, and areas where fit attenuates, suggesting missing predictors or scale mismatch. Using a consistent palette and zoom limits supports side by side comparison with other towns. The figure is not decorative. It is a diagnostic surface that guides targeted refinement and grounds narrative claims in observable spatial structure.
+See the pattern before measuring it. This visualization overlays the Tampines boundary and plots each retained transaction coloured by Local $R^2$ using quantile classes and an internal legend. The map exposes pockets where the model explains a larger share of variance, often near strong accessibility or amenity gradients, and areas where fit attenuates, suggesting missing predictors or scale mismatch. Using a consistent palette and zoom limits supports side by side comparison with other towns. The figure is not decorative. It is a diagnostic surface that guides targeted refinement and grounds narrative claims in observable spatial structure.
 
 ```{r}
 
@@ -1766,9 +1765,9 @@ Overall, the **adaptive geographically weighted regression (adaptive GWR) model*
 
 ### RQ1: Structural attributes and resale price
 
-The global Multiple Linear Regression indicates that structural characteristics are strongly and systematically related to resale price. Floor level has a large positive coefficient of about 5 800 dollars per storey, with a highly significant p value. This confirms a clear premium for higher units, consistent with better views, privacy, and reduced traffic noise.
+The global Multiple Linear Regression indicates that structural characteristics are strongly and systematically related to resale price. Floor level has a large positive coefficient of about 5,800 dollars per storey, with a highly significant p value. This confirms a clear premium for higher units, consistent with better views, privacy, and reduced traffic noise.
 
-Age in 2025 shows a similarly strong but negative effect of about 5 400 dollars per additional year. Newer blocks therefore command higher resale prices even after controlling for location and amenities. Remaining lease was dropped from the final specification because it is almost perfectly correlated with age, which created redundancy and made its coefficient unstable. Once age is retained, remaining lease contributes no additional explanatory power and its p value becomes very high.
+Age in 2025 shows a similarly strong but negative effect of about 5,400 dollars per additional year. Newer blocks therefore command higher resale prices even after controlling for location and amenities. Remaining lease was dropped from the final specification because it is almost perfectly correlated with age, which created redundancy and made its coefficient unstable. Once age is retained, remaining lease contributes no additional explanatory power and its p value becomes very high.
 
 Overall, RQ1 is answered affirmatively. Structural factors, in particular vertical position and building age, are highly significant and economically meaningful determinants of resale price in the study window. The model suggests that buyers pay sizeable premiums for newer and higher units over otherwise similar flats.
 
@@ -1778,13 +1777,13 @@ The same regression highlights several important locational drivers. Distance to
 
 Other facilities show more nuanced patterns. Greater distance from eldercare centres, hawker centres and shopping malls is associated with lower prices, indicating that proximity to these amenities generally enhances value. In contrast, distance to supermarkets exhibits a small but positive coefficient, suggesting that in some locations buyers are willing to pay slightly more to live further from busy retail clusters once other amenities are controlled. Distance to elite primary schools has a small positive coefficient, implying that most of the schooling effect is captured instead by the count variables.
 
-The counts of nearby facilities also matter. Each additional kindergarten within 350 metres increases predicted price by roughly 10 000 dollars, while each additional primary school within 1 000 metres reduces price by more than 11 000 dollars. More bus stops within 350 metres are associated with higher prices, whereas a denser supply of childcare centres slightly lowers prices. Together, these results suggest that buyers value diverse early childhood options and good public transport, but may discount locations with very intense primary school or childcare activity, possibly due to congestion and noise.
+The counts of nearby facilities also matter. Each additional kindergarten within 350 metres increases predicted price by roughly 10,000 dollars, while each additional primary school within 1,000 metres reduces price by more than 11,000 dollars. More bus stops within 350 metres are associated with higher prices, whereas a denser supply of childcare centres slightly lowers prices. Together, these results suggest that buyers value diverse early childhood options and good public transport, but may discount locations with very intense primary school or childcare activity, possibly due to congestion and noise.
 
 Hence RQ2 is also answered positively. Multiple dimensions of accessibility and local service mix are significantly associated with resale price, and their marginal effects are both statistically strong and substantively large.
 
 ### RQ3: Spatial variation in associations
 
-Geographically weighted regression reveals that these relationships vary substantially across space. For each predictor, local coefficients span wide ranges and often change sign. For example, the floor level premium has a median local effect of about 4 600 dollars but ranges from about 1 700 to more than 10 800 dollars. In some peripheral estates buyers pay only modest premiums for height, whereas in selected cores the premium per storey is very large, perhaps reflecting views over parks or waterfronts.
+Geographically weighted regression reveals that these relationships vary substantially across space. For each predictor, local coefficients span wide ranges and often change sign. For example, the floor level premium has a median local effect of about 4,600 dollars but ranges from about 1,700 to more than 10,800 dollars. In some peripheral estates buyers pay only modest premiums for height, whereas in selected cores the premium per storey is very large, perhaps reflecting views over parks or waterfronts.
 
 The age effect shows even stronger non stationarity. Local coefficients are strongly negative in many subzones, reinforcing a preference for newer blocks, but turn positive in a few neighbourhoods where older estates may be more centrally located or perceived as more spacious. Similar spatial variability occurs for distances to MRT stations, malls and schools, with some areas showing strong negative effects and others small or even positive effects.
 
@@ -1792,13 +1791,13 @@ These patterns confirm that the global regression summarises only an average res
 
 ### RQ4: Model fit and residual behaviour
 
-Comparison of diagnostics between the global Multiple Linear Regression and the adaptive geographically weighted regression shows a substantial improvement in goodness of fit and residual properties. The global model achieves R squared of about 0.761 with adjusted R squared essentially identical, indicating that about 76 percent of price variance is explained by the common set of predictors. However, residual plots show curvature in the residual versus fitted relationship and increasing spread at higher fitted values, signalling some non linearity and mild heteroscedasticity.
+Comparison of diagnostics between the global MLR and the adaptive geographically weighted regression shows a substantial improvement in goodness of fit and residual properties. The global model achieves R squared of about 0.761 with adjusted R squared essentially identical, indicating that about 76 percent of price variance is explained by the common set of predictors. However, residual plots show curvature in the residual versus fitted relationship and increasing spread at higher fitted values, signalling some non linearity and mild heteroscedasticity.
 
 Spatial diagnostics reveal more serious departures. The residual map exhibits clear clusters of over prediction and under prediction, and the Monte Carlo Moran I statistic of about 0.33 with a p value effectively zero confirms strong positive spatial autocorrelation in the residuals. This violates the independence assumption and implies that some location specific effects remain unmodelled.
 
 The adaptive geographically weighted regression reduces these problems markedly. Global R squared rises to about 0.96 and adjusted R squared to about 0.954, while residual sum of squares drops by more than 80 percent. Information criteria such as AICc and BIC are substantially lower, even after accounting for the increased effective number of parameters. Local R squared values are mostly between 0.8 and 1.0, with only small pockets around 0.6 to 0.7. Residual maps become visually less structured, and spatial clustering of large errors is greatly reduced.
 
-Consequently, RQ4 is answered affirmatively. The geographically weighted model materially improves overall fit and offers more realistic residual behaviour relative to the global Multiple Linear Regression baseline, supporting its use as the main explanatory tool for spatial price variation.
+Consequently, RQ4 is answered affirmatively. The geographically weighted model materially improves overall fit and offers more realistic residual behaviour relative to the global MLR baseline, supporting its use as the main explanatory tool for spatial price variation.
 
 ### RQ5: Local effects and practical implications
 
@@ -1808,19 +1807,43 @@ In Tampines, Local R squared ranges from about 0.69 to 0.97 with a median around
 
 In contrast, parts of the central belt of Tampines show lower Local R squared around 0.7 to 0.8. These neighbourhoods likely involve additional influences that are not captured by the current predictors, such as block specific facilities, noise exposure or detailed renewal plans. For these micro markets, the model still performs reasonably well but cannot fully substitute for case specific information.
 
-The maps of MRT distance standard errors and t values further emphasise that rail access is a robust and spatially pervasive driver. Over large parts of the island, the local t statistic for distance to MRT is strongly negative, and the associated standard errors are small, indicating precise and significant price penalties for being further from stations. Only a few fringe zones show weaker or unstable MRT effects. This reinforces the view that improvements to rail access will generally enhance resale values, but the magnitude of the gain will differ by planning area.
+The maps of MRT distance standard errors and $t$ values further emphasise that rail access is a robust and spatially pervasive driver. Over large parts of the island, the local t statistic for distance to MRT is strongly negative, and the associated standard errors are small, indicating precise and significant price penalties for being further from stations. Only a few fringe zones show weaker or unstable MRT effects. This reinforces the view that improvements to rail access will generally enhance resale values, but the magnitude of the gain will differ by planning area.
 
 ## Conclusion
 
 This study develops a complete spatial hedonic workflow for public housing resale analysis, moving from data preparation and exploratory mapping through diagnostic checking, global calibration, and location specific modelling using geographically weighted regression. The framework is intentionally transparent and modular, so that analysts can substitute alternative variables, spatial weights, or bandwidth choices while retaining a clear sequence of steps and checks.
 
-Beyond its immediate application to 4 room resale transactions, the workflow provides a reusable template for agencies and valuers who require defensible, map ready evidence on how neighbourhood context relates to housing outcomes. Each stage produces outputs that can be communicated directly to non technical audiences, for example residual maps to flag areas where prevailing valuation rules are unreliable, or local goodness of fit summaries that highlight where further field investigation is warranted.
+Beyond its immediate application to **4 room resale transactions**, the workflow provides a reusable template for agencies and valuers who require defensible, map ready evidence on how neighbourhood context relates to housing outcomes. Each stage produces outputs that can be communicated directly to non technical audiences, for example residual maps to flag areas where prevailing valuation rules are unreliable, or local goodness of fit summaries that highlight where further field investigation is warranted.
 
 Several limitations point to promising directions for future work. The design is cross sectional, so temporal dynamics and policy shocks are not yet incorporated. Important unobserved features such as interior quality, micro noise exposure, and detailed project characteristics remain outside the current variable set. Extending the framework to panel data, richer administrative sources, or combined use with machine learning methods that respect spatial structure would deepen understanding of market behaviour.
 
 Overall, the project contributes a rigorous, practice orientated methodology that can be adopted and adapted by planners, valuers, and researchers who wish to integrate spatial analytics and geographically weighted regression into routine housing market assessment.
 
+## References:
 
+1. Brunsdon, C, Fotheringham, A S and Charlton, M 1996, Geographically weighted regression: a method for exploring spatial nonstationarity, Geographical Analysis, vol 28, no 4, pp 281 to 298.
+
+1. Brunsdon, C, Fotheringham, A S and Charlton, M 1999, Some notes on parametric significance tests for geographically weighted regression, Journal of Regional Science, vol 39, no 3, pp 497 to 524.
+
+1. Creative Campus 2024, Best primary schools in Singapore 2024, Creative Campus: Learning with Latitude, viewed 16 November 2025, <https://www.creativecampus.com.sg/best-primary-schools-in-singapore-2024>.
+
+1. EdgeProp Singapore 2024, Analysis: the increasing appeal of four room HDB flats, EdgeProp Singapore, 18 February, viewed 16 November 2025, <https://www.edgeprop.sg/property-news/analysis-increasing-appeal-four-room-hdb-flats>.
+
+1. Gollini, I, Lu, B, Charlton, M, Brunsdon, C and Harris, P 2015, GWmodel: an R package for exploring spatial heterogeneity using geographically weighted models, Journal of Statistical Software, vol 63, no 17, pp 1 to 50.
+
+1. Kam, T S 2022a, Calibrating hedonic pricing model for private highrise property with GWR method, in R for Geospatial Data Science and Analytics, Singapore Management University, viewed 16 November 2025, <https://r4gdsa.netlify.app/chap13.html>.
+
+1. Kam, T S 2022b, Calibrating hedonic pricing model for private highrise property with GWR method, ISSS626 in class exercise 7, Geospatial Analytics and Applications, School of Computing and Information Systems, Singapore Management University, viewed 16 November 2025, <https://isss626-ay2025-26aug.netlify.app/in-class_ex/in-class_ex07/in-class_ex07-gwr>.
+
+1. Kam, T S 2025a, In class exercise 8: data preparation for take home exercise 3, ISSS626 in class exercise 8, Geospatial Analytics and Applications, School of Computing and Information Systems, Singapore Management University, viewed 16 November 2025, <https://isss626-ay2025-26aug.netlify.app/in-class_ex/in-class_ex08/in-class_ex08>.
+
+1. Kam, T S 2025b, Lesson 7: geographically weighted regression, ISSS626 Geospatial Analytics and Applications module notes, School of Computing and Information Systems, Singapore Management University, viewed 16 November 2025, <https://isss626-ay2025-26aug.netlify.app/lesson/lesson07/lesson07-gwr>.
+
+1. Lu, B, Harris, P, Charlton, M and Brunsdon, C 2014, The GWmodel R package: further topics for exploring spatial heterogeneity using geographically weighted models, Geo spatial Information Science, vol 17, no 2, pp 85 to 101.
+
+1. Matthews, S A and Yang, T C 2012, Mapping the results of local statistics: using geographically weighted regression, Demographic Research, vol 26, pp 151 to 166.
+
+1. Mennis, J 2006, Mapping the results of geographically weighted regression, The Cartographic Journal, vol 43, no 2, pp 171 to 179.
 
 
 
