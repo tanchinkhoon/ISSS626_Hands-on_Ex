@@ -52,6 +52,8 @@ website:
             href: In-Class_Ex03/in-class_Ex03a
       - text: "Take-home Exercise"
         menu:
+          - text: "Take-home Exercise 3"
+            href: Take-home_Ex03/take-home_ex03 
           - text: "Take-home Exercise 2"
             href: Take-home_Ex02/take-home_ex02 
           - text: "Take-home Exercise 1"
@@ -71,7 +73,7 @@ website:
 format:
   html:
     # --- Outline / TOC defaults (apply to all pages) ---
-    toc: true                # show outline
+    toc: false               # show outline
     toc-title: "On this page"
     toc-location: right      # left | right
     toc-depth: 4             # include ### headings and above
