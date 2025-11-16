@@ -73,7 +73,7 @@ website:
 format:
   html:
     # --- Outline / TOC defaults (apply to all pages) ---
-    toc: false               # show outline
+    toc: true                # show outline
     toc-title: "On this page"
     toc-location: right      # left | right
     toc-depth: 4             # include ### headings and above

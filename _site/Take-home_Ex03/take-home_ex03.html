@@ -142,7 +142,7 @@ window.Quarto = {
 <link rel="stylesheet" href="../styles.css">
 </head>
 
-<body class="nav-fixed fullcontent quarto-light">
+<body class="nav-fixed quarto-light">
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
@@ -305,7 +305,140 @@ window.Quarto = {
 <div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
 <!-- margin-sidebar -->
-    
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction"><span class="header-section-number">1</span> Introduction</a></li>
+  <li><a href="#research-questions" id="toc-research-questions" class="nav-link" data-scroll-target="#research-questions"><span class="header-section-number">2</span> Research Questions</a></li>
+  <li><a href="#the-data" id="toc-the-data" class="nav-link" data-scroll-target="#the-data"><span class="header-section-number">3</span> The Data</a></li>
+  <li><a href="#setup-the-environment" id="toc-setup-the-environment" class="nav-link" data-scroll-target="#setup-the-environment"><span class="header-section-number">4</span> Setup the Environment</a></li>
+  <li><a href="#geocoding-for-geometric" id="toc-geocoding-for-geometric" class="nav-link" data-scroll-target="#geocoding-for-geometric"><span class="header-section-number">5</span> Geocoding for Geometric</a>
+  <ul>
+  <li><a href="#geocoding-hdb-resale-transactions-by-addresses" id="toc-geocoding-hdb-resale-transactions-by-addresses" class="nav-link" data-scroll-target="#geocoding-hdb-resale-transactions-by-addresses"><span class="header-section-number">5.1</span> Geocoding HDB resale transactions by addresses</a>
+  <ul class="collapse">
+  <li><a href="#load-and-filter-to-study-window-and-flat-type" id="toc-load-and-filter-to-study-window-and-flat-type" class="nav-link" data-scroll-target="#load-and-filter-to-study-window-and-flat-type"><span class="header-section-number">5.1.1</span> Load and filter to study window and flat type</a></li>
+  <li><a href="#normalise-street-tokens" id="toc-normalise-street-tokens" class="nav-link" data-scroll-target="#normalise-street-tokens"><span class="header-section-number">5.1.2</span> Normalise street tokens</a></li>
+  <li><a href="#define-onemap-address-geocoder-with-caching" id="toc-define-onemap-address-geocoder-with-caching" class="nav-link" data-scroll-target="#define-onemap-address-geocoder-with-caching"><span class="header-section-number">5.1.3</span> Define OneMap address geocoder with caching</a></li>
+  <li><a href="#enforce-one-record-per-address-and-join-coordinates" id="toc-enforce-one-record-per-address-and-join-coordinates" class="nav-link" data-scroll-target="#enforce-one-record-per-address-and-join-coordinates"><span class="header-section-number">5.1.4</span> Enforce one record per address and join coordinates</a></li>
+  <li><a href="#create-point-geometry-and-validate" id="toc-create-point-geometry-and-validate" class="nav-link" data-scroll-target="#create-point-geometry-and-validate"><span class="header-section-number">5.1.5</span> Create POINT geometry and validate</a></li>
+  </ul></li>
+  <li><a href="#geocoding-schools-by-postcodes" id="toc-geocoding-schools-by-postcodes" class="nav-link" data-scroll-target="#geocoding-schools-by-postcodes"><span class="header-section-number">5.2</span> Geocoding schools by postcodes</a>
+  <ul class="collapse">
+  <li><a href="#load-and-keep-primary-level" id="toc-load-and-keep-primary-level" class="nav-link" data-scroll-target="#load-and-keep-primary-level"><span class="header-section-number">5.2.1</span> Load and keep primary level</a></li>
+  <li><a href="#onemap-postcode-lookup-and-clean" id="toc-onemap-postcode-lookup-and-clean" class="nav-link" data-scroll-target="#onemap-postcode-lookup-and-clean"><span class="header-section-number">5.2.2</span> OneMap postcode lookup and clean</a></li>
+  <li><a href="#join-coordinates-and-build-point-geometry" id="toc-join-coordinates-and-build-point-geometry" class="nav-link" data-scroll-target="#join-coordinates-and-build-point-geometry"><span class="header-section-number">5.2.3</span> Join coordinates and build POINT geometry</a></li>
+  </ul></li>
+  <li><a href="#persist-clean-spatial-tables" id="toc-persist-clean-spatial-tables" class="nav-link" data-scroll-target="#persist-clean-spatial-tables"><span class="header-section-number">5.3</span> Persist clean spatial tables</a></li>
+  </ul></li>
+  <li><a href="#predictors-preprocessing-and-wrangling" id="toc-predictors-preprocessing-and-wrangling" class="nav-link" data-scroll-target="#predictors-preprocessing-and-wrangling"><span class="header-section-number">6</span> Predictors Preprocessing and Wrangling</a>
+  <ul>
+  <li><a href="#structural-predictors" id="toc-structural-predictors" class="nav-link" data-scroll-target="#structural-predictors"><span class="header-section-number">6.1</span> Structural predictors</a>
+  <ul class="collapse">
+  <li><a href="#remaining-lease-in-months" id="toc-remaining-lease-in-months" class="nav-link" data-scroll-target="#remaining-lease-in-months"><span class="header-section-number">6.1.1</span> Remaining lease in months</a></li>
+  <li><a href="#floor-level-from-storey-range" id="toc-floor-level-from-storey-range" class="nav-link" data-scroll-target="#floor-level-from-storey-range"><span class="header-section-number">6.1.2</span> Floor level from storey range</a></li>
+  <li><a href="#age-of-the-unit-in-years" id="toc-age-of-the-unit-in-years" class="nav-link" data-scroll-target="#age-of-the-unit-in-years"><span class="header-section-number">6.1.3</span> Age of the unit in years</a></li>
+  <li><a href="#structural-predictors-ready" id="toc-structural-predictors-ready" class="nav-link" data-scroll-target="#structural-predictors-ready"><span class="header-section-number">6.1.4</span> Structural predictors ready</a></li>
+  </ul></li>
+  <li><a href="#preparing-target-layers-for-location-factors" id="toc-preparing-target-layers-for-location-factors" class="nav-link" data-scroll-target="#preparing-target-layers-for-location-factors"><span class="header-section-number">6.2</span> Preparing target layers for location factors</a>
+  <ul class="collapse">
+  <li><a href="#function-and-global-checks" id="toc-function-and-global-checks" class="nav-link" data-scroll-target="#function-and-global-checks"><span class="header-section-number">6.2.1</span> Function and global checks</a></li>
+  <li><a href="#mrt-station-exits-from-geojson" id="toc-mrt-station-exits-from-geojson" class="nav-link" data-scroll-target="#mrt-station-exits-from-geojson"><span class="header-section-number">6.2.2</span> MRT station exits from GeoJSON</a></li>
+  <li><a href="#primary-schools-and-elite-subset" id="toc-primary-schools-and-elite-subset" class="nav-link" data-scroll-target="#primary-schools-and-elite-subset"><span class="header-section-number">6.2.3</span> Primary schools and elite subset</a></li>
+  <li><a href="#kindergartens-geojson" id="toc-kindergartens-geojson" class="nav-link" data-scroll-target="#kindergartens-geojson"><span class="header-section-number">6.2.4</span> Kindergartens GeoJSON</a></li>
+  <li><a href="#childcare-centres-geojson" id="toc-childcare-centres-geojson" class="nav-link" data-scroll-target="#childcare-centres-geojson"><span class="header-section-number">6.2.5</span> Childcare centres GeoJSON</a></li>
+  <li><a href="#bus-stops-shapefile" id="toc-bus-stops-shapefile" class="nav-link" data-scroll-target="#bus-stops-shapefile"><span class="header-section-number">6.2.6</span> Bus stops Shapefile</a></li>
+  <li><a href="#eldercare-geojson" id="toc-eldercare-geojson" class="nav-link" data-scroll-target="#eldercare-geojson"><span class="header-section-number">6.2.7</span> Eldercare GeoJSON</a></li>
+  <li><a href="#hawker-centres-geojson" id="toc-hawker-centres-geojson" class="nav-link" data-scroll-target="#hawker-centres-geojson"><span class="header-section-number">6.2.8</span> Hawker centres GeoJSON</a></li>
+  <li><a href="#parks-geojson" id="toc-parks-geojson" class="nav-link" data-scroll-target="#parks-geojson"><span class="header-section-number">6.2.9</span> Parks GeoJSON</a></li>
+  <li><a href="#shopping-malls-csv" id="toc-shopping-malls-csv" class="nav-link" data-scroll-target="#shopping-malls-csv"><span class="header-section-number">6.2.10</span> Shopping malls CSV</a></li>
+  <li><a href="#supermarkets-geojson" id="toc-supermarkets-geojson" class="nav-link" data-scroll-target="#supermarkets-geojson"><span class="header-section-number">6.2.11</span> Supermarkets GeoJSON</a></li>
+  <li><a href="#cbd-point-from-master-plan-subzones" id="toc-cbd-point-from-master-plan-subzones" class="nav-link" data-scroll-target="#cbd-point-from-master-plan-subzones"><span class="header-section-number">6.2.12</span> CBD point from Master Plan subzones</a></li>
+  <li><a href="#save-prepared-layers-for-repeatable-use" id="toc-save-prepared-layers-for-repeatable-use" class="nav-link" data-scroll-target="#save-prepared-layers-for-repeatable-use"><span class="header-section-number">6.2.13</span> Save prepared layers for repeatable use</a></li>
+  </ul></li>
+  <li><a href="#location-predictors" id="toc-location-predictors" class="nav-link" data-scroll-target="#location-predictors"><span class="header-section-number">6.3</span> Location predictors</a>
+  <ul class="collapse">
+  <li><a href="#helpers-used-by-all-location-predictors" id="toc-helpers-used-by-all-location-predictors" class="nav-link" data-scroll-target="#helpers-used-by-all-location-predictors"><span class="header-section-number">6.3.1</span> Helpers used by all location predictors</a></li>
+  <li><a href="#proximity-to-mrt-stations" id="toc-proximity-to-mrt-stations" class="nav-link" data-scroll-target="#proximity-to-mrt-stations"><span class="header-section-number">6.3.2</span> Proximity to MRT stations</a></li>
+  <li><a href="#proximity-to-parks" id="toc-proximity-to-parks" class="nav-link" data-scroll-target="#proximity-to-parks"><span class="header-section-number">6.3.3</span> Proximity to parks</a></li>
+  <li><a href="#proximity-to-eldercare-services" id="toc-proximity-to-eldercare-services" class="nav-link" data-scroll-target="#proximity-to-eldercare-services"><span class="header-section-number">6.3.4</span> Proximity to eldercare services</a></li>
+  <li><a href="#proximity-to-hawker-centres" id="toc-proximity-to-hawker-centres" class="nav-link" data-scroll-target="#proximity-to-hawker-centres"><span class="header-section-number">6.3.5</span> Proximity to hawker centres</a></li>
+  <li><a href="#proximity-to-supermarkets" id="toc-proximity-to-supermarkets" class="nav-link" data-scroll-target="#proximity-to-supermarkets"><span class="header-section-number">6.3.6</span> Proximity to supermarkets</a></li>
+  <li><a href="#proximity-to-shopping-malls" id="toc-proximity-to-shopping-malls" class="nav-link" data-scroll-target="#proximity-to-shopping-malls"><span class="header-section-number">6.3.7</span> Proximity to shopping malls</a></li>
+  <li><a href="#proximity-to-the-cbd-reference-point" id="toc-proximity-to-the-cbd-reference-point" class="nav-link" data-scroll-target="#proximity-to-the-cbd-reference-point"><span class="header-section-number">6.3.8</span> Proximity to the CBD reference point</a></li>
+  <li><a href="#proximity-to-elite-primary-schools" id="toc-proximity-to-elite-primary-schools" class="nav-link" data-scroll-target="#proximity-to-elite-primary-schools"><span class="header-section-number">6.3.9</span> Proximity to elite primary schools</a></li>
+  <li><a href="#amenity-counts-within-350-meters" id="toc-amenity-counts-within-350-meters" class="nav-link" data-scroll-target="#amenity-counts-within-350-meters"><span class="header-section-number">6.3.10</span> Amenity counts within 350 meters</a></li>
+  <li><a href="#primary-schools-within-1-kilometer" id="toc-primary-schools-within-1-kilometer" class="nav-link" data-scroll-target="#primary-schools-within-1-kilometer"><span class="header-section-number">6.3.11</span> Primary schools within 1 kilometer</a></li>
+  <li><a href="#quick-compact-check" id="toc-quick-compact-check" class="nav-link" data-scroll-target="#quick-compact-check"><span class="header-section-number">6.3.12</span> Quick compact check</a></li>
+  </ul></li>
+  </ul></li>
+  <li><a href="#exploratory-data-analysis-eda" id="toc-exploratory-data-analysis-eda" class="nav-link" data-scroll-target="#exploratory-data-analysis-eda"><span class="header-section-number">7</span> Exploratory Data Analysis (EDA)</a>
+  <ul>
+  <li><a href="#build-an-analysis-table" id="toc-build-an-analysis-table" class="nav-link" data-scroll-target="#build-an-analysis-table"><span class="header-section-number">7.1</span> Build an analysis table</a></li>
+  <li><a href="#univariate-summaries-and-distributions" id="toc-univariate-summaries-and-distributions" class="nav-link" data-scroll-target="#univariate-summaries-and-distributions"><span class="header-section-number">7.2</span> Univariate summaries and distributions</a>
+  <ul class="collapse">
+  <li><a href="#eda-using-statistical-graphics" id="toc-eda-using-statistical-graphics" class="nav-link" data-scroll-target="#eda-using-statistical-graphics"><span class="header-section-number">7.2.1</span> EDA using statistical graphics</a></li>
+  <li><a href="#multiple-histogram-plots-distribution-of-variables" id="toc-multiple-histogram-plots-distribution-of-variables" class="nav-link" data-scroll-target="#multiple-histogram-plots-distribution-of-variables"><span class="header-section-number">7.2.2</span> Multiple histogram plots distribution of variables</a></li>
+  </ul></li>
+  <li><a href="#simple-bivariate-relationships" id="toc-simple-bivariate-relationships" class="nav-link" data-scroll-target="#simple-bivariate-relationships"><span class="header-section-number">7.3</span> Simple bivariate relationships</a></li>
+  </ul></li>
+  <li><a href="#exploratory-data-spatial-analysis-edsa" id="toc-exploratory-data-spatial-analysis-edsa" class="nav-link" data-scroll-target="#exploratory-data-spatial-analysis-edsa"><span class="header-section-number">8</span> Exploratory Data Spatial Analysis (EDSA)</a></li>
+  <li><a href="#hedonic-pricing-modelling" id="toc-hedonic-pricing-modelling" class="nav-link" data-scroll-target="#hedonic-pricing-modelling"><span class="header-section-number">9</span> Hedonic Pricing Modelling</a>
+  <ul>
+  <li><a href="#multiple-linear-regression-mlr-method" id="toc-multiple-linear-regression-mlr-method" class="nav-link" data-scroll-target="#multiple-linear-regression-mlr-method"><span class="header-section-number">9.1</span> Multiple Linear Regression (MLR) method</a>
+  <ul class="collapse">
+  <li><a href="#visualising-the-relationships-of-the-independent-variables" id="toc-visualising-the-relationships-of-the-independent-variables" class="nav-link" data-scroll-target="#visualising-the-relationships-of-the-independent-variables"><span class="header-section-number">9.1.1</span> Visualising the relationships of the independent variables</a></li>
+  <li><a href="#building-a-hedonic-pricing-model-using-multiple-linear-regression-method" id="toc-building-a-hedonic-pricing-model-using-multiple-linear-regression-method" class="nav-link" data-scroll-target="#building-a-hedonic-pricing-model-using-multiple-linear-regression-method"><span class="header-section-number">9.1.2</span> Building a hedonic pricing model using multiple linear regression method</a></li>
+  <li><a href="#revising-the-model" id="toc-revising-the-model" class="nav-link" data-scroll-target="#revising-the-model"><span class="header-section-number">9.1.3</span> Revising the model</a></li>
+  </ul></li>
+  <li><a href="#regression-diagnostics" id="toc-regression-diagnostics" class="nav-link" data-scroll-target="#regression-diagnostics"><span class="header-section-number">9.2</span> Regression diagnostics</a>
+  <ul class="collapse">
+  <li><a href="#multicollinearity-test" id="toc-multicollinearity-test" class="nav-link" data-scroll-target="#multicollinearity-test"><span class="header-section-number">9.2.1</span> Multicollinearity test</a></li>
+  <li><a href="#test-for-non-linearity" id="toc-test-for-non-linearity" class="nav-link" data-scroll-target="#test-for-non-linearity"><span class="header-section-number">9.2.2</span> Test for non-linearity</a></li>
+  <li><a href="#test-for-normality-assumption" id="toc-test-for-normality-assumption" class="nav-link" data-scroll-target="#test-for-normality-assumption"><span class="header-section-number">9.2.3</span> Test for normality assumption</a></li>
+  <li><a href="#testing-for-spatial-autocorrelation" id="toc-testing-for-spatial-autocorrelation" class="nav-link" data-scroll-target="#testing-for-spatial-autocorrelation"><span class="header-section-number">9.2.4</span> Testing for Spatial Autocorrelation</a></li>
+  </ul></li>
+  </ul></li>
+  <li><a href="#building-hedonic-pricing-models-using-geographically-weighted-model-gwmodel" id="toc-building-hedonic-pricing-models-using-geographically-weighted-model-gwmodel" class="nav-link" data-scroll-target="#building-hedonic-pricing-models-using-geographically-weighted-model-gwmodel"><span class="header-section-number">10</span> Building Hedonic Pricing Models using Geographically-Weighted Model (GWmodel)</a>
+  <ul>
+  <li><a href="#building-fixed-bandwidth-geographically-weighted-regression-gwr-model" id="toc-building-fixed-bandwidth-geographically-weighted-regression-gwr-model" class="nav-link" data-scroll-target="#building-fixed-bandwidth-geographically-weighted-regression-gwr-model"><span class="header-section-number">10.1</span> Building fixed bandwidth Geographically-Weighted Regression (GWR) model</a>
+  <ul class="collapse">
+  <li><a href="#computing-fixed-bandwith" id="toc-computing-fixed-bandwith" class="nav-link" data-scroll-target="#computing-fixed-bandwith"><span class="header-section-number">10.1.1</span> Computing fixed bandwith</a></li>
+  <li><a href="#gwmodel-method---fixed-bandwith" id="toc-gwmodel-method---fixed-bandwith" class="nav-link" data-scroll-target="#gwmodel-method---fixed-bandwith"><span class="header-section-number">10.1.2</span> GWModel method - fixed bandwith</a></li>
+  </ul></li>
+  <li><a href="#building-adaptive-bandwidth-gwr-model" id="toc-building-adaptive-bandwidth-gwr-model" class="nav-link" data-scroll-target="#building-adaptive-bandwidth-gwr-model"><span class="header-section-number">10.2</span> Building Adaptive Bandwidth GWR Model</a>
+  <ul class="collapse">
+  <li><a href="#computing-the-adaptive-bandwidth" id="toc-computing-the-adaptive-bandwidth" class="nav-link" data-scroll-target="#computing-the-adaptive-bandwidth"><span class="header-section-number">10.2.1</span> Computing the adaptive bandwidth</a></li>
+  <li><a href="#constructing-the-adaptive-bandwidth-gwr-model" id="toc-constructing-the-adaptive-bandwidth-gwr-model" class="nav-link" data-scroll-target="#constructing-the-adaptive-bandwidth-gwr-model"><span class="header-section-number">10.2.2</span> Constructing the adaptive bandwidth gwr model</a></li>
+  </ul></li>
+  <li><a href="#visualising-gwr-output" id="toc-visualising-gwr-output" class="nav-link" data-scroll-target="#visualising-gwr-output"><span class="header-section-number">10.3</span> Visualising GWR Output</a>
+  <ul class="collapse">
+  <li><a href="#converting-sdf-into-sf-data.frame" id="toc-converting-sdf-into-sf-data.frame" class="nav-link" data-scroll-target="#converting-sdf-into-sf-data.frame"><span class="header-section-number">10.3.1</span> Converting SDF into sf data.frame</a></li>
+  <li><a href="#visualising-local-r2" id="toc-visualising-local-r2" class="nav-link" data-scroll-target="#visualising-local-r2"><span class="header-section-number">10.3.2</span> Visualising local <span class="math inline">\(R^2\)</span></a></li>
+  <li><a href="#visualising-coefficient-estimates" id="toc-visualising-coefficient-estimates" class="nav-link" data-scroll-target="#visualising-coefficient-estimates"><span class="header-section-number">10.3.3</span> Visualising coefficient estimates</a></li>
+  </ul></li>
+  <li><a href="#case-studies-of-localised-hdb-re-sale-price-dynamics-tampines" id="toc-case-studies-of-localised-hdb-re-sale-price-dynamics-tampines" class="nav-link" data-scroll-target="#case-studies-of-localised-hdb-re-sale-price-dynamics-tampines"><span class="header-section-number">10.4</span> Case studies of localised HDB re-sale price dynamics: Tampines</a>
+  <ul class="collapse">
+  <li><a href="#selecting-the-tampines-planning-area-polygon" id="toc-selecting-the-tampines-planning-area-polygon" class="nav-link" data-scroll-target="#selecting-the-tampines-planning-area-polygon"><span class="header-section-number">10.4.1</span> Selecting the Tampines planning area polygon</a></li>
+  <li><a href="#retaining-only-hdb-resale-points-inside-tampines" id="toc-retaining-only-hdb-resale-points-inside-tampines" class="nav-link" data-scroll-target="#retaining-only-hdb-resale-points-inside-tampines"><span class="header-section-number">10.4.2</span> Retaining only HDB resale points inside Tampines</a></li>
+  <li><a href="#visualising-tampines-boundary-with-points-coloured-by-local-r2" id="toc-visualising-tampines-boundary-with-points-coloured-by-local-r2" class="nav-link" data-scroll-target="#visualising-tampines-boundary-with-points-coloured-by-local-r2"><span class="header-section-number">10.4.3</span> Visualising Tampines boundary with points coloured by Local <span class="math inline">\(R^2\)</span></a></li>
+  <li><a href="#summarising-local-r2-for-tampines" id="toc-summarising-local-r2-for-tampines" class="nav-link" data-scroll-target="#summarising-local-r2-for-tampines"><span class="header-section-number">10.4.4</span> Summarising Local <span class="math inline">\(R^2\)</span> for Tampines</a></li>
+  </ul></li>
+  </ul></li>
+  <li><a href="#discussion-of-research-questions" id="toc-discussion-of-research-questions" class="nav-link" data-scroll-target="#discussion-of-research-questions"><span class="header-section-number">11</span> Discussion of Research Questions</a>
+  <ul>
+  <li><a href="#rq1-structural-attributes-and-resale-price" id="toc-rq1-structural-attributes-and-resale-price" class="nav-link" data-scroll-target="#rq1-structural-attributes-and-resale-price"><span class="header-section-number">11.1</span> RQ1: Structural attributes and resale price</a></li>
+  <li><a href="#rq2-locational-attributes-and-resale-price" id="toc-rq2-locational-attributes-and-resale-price" class="nav-link" data-scroll-target="#rq2-locational-attributes-and-resale-price"><span class="header-section-number">11.2</span> RQ2: Locational attributes and resale price</a></li>
+  <li><a href="#rq3-spatial-variation-in-associations" id="toc-rq3-spatial-variation-in-associations" class="nav-link" data-scroll-target="#rq3-spatial-variation-in-associations"><span class="header-section-number">11.3</span> RQ3: Spatial variation in associations</a></li>
+  <li><a href="#rq4-model-fit-and-residual-behaviour" id="toc-rq4-model-fit-and-residual-behaviour" class="nav-link" data-scroll-target="#rq4-model-fit-and-residual-behaviour"><span class="header-section-number">11.4</span> RQ4: Model fit and residual behaviour</a></li>
+  <li><a href="#rq5-local-effects-and-practical-implications" id="toc-rq5-local-effects-and-practical-implications" class="nav-link" data-scroll-target="#rq5-local-effects-and-practical-implications"><span class="header-section-number">11.5</span> RQ5: Local effects and practical implications</a></li>
+  </ul></li>
+  <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion"><span class="header-section-number">12</span> Conclusion</a></li>
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references"><span class="header-section-number">13</span> References:</a></li>
+  </ul>
+</nav>
+    </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
