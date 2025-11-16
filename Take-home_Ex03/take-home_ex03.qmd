@@ -1819,7 +1819,7 @@ Several limitations point to promising directions for future work. The design is
 
 Overall, the project contributes a rigorous, practice orientated methodology that can be adopted and adapted by planners, valuers, and researchers who wish to integrate spatial analytics and geographically weighted regression into routine housing market assessment.
 
-## References:
+## References
 
 1. Brunsdon, C, Fotheringham, A S and Charlton, M 1996, Geographically weighted regression: a method for exploring spatial nonstationarity, Geographical Analysis, vol 28, no 4, pp 281 to 298.
 
