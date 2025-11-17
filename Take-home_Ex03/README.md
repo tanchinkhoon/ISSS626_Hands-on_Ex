@@ -5,9 +5,9 @@ This project provides a complete, reproducible Quarto workflow for modeling HDB 
 ## Folder layout
 
 1. take home ex03.qmd Quarto source
-2. data/aspatial folder for CSV and lookups
-3. data/geospatial folder for sf layers
-4. data/geospatial for RDS artefacts
+2. `data/aspatial` folder for CSV and lookups
+3. `data/geospatial` folder for sf layers
+4. `data/rds` for RDS artefacts
 5. figs folder for saved images, plots, and maps
 6. outputs folder for tables and intermediate files
 7. HTML folder for the rendered site if used
