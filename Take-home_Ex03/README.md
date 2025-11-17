@@ -1,6 +1,6 @@
 # Take-home Ex03 README
 
-This project provides a complete, reproducible Quarto workflow to model HDB resale prices in Singapore with global and local spatial methods. The study builds a Multiple Linear Regression hedonic model and a Geographically Weighted model to examine localised effects. Outputs include publication grade regression tables, diagnostics, residual spatial tests, and cartographic products such as Local R squared and coefficient maps. All computation runs from one Quarto source using relative paths. Spatial operations use EPSG 3414 with metre units.
+This project provides a complete, reproducible Quarto workflow for modeling HDB resale prices in Singapore using global and local spatial methods. The study builds a Multiple Linear Regression (MLR) hedonic model and a Geographically Weighted model (GWmodel) to examine localised effects. Outputs include publication-grade regression tables, diagnostics, residual spatial tests, and cartographic products such as Local R-squared and coefficient maps. All computations run from a single Quarto source using relative paths. Spatial operations use EPSG 3414 with metre units.
 
 ## Folder layout
 
@@ -39,7 +39,7 @@ install.packages(setdiff(packages, installed.packages()[, "Package"]))
    * Hawker centres
    * Supermarkets
    * Shopping malls
-   * Primary schools with elite school filter
+   * Primary schools with an elite school filter
 4. Service points for buffer counts
 
    * Kindergartens
@@ -93,7 +93,7 @@ Multiple model predictors
 4. Produce the table with gtsummary tbl regression, including intercept, t, then add glance source note with R-squared, adjusted R-squared, AIC, F statistic, overall p value, and sigma
 5. Diagnostics
 
-   * performance check collinearity and plot the result
+   * performance check on collinearity and plot the result
    * see check model for linearity and normality
    * performance check normality with QQ plot
 6. Residual spatial test
@@ -109,7 +109,7 @@ Multiple model predictors
 
 ## Section 10 Geographically Weighted model
 
-1. Compute fixed bandwidth with cross-validation, then fit GWR basic on the same predictors
+1. Compute fixed bandwidth with cross-validation, then fit GWR based on the same predictors
 2. Compute adaptive bandwidth with cross-validation, n, then fit GWR basic with adaptive TRUE
 3. Convert output SDF to sf and enforce EPSG 3414
 4. Map Local R-squared with quantile breaks and a legend inside the frame
