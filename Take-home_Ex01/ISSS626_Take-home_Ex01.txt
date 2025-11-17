@@ -1,5 +1,0 @@
-Coursework Repository on GitHub for ISSS626 Take-home Exercise 01: https://github.com/tanchinkhoon/ISSS626_Hands-on_Ex/tree/main/Take-home_Ex01. If you face any difficulty accessing it, please let me know immediately.
-
-
-Coursework Website on Netlify for ISSS626 Take-home Exercise 01: https://isss626-handson-ex.netlify.app or https://isss626-handson-ex.netlify.app/take-home_ex01/take-home_ex01. If you face any difficulty accessing it, please let me know immediately. 
-
