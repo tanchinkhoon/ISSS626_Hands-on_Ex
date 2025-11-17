@@ -175,16 +175,16 @@ Add this at the end of the document to record versions
 sessionInfo()
 ```
 
-## How to cite
+## Citation and attribution
 
-Include citations for official data sources and R packages. Create package citations with
+If you use this repository for learning or further research, please cite it in the spirit of scholarly work, for example
 
-```r
-citation("GWmodel")
-citation("sf")
-citation("tmap")
-```
+> Tan C K Modelling HDB Resale Prices with Geographically Weighted Methods ISSS626 School of Computing and Information Systems Singapore Management University 2025
 
-## Contact
+Please also credit the original data providers, data.gov.sg, DataMall, Kaggle, and OneMap when using their datasets.
 
-Open a repository issue with the exact chunk label and the console message if assistance is required.
+---
+
+## Acknowledgements
+
+This project builds directly on the teaching materials and coding patterns developed by Professor Kam Tin Seong for ISSS626. The structure of the analysis, the choice of methods, and the interpretation style closely follow the in-class and hands-on exercises for geographically weighted model analytics.  
