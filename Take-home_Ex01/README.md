@@ -1,4 +1,4 @@
-# Take-home Ex01 Geospatial Analytics for Public Good
+# Take-home Ex01: Geospatial Analytics for Public Good
 
 This repository contains the full reproducible workflow for Take-home Ex01 in ISSS626 Geospatial Analytics and Applications. The study uses newly registered restaurant entities in Singapore to explore how geospatial methods can support evidence-based planning for town centres, food services licensing, and last-mile logistics.  
 
