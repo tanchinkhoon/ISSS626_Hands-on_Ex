@@ -1,4 +1,4 @@
-# Take-home Ex03 README
+# Take-home Ex03: Modelling HDB Resale Prices with Geographically Weighted Methods
 
 This project provides a complete, reproducible Quarto workflow for modeling HDB resale prices in Singapore using global and local spatial methods. The study builds a Multiple Linear Regression (MLR) hedonic model and a Geographically Weighted model (GWmodel) to examine localised effects. Outputs include publication-grade regression tables, diagnostics, residual spatial tests, and cartographic products such as Local R-squared and coefficient maps. All computations run from a single Quarto source using relative paths. Spatial operations use EPSG 3414 with metre units.
 
