@@ -180,7 +180,7 @@ You may also see standard helper packages such as `purrr`, `readr`, and `dplyr` 
 2. Open the R project in RStudio.  
 3. Download and place the required source data files in the `data/aspatial` and `data/geospatial` folders following the naming conventions used in the quarto file (.qmd).  
 4. Create a OneMap account and store your API token securely for use by the geocoding script within the .qmd file.  
-5. Run the code chunk in the `.qmd` file in numeric order, or knit the Quarto document if it orchestrates the full workflow.  
+5. Run the chunk code in the `.qmd` file in numeric order, or knit the Quarto document if it orchestrates the full workflow.  
 6. Inspect intermediate RDS files being created in the 'data/rds' folder to confirm that each stage has completed successfully before moving to subsequent analysis.  
 
 ---
