@@ -15,7 +15,7 @@ execute:
 
 ## Introduction
 
-This study examines the determinants of Housing and Development Board resale prices in Singapore using an explanatory spatial modelling framework. We focus on **4** room flats during **1 January 2025 to 30 September 2025** to maintain comparability and reflect current family preferences for this size category (EdgeProp Singapore, 2024). The objective is to identify structural and locational attributes associated with transaction prices and to reveal how those associations vary across space. Structural variables include floor area in square meters, floor level, age in years, and remaining lease in years. Locational variables include proximity to rail transit, parks and open space, primary schools including selected high performing schools, childcare and preschool supply, supermarkets, shopping malls, and bus stops. Count variables are computed within 350 meters and 1,000 meters buffers, and point to point proximity is measured in meters after projecting all layers to SVY21. The remainder of this report states the research questions, documents reproducible data preparation, specifies the global and geographically weighted models, and presents spatially explicit findings with concise implications.
+This study examines the determinants of Housing and Development Board resale prices in Singapore using an explanatory spatial modelling framework. We focus on **4** room flats during **1 January 2025 to 30 September 2025** to maintain comparability and reflect current family preferences for this size category (EdgeProp Singapore, 2024). The objective is to identify structural and locational attributes associated with transaction prices and to reveal how those associations vary across space. Structural variables include floor level, age in years, and remaining lease in years. Locational variables include proximity to rail transit, parks and open space, primary schools including selected high performing or elite schools (Creative Campus, 2024), childcare and preschool supply, supermarkets, shopping malls, and bus stops. Count variables are computed within 350 meters and 1,000 meters buffers, and point to point proximity is measured in meters after projecting all layers to SVY21. The remainder of this report states the research questions, documents reproducible data preparation, specifies the global and geographically weighted models, and presents spatially explicit findings with concise implications.
 
 ## Research Questions
 
@@ -541,7 +541,7 @@ glimpse(mrt_pt)
 
 #### Primary schools and elite subset
 
-Elite school proximity uses the same school geocodes we already created in Section 5. We load the prepared RDS `primary_schools_sf.rds`, confirm EPSG 3414 and POINT geometry, then build a filtered view containing only the 20 elite schools specified. This subset will be used to compute continuous distance to the nearest elite school point and also optional counts within buffers if needed. Keeping both the full set and the elite subset in memory gives flexibility for later features such as count of any primary school within one kilometer and distance to the nearest elite school. A quick print confirms the expected number of rows.
+Elite school proximity uses the same school geocodes we already created in Section 5. We load the prepared RDS `primary_schools_sf.rds`, confirm EPSG 3414 and POINT geometry, then build a filtered view containing only the 20 elite schools specified (Creative Campus, 2024). This subset will be used to compute continuous distance to the nearest elite school point and also optional counts within buffers if needed. Keeping both the full set and the elite subset in memory gives flexibility for later features such as count of any primary school within one kilometer and distance to the nearest elite school. A quick print confirms the expected number of rows.
 
 ```{r}
 
@@ -821,7 +821,7 @@ glimpse(HDBresale_sf$DIST_HAWKER_M)
 
 #### Proximity to supermarkets
 
-Supermarkets indicate stable food supply and often co locate with other services such as pharmacies and financial services. We compute the distance to the nearest supermarket point. The variable captures everyday convenience that families value when selecting a flat. It can also proxy for local retail vitality. Be aware that this feature sometimes correlates with shopping mall distance in central areas, so we will check variance inflation later. For now we keep it as a straightforward continuous measure that is easy to explain to a non technical audience.
+Supermarkets indicate stable food supply and often co-locate with other services such as pharmacies and financial services. We compute the distance to the nearest supermarket point. The variable captures everyday convenience that families value when selecting a flat. It can also proxy for local retail vitality. Be aware that this feature sometimes correlates with shopping mall distance in central areas, so we will check variance inflation later. For now we keep it as a straightforward continuous measure that is easy to explain to a non technical audience.
 
 ```{r}
 
