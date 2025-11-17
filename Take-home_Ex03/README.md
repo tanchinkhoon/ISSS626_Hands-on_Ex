@@ -85,7 +85,7 @@ Multiple model predictors
 * CNT_BUS_350
 * CNT_PRIMARY_1000
 
-## Section 8 Hedonic Pricing Modelling
+## Section 9 Hedonic Pricing Modelling
 
 1. Prepare a correlation matrix of the predictors using corrplot AOE order upper triangle
 2. Fit the full Multiple model on RESALE_PRICE with the exact 15 predictors
