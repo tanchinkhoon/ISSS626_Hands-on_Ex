@@ -4,13 +4,10 @@ This project provides a complete, reproducible Quarto workflow for modeling HDB 
 
 ## Folder layout
 
-1. take home ex03.qmd Quarto source
+1. take-home_ex03.qmd Quarto source
 2. `data/aspatial` folder for CSV and lookups
 3. `data/geospatial` folder for sf layers
 4. `data/rds` for RDS artefacts
-5. figs folder for saved images, plots, and maps
-6. outputs folder for tables and intermediate files
-7. HTML folder for the rendered site if used
 
 ## Software and packages
 
@@ -52,9 +49,9 @@ Distances are in metres. Counts use buffers of 350 metres or 1000 metres as stat
 ## Run order
 
 1. Open the project in RStudio
-2. Create folders data/aspatial, data/geospatial, and data/rds if missing
-3. Download the source data, as indicated in Table 1, and place the files in the correct folders
-4. Open take-home_ex03.qmd
+2. Create folders `data/aspatial`, `data/geospatial`, and `data/rds` if missing
+3. Download the source data, as indicated in Table 1 within the .qmd file, and place the files in the correct folders
+4. Open `take-home_ex03.qmd`
 5. Click Render or run the command below
 
 ```bash
