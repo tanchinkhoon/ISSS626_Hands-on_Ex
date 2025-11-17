@@ -1,4 +1,4 @@
-# Take home Ex03 README
+# Take-home Ex03 README
 
 This project provides a complete, reproducible Quarto workflow to model HDB resale prices in Singapore with global and local spatial methods. The study builds a Multiple Linear Regression hedonic model and a Geographically Weighted model to examine localised effects. Outputs include publication grade regression tables, diagnostics, residual spatial tests, and cartographic products such as Local R squared and coefficient maps. All computation runs from one Quarto source using relative paths. Spatial operations use EPSG 3414 with metre units.
 
