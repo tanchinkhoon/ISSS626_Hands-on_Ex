@@ -435,7 +435,7 @@ window.Quarto = {
   <li><a href="#rq5-local-effects-and-practical-implications" id="toc-rq5-local-effects-and-practical-implications" class="nav-link" data-scroll-target="#rq5-local-effects-and-practical-implications"><span class="header-section-number">11.5</span> RQ5: Local effects and practical implications</a></li>
   </ul></li>
   <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion"><span class="header-section-number">12</span> Conclusion</a></li>
-  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references"><span class="header-section-number">13</span> References:</a></li>
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references"><span class="header-section-number">13</span> References</a></li>
   </ul>
 </nav>
     </div>
@@ -619,16 +619,16 @@ window.Quarto = {
 <span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>  progress,     <span class="co"># simple progress bars for batch jobs</span></span>
 <span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>  knitr,        <span class="co"># report tables</span></span>
 <span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>  kableExtra,   <span class="co"># table styling for HTML output</span></span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>  purrr,</span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>  stringr,</span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>  Hmisc,</span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>  ggpubr,</span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>  gtsummary,</span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>  RColorBrewer, </span>
-<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>  see,</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>  purrr,        <span class="co"># functional programming mappers for list and data workflows</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>  stringr,      <span class="co"># consistent tools for string detection cleaning and formatting</span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>  Hmisc,        <span class="co"># regression utilities descriptive statistics and data preparation</span></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>  ggpubr,       <span class="co"># publication ready plots that extend ggplot2</span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>  gtsummary,    <span class="co"># regression and summary tables for reporting models</span></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>  RColorBrewer, <span class="co"># curated colour palettes for maps and statistical graphics</span></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>  see,          <span class="co"># visual diagnostics for checking model assumptions</span></span>
 <span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>  performance,  <span class="co"># used to test multicollinearity.</span></span>
 <span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>  olsrr,        <span class="co"># building OLS and performing diagnostics tests </span></span>
-<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>  qqplotr,</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>  qqplotr,      <span class="co"># quantile quantile plots for residual and distribution checks</span></span>
 <span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>  corrplot      <span class="co"># multivariate data visualisation and analysis</span></span>
 <span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a></span>
@@ -685,29 +685,29 @@ window.Quarto = {
 <span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a><span class="co"># path to the cache file</span></span>
 <span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>cache_path <span class="ot">&lt;-</span> <span class="st">"data/aspatial/geocode_hdb_cache.csv"</span> <span class="co"># csv cache for address results</span></span>
 <span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="fu">file.exists</span>(cache_path)) {                      <span class="co"># use cache if it exists</span></span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="fu">file.exists</span>(cache_path)) {            <span class="co"># use cache if it exists</span></span>
 <span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>  hdb_cache <span class="ot">&lt;-</span> readr<span class="sc">::</span><span class="fu">read_csv</span>(cache_path, <span class="at">show_col_types =</span> <span class="cn">FALSE</span>)   <span class="co"># load cached coordinates</span></span>
-<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>} <span class="cf">else</span> {                                            <span class="co"># otherwise build the cache now</span></span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>} <span class="cf">else</span> {                                  <span class="co"># otherwise build the cache now</span></span>
 <span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>  uniq_addr <span class="ot">&lt;-</span> HDBresale <span class="sc">%&gt;%</span>                        <span class="co"># start from filtered HDB table</span></span>
-<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">distinct</span>(block, street_name)             <span class="co"># keep unique block street pairs</span></span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>  uniq_addr <span class="ot">&lt;-</span> HDBresale <span class="sc">%&gt;%</span>              <span class="co"># start from filtered HDB table</span></span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">distinct</span>(block, street_name)   <span class="co"># keep unique block street pairs</span></span>
 <span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>  pb <span class="ot">&lt;-</span> progress<span class="sc">::</span>progress_bar<span class="sc">$</span><span class="fu">new</span>(<span class="at">total =</span> <span class="fu">nrow</span>(uniq_addr)) <span class="co"># progress indicator</span></span>
 <span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a>  hdb_cache <span class="ot">&lt;-</span> uniq_addr <span class="sc">%&gt;%</span>                        <span class="co"># begin cache pipeline</span></span>
-<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">mutate</span>(                                  <span class="co"># add a list column named geo</span></span>
-<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a>      <span class="at">geo =</span> purrr<span class="sc">::</span><span class="fu">map2</span>(                            <span class="co"># call function for each pair</span></span>
-<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a>        block,                                      <span class="co"># first argument is block</span></span>
-<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a>        street_name,                                <span class="co"># second argument is street name</span></span>
-<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a>        <span class="cf">function</span>(.x, .y) {                          <span class="co"># inline function wrapper</span></span>
-<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a>          pb<span class="sc">$</span><span class="fu">tick</span>()                                 <span class="co"># advance the progress bar</span></span>
-<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a>          <span class="fu">geocode_addr</span>(.x, .y)                      <span class="co"># call OneMap geocoder and return tibble</span></span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a>  hdb_cache <span class="ot">&lt;-</span> uniq_addr <span class="sc">%&gt;%</span>              <span class="co"># begin cache pipeline</span></span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">mutate</span>(                        <span class="co"># add a list column named geo</span></span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a>      <span class="at">geo =</span> purrr<span class="sc">::</span><span class="fu">map2</span>(                  <span class="co"># call function for each pair</span></span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a>        block,                            <span class="co"># first argument is block</span></span>
+<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a>        street_name,                      <span class="co"># second argument is street name</span></span>
+<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a>        <span class="cf">function</span>(.x, .y) {                <span class="co"># inline function wrapper</span></span>
+<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a>          pb<span class="sc">$</span><span class="fu">tick</span>()                       <span class="co"># advance the progress bar</span></span>
+<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a>          <span class="fu">geocode_addr</span>(.x, .y)            <span class="co"># call OneMap geocoder and return tibble</span></span>
 <span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a>        }</span>
 <span id="cb4-36"><a href="#cb4-36" aria-hidden="true" tabindex="-1"></a>      )</span>
-<span id="cb4-37"><a href="#cb4-37" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">%&gt;%</span>                                           <span class="co"># end mutate and continue pipe</span></span>
-<span id="cb4-38"><a href="#cb4-38" aria-hidden="true" tabindex="-1"></a>    tidyr<span class="sc">::</span><span class="fu">unnest</span>(<span class="at">cols =</span> <span class="fu">c</span>(geo))                    <span class="co"># expand LATITUDE and LONGITUDE columns</span></span>
+<span id="cb4-37"><a href="#cb4-37" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">%&gt;%</span>                                 <span class="co"># end mutate and continue pipe</span></span>
+<span id="cb4-38"><a href="#cb4-38" aria-hidden="true" tabindex="-1"></a>    tidyr<span class="sc">::</span><span class="fu">unnest</span>(<span class="at">cols =</span> <span class="fu">c</span>(geo))          <span class="co"># expand LATITUDE and LONGITUDE columns</span></span>
 <span id="cb4-39"><a href="#cb4-39" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-40"><a href="#cb4-40" aria-hidden="true" tabindex="-1"></a>  readr<span class="sc">::</span><span class="fu">write_csv</span>(hdb_cache, cache_path)           <span class="co"># save cache to disk for reuse</span></span>
+<span id="cb4-40"><a href="#cb4-40" aria-hidden="true" tabindex="-1"></a>  readr<span class="sc">::</span><span class="fu">write_csv</span>(hdb_cache, cache_path) <span class="co"># save cache to disk for reuse</span></span>
 <span id="cb4-41"><a href="#cb4-41" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
@@ -803,15 +803,15 @@ PROJCRS["SVY21 / Singapore TM",
 <h4 data-number="5.2.2" class="anchored" data-anchor-id="onemap-postcode-lookup-and-clean"><span class="header-section-number">5.2.2</span> OneMap postcode lookup and clean</h4>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># query OneMap by postcode to get X Y in SVY21</span></span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>om_url <span class="ot">&lt;-</span> <span class="st">"https://onemap.gov.sg/api/common/elastic/search"</span>                              <span class="co"># endpoint</span></span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>postcodes <span class="ot">&lt;-</span> <span class="fu">unique</span>(primary_schools<span class="sc">$</span>postal_code)                                         <span class="co"># unique codes</span></span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>found_xy <span class="ot">&lt;-</span> tibble<span class="sc">::</span><span class="fu">tibble</span>()                                                             <span class="co"># holder</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>om_url <span class="ot">&lt;-</span> <span class="st">"https://onemap.gov.sg/api/common/elastic/search"</span>    <span class="co"># endpoint</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>postcodes <span class="ot">&lt;-</span> <span class="fu">unique</span>(primary_schools<span class="sc">$</span>postal_code)               <span class="co"># unique codes</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>found_xy <span class="ot">&lt;-</span> tibble<span class="sc">::</span><span class="fu">tibble</span>()                                   <span class="co"># holder</span></span>
 <span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (pc <span class="cf">in</span> postcodes) {                                                                  <span class="co"># loop codes</span></span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>  q <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">searchVal =</span> pc, <span class="at">returnGeom =</span> <span class="st">"Y"</span>, <span class="at">getAddrDetails =</span> <span class="st">"Y"</span>, <span class="at">pageNum =</span> <span class="st">"1"</span>)       <span class="co"># params</span></span>
-<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>  js <span class="ot">&lt;-</span> httr<span class="sc">::</span><span class="fu">content</span>(httr<span class="sc">::</span><span class="fu">GET</span>(om_url, <span class="at">query =</span> q))                                      <span class="co"># request parse</span></span>
-<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.null</span>(js<span class="sc">$</span>found) <span class="sc">&amp;&amp;</span> js<span class="sc">$</span>found <span class="sc">&gt;</span> <span class="dv">0</span>) {                                              <span class="co"># keep matches</span></span>
-<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>    df <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(js<span class="sc">$</span>results, <span class="at">stringsAsFactors =</span> <span class="cn">FALSE</span>)                            <span class="co"># to data frame</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (pc <span class="cf">in</span> postcodes) {                                        <span class="co"># loop codes</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>  q <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">searchVal =</span> pc, <span class="at">returnGeom =</span> <span class="st">"Y"</span>, <span class="at">getAddrDetails =</span> <span class="st">"Y"</span>, <span class="at">pageNum =</span> <span class="st">"1"</span>)  <span class="co"># params</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>  js <span class="ot">&lt;-</span> httr<span class="sc">::</span><span class="fu">content</span>(httr<span class="sc">::</span><span class="fu">GET</span>(om_url, <span class="at">query =</span> q))            <span class="co"># request parse</span></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.null</span>(js<span class="sc">$</span>found) <span class="sc">&amp;&amp;</span> js<span class="sc">$</span>found <span class="sc">&gt;</span> <span class="dv">0</span>) {                    <span class="co"># keep matches</span></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>    df <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(js<span class="sc">$</span>results, <span class="at">stringsAsFactors =</span> <span class="cn">FALSE</span>)  <span class="co"># to data frame</span></span>
 <span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>    found_xy <span class="ot">&lt;-</span> dplyr<span class="sc">::</span><span class="fu">bind_rows</span>(found_xy, tibble<span class="sc">::</span><span class="fu">as_tibble</span>(df[, <span class="fu">c</span>(<span class="st">"POSTAL"</span>,<span class="st">"X"</span>,<span class="st">"Y"</span>)])) <span class="co"># keep fields</span></span>
 <span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>  }</span>
 <span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>}</span>
@@ -819,8 +819,8 @@ PROJCRS["SVY21 / Singapore TM",
 <span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a><span class="co"># coerce and keep one row per code</span></span>
 <span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>found_xy_clean <span class="ot">&lt;-</span> found_xy <span class="sc">%&gt;%</span></span>
 <span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">mutate</span>(<span class="at">POSTAL =</span> <span class="fu">as.character</span>(POSTAL), <span class="at">X =</span> <span class="fu">as.numeric</span>(X), <span class="at">Y =</span> <span class="fu">as.numeric</span>(Y)) <span class="sc">%&gt;%</span> <span class="co"># numeric</span></span>
-<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(X), <span class="sc">!</span><span class="fu">is.na</span>(Y)) <span class="sc">%&gt;%</span>                                                <span class="co"># drop NA</span></span>
-<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">group_by</span>(POSTAL) <span class="sc">%&gt;%</span> dplyr<span class="sc">::</span><span class="fu">slice_head</span>(<span class="at">n =</span> <span class="dv">1</span>) <span class="sc">%&gt;%</span> dplyr<span class="sc">::</span><span class="fu">ungroup</span>()              <span class="co"># one per code</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(X), <span class="sc">!</span><span class="fu">is.na</span>(Y)) <span class="sc">%&gt;%</span>                      <span class="co"># drop NA</span></span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">group_by</span>(POSTAL) <span class="sc">%&gt;%</span> dplyr<span class="sc">::</span><span class="fu">slice_head</span>(<span class="at">n =</span> <span class="dv">1</span>) <span class="sc">%&gt;%</span> dplyr<span class="sc">::</span><span class="fu">ungroup</span>() <span class="co"># one per code</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
 <section id="join-coordinates-and-build-point-geometry" class="level4" data-number="5.2.3">
@@ -828,7 +828,7 @@ PROJCRS["SVY21 / Singapore TM",
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># attach X Y to school table</span></span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>primary_schools_xy <span class="ot">&lt;-</span> primary_schools <span class="sc">%&gt;%</span></span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">left_join</span>(found_xy_clean, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"postal_code"</span> <span class="ot">=</span> <span class="st">"POSTAL"</span>))                       <span class="co"># join coords</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">left_join</span>(found_xy_clean, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"postal_code"</span> <span class="ot">=</span> <span class="st">"POSTAL"</span>))   <span class="co"># join coords</span></span>
 <span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="co"># convert to sf POINT in SVY21</span></span>
 <span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>primary_schools_sf <span class="ot">&lt;-</span> sf<span class="sc">::</span><span class="fu">st_as_sf</span>(primary_schools_xy, <span class="at">coords =</span> <span class="fu">c</span>(<span class="st">"X"</span>,<span class="st">"Y"</span>), <span class="at">crs =</span> <span class="dv">3414</span>)    <span class="co"># build POINT</span></span>
@@ -1015,7 +1015,7 @@ $ geometry     &lt;POINT [m]&gt; POINT (30036.29 38360.76), POINT (29283.45 3851
 <span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">AGE_2025 =</span> <span class="fu">suppressWarnings</span>(   <span class="co"># new numeric field        </span></span>
 <span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>      <span class="fu">as.numeric</span>(analysis_year <span class="sc">-</span> <span class="fu">as.integer</span>(lease_commence_date))                </span>
 <span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>    ),                                                                          </span>
-<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">AGE_2025 =</span> dplyr<span class="sc">::</span><span class="fu">if_else</span>(AGE_2025 <span class="sc">&gt;=</span> <span class="dv">0</span>, AGE_2025, <span class="fu">as.numeric</span>(<span class="cn">NA</span>))      <span class="co"># guard</span></span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">AGE_2025 =</span> dplyr<span class="sc">::</span><span class="fu">if_else</span>(AGE_2025 <span class="sc">&gt;=</span> <span class="dv">0</span>, AGE_2025, <span class="fu">as.numeric</span>(<span class="cn">NA</span>)) <span class="co"># guard</span></span>
 <span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>  )</span>
 <span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a><span class="co"># validate                                                                         </span></span>
@@ -1317,7 +1317,7 @@ $ geometry &lt;POINT [m]&gt; POINT (35565.66 41659.52), POINT (21439.91 31253.63
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>HDBresale_sf <span class="ot">&lt;-</span> HDBresale_sf <span class="sc">%&gt;%</span></span>
 <span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">mutate</span>(<span class="at">DIST_MRT_M =</span> <span class="fu">nearest_distance_m</span>(geometry, mrt_pt))</span>
 <span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Quick check and inspection </span></span>
+<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a><span class="co"># quick check and inspection </span></span>
 <span id="cb40-5"><a href="#cb40-5" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(HDBresale_sf<span class="sc">$</span>DIST_MRT_M)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code> num [1:8679] 718 731 718 384 731 ...</code></pre>
@@ -1331,7 +1331,7 @@ $ geometry &lt;POINT [m]&gt; POINT (35565.66 41659.52), POINT (21439.91 31253.63
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>HDBresale_sf <span class="ot">&lt;-</span> HDBresale_sf <span class="sc">%&gt;%</span></span>
 <span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">mutate</span>(<span class="at">DIST_PARK_M =</span> <span class="fu">nearest_distance_m</span>(geometry, parks_pt))</span>
 <span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Quick check and inspection</span></span>
+<span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a><span class="co"># quick check and inspection</span></span>
 <span id="cb42-5"><a href="#cb42-5" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(HDBresale_sf<span class="sc">$</span>DIST_PARK_M)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code> num [1:8679] 426 636 426 356 636 ...</code></pre>
@@ -1345,7 +1345,7 @@ $ geometry &lt;POINT [m]&gt; POINT (35565.66 41659.52), POINT (21439.91 31253.63
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>HDBresale_sf <span class="ot">&lt;-</span> HDBresale_sf <span class="sc">%&gt;%</span></span>
 <span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">mutate</span>(<span class="at">DIST_ELDERCARE_M =</span> <span class="fu">nearest_distance_m</span>(geometry, eldercare_pt))</span>
 <span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb44-4"><a href="#cb44-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Quick check and inspection</span></span>
+<span id="cb44-4"><a href="#cb44-4" aria-hidden="true" tabindex="-1"></a><span class="co"># quick check and inspection</span></span>
 <span id="cb44-5"><a href="#cb44-5" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(HDBresale_sf<span class="sc">$</span>DIST_ELDERCARE_M)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code> num [1:8679] 260 255 260 398 255 ...</code></pre>
@@ -1359,7 +1359,7 @@ $ geometry &lt;POINT [m]&gt; POINT (35565.66 41659.52), POINT (21439.91 31253.63
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a>HDBresale_sf <span class="ot">&lt;-</span> HDBresale_sf <span class="sc">%&gt;%</span></span>
 <span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">mutate</span>(<span class="at">DIST_HAWKER_M =</span> <span class="fu">nearest_distance_m</span>(geometry, hawker_pt))</span>
 <span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb46-4"><a href="#cb46-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Quick check and inspection</span></span>
+<span id="cb46-4"><a href="#cb46-4" aria-hidden="true" tabindex="-1"></a><span class="co"># quick check and inspection</span></span>
 <span id="cb46-5"><a href="#cb46-5" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(HDBresale_sf<span class="sc">$</span>DIST_HAWKER_M)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code> num [1:8679] 389 381 389 132 381 ...</code></pre>
@@ -1373,7 +1373,7 @@ $ geometry &lt;POINT [m]&gt; POINT (35565.66 41659.52), POINT (21439.91 31253.63
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb48"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a>HDBresale_sf <span class="ot">&lt;-</span> HDBresale_sf <span class="sc">%&gt;%</span></span>
 <span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">mutate</span>(<span class="at">DIST_SUPERMKT_M =</span> <span class="fu">nearest_distance_m</span>(geometry, supermarket_pt))</span>
 <span id="cb48-3"><a href="#cb48-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb48-4"><a href="#cb48-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Quick check and inspection</span></span>
+<span id="cb48-4"><a href="#cb48-4" aria-hidden="true" tabindex="-1"></a><span class="co"># quick check and inspection</span></span>
 <span id="cb48-5"><a href="#cb48-5" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(HDBresale_sf<span class="sc">$</span>DIST_SUPERMKT_M)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code> num [1:8679] 285 314 285 186 314 ...</code></pre>
@@ -1387,7 +1387,7 @@ $ geometry &lt;POINT [m]&gt; POINT (35565.66 41659.52), POINT (21439.91 31253.63
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb50"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a>HDBresale_sf <span class="ot">&lt;-</span> HDBresale_sf <span class="sc">%&gt;%</span></span>
 <span id="cb50-2"><a href="#cb50-2" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">mutate</span>(<span class="at">DIST_MALL_M =</span> <span class="fu">nearest_distance_m</span>(geometry, mall_pt))</span>
 <span id="cb50-3"><a href="#cb50-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb50-4"><a href="#cb50-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Quick check and inspection</span></span>
+<span id="cb50-4"><a href="#cb50-4" aria-hidden="true" tabindex="-1"></a><span class="co"># quick check and inspection</span></span>
 <span id="cb50-5"><a href="#cb50-5" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(HDBresale_sf<span class="sc">$</span>DIST_MALL_M)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code> num [1:8679] 756 652 756 960 652 ...</code></pre>
@@ -1401,7 +1401,7 @@ $ geometry &lt;POINT [m]&gt; POINT (35565.66 41659.52), POINT (21439.91 31253.63
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb52"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a>HDBresale_sf <span class="ot">&lt;-</span> HDBresale_sf <span class="sc">%&gt;%</span></span>
 <span id="cb52-2"><a href="#cb52-2" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">mutate</span>(<span class="at">DIST_CBD_M =</span> <span class="fu">nearest_distance_m</span>(geometry, cbd_pt))</span>
 <span id="cb52-3"><a href="#cb52-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb52-4"><a href="#cb52-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Quick check and inspection</span></span>
+<span id="cb52-4"><a href="#cb52-4" aria-hidden="true" tabindex="-1"></a><span class="co"># quick check and inspection</span></span>
 <span id="cb52-5"><a href="#cb52-5" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(HDBresale_sf<span class="sc">$</span>DIST_CBD_M)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code> num [1:8679] 8486 8718 8486 9185 8718 ...</code></pre>
@@ -1410,12 +1410,12 @@ $ geometry &lt;POINT [m]&gt; POINT (35565.66 41659.52), POINT (21439.91 31253.63
 </section>
 <section id="proximity-to-elite-primary-schools" class="level4" data-number="6.3.9">
 <h4 data-number="6.3.9" class="anchored" data-anchor-id="proximity-to-elite-primary-schools"><span class="header-section-number">6.3.9</span> Proximity to elite primary schools</h4>
-<p>School prestige can affect price expectations for families with young children. We already derived an elite subset with twenty schools from the full primary list. We compute a continuous distance to the nearest elite school point. This gives a clear and interpretable number in meters that can be compared across towns. In later robustness checks, we may also include the distance to the nearest ordinary primary school to differentiate general access from prestige access. For now we focus on the prestige signal since that is more likely to be reflected in marginal willingness to pay.</p>
+<p>School prestige can affect price expectations for families with young children. We already derived an elite subset with twenty schools from the full primary list (Creative Campus, 2024). We compute a continuous distance to the nearest elite school point. This gives a clear and interpretable number in meters that can be compared across towns. In later robustness checks, we may also include the distance to the nearest ordinary primary school to differentiate general access from prestige access. For now we focus on the prestige signal since that is more likely to be reflected in marginal willingness to pay.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb54"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a>HDBresale_sf <span class="ot">&lt;-</span> HDBresale_sf <span class="sc">%&gt;%</span></span>
 <span id="cb54-2"><a href="#cb54-2" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">mutate</span>(<span class="at">DIST_ELITEPRI_M =</span> <span class="fu">nearest_distance_m</span>(geometry, elite_primary_pt))</span>
 <span id="cb54-3"><a href="#cb54-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb54-4"><a href="#cb54-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Quick check and inspection</span></span>
+<span id="cb54-4"><a href="#cb54-4" aria-hidden="true" tabindex="-1"></a><span class="co"># quick check and inspection</span></span>
 <span id="cb54-5"><a href="#cb54-5" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(HDBresale_sf<span class="sc">$</span>DIST_ELITEPRI_M)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code> num [1:8679] 2090 1390 2090 992 1390 ...</code></pre>
@@ -1435,7 +1435,7 @@ $ geometry &lt;POINT [m]&gt; POINT (35565.66 41659.52), POINT (21439.91 31253.63
 <span id="cb56-7"><a href="#cb56-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">CNT_BUS_350    =</span> <span class="fu">count_within_m</span>(geometry, busstop_pt,       RADIUS_SHORT)</span>
 <span id="cb56-8"><a href="#cb56-8" aria-hidden="true" tabindex="-1"></a>  )</span>
 <span id="cb56-9"><a href="#cb56-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb56-10"><a href="#cb56-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Quick check and inspection</span></span>
+<span id="cb56-10"><a href="#cb56-10" aria-hidden="true" tabindex="-1"></a><span class="co"># quick check and inspection</span></span>
 <span id="cb56-11"><a href="#cb56-11" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(HDBresale_sf<span class="sc">$</span>CNT_KINDER_350)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code> int [1:8679] 1 1 1 2 1 2 1 1 0 0 ...</code></pre>
@@ -1457,7 +1457,7 @@ $ geometry &lt;POINT [m]&gt; POINT (35565.66 41659.52), POINT (21439.91 31253.63
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb62"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a>HDBresale_sf <span class="ot">&lt;-</span> HDBresale_sf <span class="sc">%&gt;%</span></span>
 <span id="cb62-2"><a href="#cb62-2" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">mutate</span>(<span class="at">CNT_PRIMARY_1000 =</span> <span class="fu">count_within_m</span>(geometry, primary_pt, <span class="dv">1000</span>))</span>
 <span id="cb62-3"><a href="#cb62-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb62-4"><a href="#cb62-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Quick check and inspection</span></span>
+<span id="cb62-4"><a href="#cb62-4" aria-hidden="true" tabindex="-1"></a><span class="co"># quick check and inspection</span></span>
 <span id="cb62-5"><a href="#cb62-5" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(HDBresale_sf<span class="sc">$</span>CNT_PRIMARY_1000)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code> int [1:8679] 3 2 3 2 2 2 3 3 2 2 ...</code></pre>
@@ -1565,18 +1565,18 @@ $ geometry         &lt;POINT [m]&gt; POINT (30036.29 38360.76), POINT (29283.45 
  Max.   :19874   Max.   :2120.10   Max.   :2205.03   Max.   :3282.3  
  DIST_HAWKER_M     DIST_SUPERMKT_M      DIST_MALL_M      DIST_ELITEPRI_M   
  Min.   :  25.35   Min.   :   0.0003   Min.   :  39.14   Min.   :   74.37  
- 1st Qu.: 376.85   1st Qu.: 179.1599   1st Qu.: 378.70   1st Qu.: 1312.01  
+ 1st Qu.: 376.85   1st Qu.: 179.1599   1st Qu.: 378.70   1st Qu.: 1309.14  
  Median : 647.65   Median : 278.4398   Median : 600.73   Median : 2412.29  
- Mean   : 730.12   Mean   : 308.4312   Mean   : 664.70   Mean   : 3551.73  
+ Mean   : 730.12   Mean   : 308.4312   Mean   : 664.70   Mean   : 3551.32  
  3rd Qu.: 961.37   3rd Qu.: 397.2718   3rd Qu.: 886.89   3rd Qu.: 4997.38  
  Max.   :2500.14   Max.   :1415.3217   Max.   :2446.77   Max.   :11490.86  
  CNT_KINDER_350   CNT_CHILD_350     CNT_BUS_350     CNT_PRIMARY_1000
- Min.   :0.0000   Min.   : 0.000   Min.   : 0.000   Min.   :0.00    
- 1st Qu.:0.0000   1st Qu.: 3.000   1st Qu.: 6.000   1st Qu.:2.00    
- Median :1.0000   Median : 4.000   Median : 8.000   Median :3.00    
- Mean   :0.9289   Mean   : 4.653   Mean   : 7.985   Mean   :3.04    
- 3rd Qu.:1.0000   3rd Qu.: 6.000   3rd Qu.:10.000   3rd Qu.:4.00    
- Max.   :8.0000   Max.   :19.000   Max.   :19.000   Max.   :9.00    </code></pre>
+ Min.   :0.0000   Min.   : 0.000   Min.   : 0.000   Min.   :0.000   
+ 1st Qu.:0.0000   1st Qu.: 3.000   1st Qu.: 6.000   1st Qu.:2.000   
+ Median :1.0000   Median : 4.000   Median : 8.000   Median :3.000   
+ Mean   :0.9289   Mean   : 4.653   Mean   : 7.985   Mean   :3.035   
+ 3rd Qu.:1.0000   3rd Qu.: 6.000   3rd Qu.:10.000   3rd Qu.:4.000   
+ Max.   :8.0000   Max.   :19.000   Max.   :19.000   Max.   :9.000   </code></pre>
 </div>
 </div>
 <section id="eda-using-statistical-graphics" class="level4" data-number="7.2.1">
@@ -1668,7 +1668,7 @@ $ geometry         &lt;POINT [m]&gt; POINT (30036.29 38360.76), POINT (29283.45 
 <h2 data-number="8" class="anchored" data-anchor-id="exploratory-data-spatial-analysis-edsa"><span class="header-section-number">8</span> Exploratory Data Spatial Analysis (EDSA)</h2>
 <p>Spatial exploration starts with maps. Because we have a dense point sample, it is often clearer to map quantiles rather than raw values. The first map shows log price in five quantile bands so central and suburban gradients can be seen quickly. The second map shows the distance to the CBD in five quantiles to compare spatial patterns. Keeping a consistent theme and coordinate system makes visual comparison easier. These first views often reveal data issues such as points falling in the sea or outside planning areas which we can then fix before running statistics that assume clean geometry.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb72"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb72-1"><a href="#cb72-1" aria-hidden="true" tabindex="-1"></a><span class="co"># use tmap in static mode</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb72"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb72-1"><a href="#cb72-1" aria-hidden="true" tabindex="-1"></a><span class="co"># use tmap in static or view mode</span></span>
 <span id="cb72-2"><a href="#cb72-2" aria-hidden="true" tabindex="-1"></a><span class="fu">tmap_mode</span>(<span class="st">"plot"</span>)</span>
 <span id="cb72-3"><a href="#cb72-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb72-4"><a href="#cb72-4" aria-hidden="true" tabindex="-1"></a><span class="co"># 5 explicit colours for v4 (actual colours, not a palette name string)</span></span>
@@ -1783,11 +1783,11 @@ DIST_ELDERCARE_M    -0.126627904         0.026535546 -0.02503077  0.399274924
 DIST_HAWKER_M       -0.139778703         0.029158714 -0.03004163  0.344602149
 DIST_SUPERMKT_M     -0.038831406         0.045386897 -0.04479530  0.016896068
 DIST_MALL_M         -0.011655741        -0.084027939  0.08562340 -0.225004071
-DIST_ELITEPRI_M     -0.129972260         0.120900782 -0.12009114  0.705061750
+DIST_ELITEPRI_M     -0.129886278         0.121034295 -0.12022306  0.704999426
 CNT_KINDER_350       0.002303374        -0.161439591  0.16082083 -0.004500193
 CNT_CHILD_350        0.019279142         0.021688788 -0.02287158  0.113950711
 CNT_BUS_350         -0.032800232         0.009937946 -0.01054252  0.183472813
-CNT_PRIMARY_1000    -0.096965172        -0.031512373  0.03079923  0.260404601
+CNT_PRIMARY_1000    -0.097105890        -0.034480488  0.03375318  0.255597435
                        DIST_MRT_M DIST_PARK_M DIST_ELDERCARE_M DIST_HAWKER_M
 FLOOR_LEVEL         -0.1077131843 -0.05198686      -0.12662790   -0.13977870
 REMAINING_LEASE_MTH  0.0256770139  0.11101453       0.02653555    0.02915871
@@ -1799,43 +1799,43 @@ DIST_ELDERCARE_M     0.1067668594 -0.03338244       1.00000000    0.13245089
 DIST_HAWKER_M        0.0127721005  0.11819275       0.13245089    1.00000000
 DIST_SUPERMKT_M      0.1765673011 -0.11986959       0.03450565   -0.02562024
 DIST_MALL_M          0.3388069011 -0.04258508       0.02584431   -0.15787007
-DIST_ELITEPRI_M     -0.0001624268  0.23282594       0.35573127    0.23130821
+DIST_ELITEPRI_M     -0.0003027221  0.23279408       0.35567522    0.23144739
 CNT_KINDER_350      -0.0592377617  0.02556129       0.03447085    0.06446977
 CNT_CHILD_350       -0.1840478956  0.16796939      -0.02019895    0.10158066
 CNT_BUS_350         -0.0012617027  0.12903762       0.01914944   -0.01850288
-CNT_PRIMARY_1000    -0.2816911139  0.23296458      -0.08188842    0.06737123
+CNT_PRIMARY_1000    -0.2818603425  0.23650596      -0.08736091    0.06696302
                     DIST_SUPERMKT_M DIST_MALL_M DIST_ELITEPRI_M CNT_KINDER_350
-FLOOR_LEVEL             -0.03883141 -0.01165574   -0.1299722595    0.002303374
-REMAINING_LEASE_MTH      0.04538690 -0.08402794    0.1209007817   -0.161439591
-AGE_2025                -0.04479530  0.08562340   -0.1200911403    0.160820834
-DIST_CBD_M               0.01689607 -0.22500407    0.7050617496   -0.004500193
-DIST_MRT_M               0.17656730  0.33880690   -0.0001624268   -0.059237762
-DIST_PARK_M             -0.11986959 -0.04258508    0.2328259410    0.025561293
-DIST_ELDERCARE_M         0.03450565  0.02584431    0.3557312671    0.034470854
-DIST_HAWKER_M           -0.02562024 -0.15787007    0.2313082059    0.064469774
-DIST_SUPERMKT_M          1.00000000  0.20820232   -0.0677967866   -0.118708737
-DIST_MALL_M              0.20820232  1.00000000   -0.2732240341   -0.050023131
-DIST_ELITEPRI_M         -0.06779679 -0.27322403    1.0000000000   -0.047414174
-CNT_KINDER_350          -0.11870874 -0.05002313   -0.0474141744    1.000000000
-CNT_CHILD_350           -0.23729483 -0.26179038    0.0727460753    0.471435322
-CNT_BUS_350             -0.08543510 -0.23892133    0.0551058117    0.072713779
-CNT_PRIMARY_1000        -0.17782225 -0.35451228    0.1335564522    0.033401170
+FLOOR_LEVEL             -0.03883141 -0.01165574   -0.1298862776    0.002303374
+REMAINING_LEASE_MTH      0.04538690 -0.08402794    0.1210342950   -0.161439591
+AGE_2025                -0.04479530  0.08562340   -0.1202230592    0.160820834
+DIST_CBD_M               0.01689607 -0.22500407    0.7049994260   -0.004500193
+DIST_MRT_M               0.17656730  0.33880690   -0.0003027221   -0.059237762
+DIST_PARK_M             -0.11986959 -0.04258508    0.2327940782    0.025561293
+DIST_ELDERCARE_M         0.03450565  0.02584431    0.3556752155    0.034470854
+DIST_HAWKER_M           -0.02562024 -0.15787007    0.2314473850    0.064469774
+DIST_SUPERMKT_M          1.00000000  0.20820232   -0.0678208557   -0.118708737
+DIST_MALL_M              0.20820232  1.00000000   -0.2732747514   -0.050023131
+DIST_ELITEPRI_M         -0.06782086 -0.27327475    1.0000000000   -0.047433701
+CNT_KINDER_350          -0.11870874 -0.05002313   -0.0474337012    1.000000000
+CNT_CHILD_350           -0.23729483 -0.26179038    0.0726914082    0.471435322
+CNT_BUS_350             -0.08543510 -0.23892133    0.0551085410    0.072713779
+CNT_PRIMARY_1000        -0.17673230 -0.35350215    0.1276104174    0.031506480
                     CNT_CHILD_350  CNT_BUS_350 CNT_PRIMARY_1000
-FLOOR_LEVEL            0.01927914 -0.032800232      -0.09696517
-REMAINING_LEASE_MTH    0.02168879  0.009937946      -0.03151237
-AGE_2025              -0.02287158 -0.010542525       0.03079923
-DIST_CBD_M             0.11395071  0.183472813       0.26040460
-DIST_MRT_M            -0.18404790 -0.001261703      -0.28169111
-DIST_PARK_M            0.16796939  0.129037619       0.23296458
-DIST_ELDERCARE_M      -0.02019895  0.019149444      -0.08188842
-DIST_HAWKER_M          0.10158066 -0.018502881       0.06737123
-DIST_SUPERMKT_M       -0.23729483 -0.085435098      -0.17782225
-DIST_MALL_M           -0.26179038 -0.238921335      -0.35451228
-DIST_ELITEPRI_M        0.07274608  0.055105812       0.13355645
-CNT_KINDER_350         0.47143532  0.072713779       0.03340117
-CNT_CHILD_350          1.00000000  0.240766976       0.31886264
-CNT_BUS_350            0.24076698  1.000000000       0.21454825
-CNT_PRIMARY_1000       0.31886264  0.214548250       1.00000000</code></pre>
+FLOOR_LEVEL            0.01927914 -0.032800232      -0.09710589
+REMAINING_LEASE_MTH    0.02168879  0.009937946      -0.03448049
+AGE_2025              -0.02287158 -0.010542525       0.03375318
+DIST_CBD_M             0.11395071  0.183472813       0.25559744
+DIST_MRT_M            -0.18404790 -0.001261703      -0.28186034
+DIST_PARK_M            0.16796939  0.129037619       0.23650596
+DIST_ELDERCARE_M      -0.02019895  0.019149444      -0.08736091
+DIST_HAWKER_M          0.10158066 -0.018502881       0.06696302
+DIST_SUPERMKT_M       -0.23729483 -0.085435098      -0.17673230
+DIST_MALL_M           -0.26179038 -0.238921335      -0.35350215
+DIST_ELITEPRI_M        0.07269141  0.055108541       0.12761042
+CNT_KINDER_350         0.47143532  0.072713779       0.03150648
+CNT_CHILD_350          1.00000000  0.240766976       0.31799871
+CNT_BUS_350            0.24076698  1.000000000       0.21111312
+CNT_PRIMARY_1000       0.31799871  0.211113122       1.00000000</code></pre>
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb77"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb77-1"><a href="#cb77-1" aria-hidden="true" tabindex="-1"></a><span class="co"># visualise the matrix with a compact upper triangle layout</span></span>
 <span id="cb77-2"><a href="#cb77-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(corrplot)       <span class="co"># load correlation plot package</span></span>
@@ -1883,11 +1883,11 @@ CNT_PRIMARY_1000       0.31886264  0.214548250       1.00000000</code></pre>
 <div class="cell-output cell-output-stdout">
 <pre><code>                              Model Summary                                
 --------------------------------------------------------------------------
-R                           0.873       RMSE                    78436.147 
-R-Squared                   0.761       MSE                6152229192.516 
-Adj. R-Squared              0.761       Coef. Var                  11.675 
-Pred R-Squared              0.761       AIC                    220289.292 
-MAE                     60536.435       SBC                    220409.459 
+R                           0.873       RMSE                    78472.898 
+R-Squared                   0.761       MSE                6157995764.380 
+Adj. R-Squared              0.761       Coef. Var                  11.680 
+Pred R-Squared              0.760       AIC                    220297.423 
+MAE                     60554.669       SBC                    220417.591 
 --------------------------------------------------------------------------
  RMSE: Root Mean Square Error 
  MSE: Mean Square Error 
@@ -1900,31 +1900,31 @@ MAE                     60536.435       SBC                    220409.459
                            Sum of                                                         
                           Squares          DF           Mean Square       F          Sig. 
 ------------------------------------------------------------------------------------------
-Regression    170474487949160.562          15    11364965863277.371    1843.887    0.0000 
-Residual       53395197161850.531        8663        6163591961.428                       
-Total         223869685111011.094        8678                                             
+Regression    170424439871958.312          15    11361629324797.221    1841.619    0.0000 
+Residual       53445245239052.742        8663        6169369183.776                       
+Total         223869685111011.062        8678                                             
 ------------------------------------------------------------------------------------------
 
                                               Parameter Estimates                                               
 ---------------------------------------------------------------------------------------------------------------
               model           Beta    Std. Error    Std. Beta       t        Sig          lower          upper 
 ---------------------------------------------------------------------------------------------------------------
-        (Intercept)    1085699.508    221577.906                   4.900    0.000    651354.108    1520044.909 
-        FLOOR_LEVEL       5854.876       146.318        0.232     40.015    0.000      5568.059       6141.693 
-REMAINING_LEASE_MTH         -3.347       186.073       -0.004     -0.018    0.986      -368.095        361.400 
-           AGE_2025      -5438.039      2235.751       -0.477     -2.432    0.015     -9820.642      -1055.435 
-         DIST_CBD_M        -19.751         0.334       -0.540    -59.097    0.000       -20.406        -19.096 
-         DIST_MRT_M        -56.538         2.642       -0.131    -21.401    0.000       -61.716        -51.359 
-        DIST_PARK_M         -2.737         2.356       -0.007     -1.162    0.245        -7.355          1.881 
-   DIST_ELDERCARE_M        -10.786         1.528       -0.043     -7.059    0.000       -13.781         -7.791 
-      DIST_HAWKER_M        -25.306         1.998       -0.072    -12.667    0.000       -29.222        -21.390 
-    DIST_SUPERMKT_M         15.585         4.983        0.018      3.127    0.002         5.816         25.354 
-        DIST_MALL_M        -27.091         2.739       -0.063     -9.891    0.000       -32.460        -21.722 
-    DIST_ELITEPRI_M          1.886         0.422        0.035      4.474    0.000         1.060          2.713 
-     CNT_KINDER_350      10194.973       930.214        0.068     10.960    0.000      8371.532      12018.414 
-      CNT_CHILD_350      -1910.268       467.163       -0.027     -4.089    0.000     -2826.018       -994.518 
-        CNT_BUS_350       1477.776       320.857        0.026      4.606    0.000       848.820       2106.733 
-   CNT_PRIMARY_1000     -11971.804       662.369       -0.116    -18.074    0.000    -13270.204     -10673.404 
+        (Intercept)    1086256.873    221682.512                   4.900    0.000    651706.419    1520807.326 
+        FLOOR_LEVEL       5856.078       146.390        0.232     40.003    0.000      5569.120       6143.036 
+REMAINING_LEASE_MTH         -4.081       186.161       -0.004     -0.022    0.983      -369.001        360.838 
+           AGE_2025      -5443.397      2236.807       -0.478     -2.434    0.015     -9828.071      -1058.723 
+         DIST_CBD_M        -19.782         0.334       -0.541    -59.189    0.000       -20.437        -19.126 
+         DIST_MRT_M        -56.365         2.643       -0.131    -21.327    0.000       -61.546        -51.184 
+        DIST_PARK_M         -2.523         2.359       -0.006     -1.070    0.285        -7.147          2.101 
+   DIST_ELDERCARE_M        -10.812         1.529       -0.043     -7.071    0.000       -13.810         -7.815 
+      DIST_HAWKER_M        -25.236         1.998       -0.072    -12.628    0.000       -29.153        -21.318 
+    DIST_SUPERMKT_M         15.833         4.985        0.018      3.176    0.001         6.061         25.605 
+        DIST_MALL_M        -27.086         2.741       -0.063     -9.881    0.000       -32.460        -21.713 
+    DIST_ELITEPRI_M          1.870         0.422        0.035      4.432    0.000         1.043          2.698 
+     CNT_KINDER_350      10169.851       930.975        0.068     10.924    0.000      8344.919      11994.783 
+      CNT_CHILD_350      -1924.157       467.467       -0.027     -4.116    0.000     -2840.504      -1007.809 
+        CNT_BUS_350       1449.503       320.929        0.026      4.517    0.000       820.406       2078.600 
+   CNT_PRIMARY_1000     -11790.122       660.972       -0.115    -17.838    0.000    -13085.785     -10494.459 
 ---------------------------------------------------------------------------------------------------------------</code></pre>
 </div>
 </div>
@@ -1954,11 +1954,11 @@ REMAINING_LEASE_MTH         -3.347       186.073       -0.004     -0.018    0.98
 <div class="cell-output cell-output-stdout">
 <pre><code>                              Model Summary                                
 --------------------------------------------------------------------------
-R                           0.873       RMSE                    78442.260 
-R-Squared                   0.761       MSE                6153188118.823 
-Adj. R-Squared              0.761       Coef. Var                  11.675 
-Pred R-Squared              0.761       AIC                    220286.645 
-MAE                     60502.030       SBC                    220392.675 
+R                           0.872       RMSE                    78478.080 
+R-Squared                   0.761       MSE                6158808980.994 
+Adj. R-Squared              0.761       Coef. Var                  11.680 
+Pred R-Squared              0.760       AIC                    220294.569 
+MAE                     60522.924       SBC                    220400.599 
 --------------------------------------------------------------------------
  RMSE: Root Mean Square Error 
  MSE: Mean Square Error 
@@ -1971,29 +1971,29 @@ MAE                     60502.030       SBC                    220392.675
                            Sum of                                                         
                           Squares          DF           Mean Square       F          Sig. 
 ------------------------------------------------------------------------------------------
-Regression    170466165427744.312          13    13112781955980.332    2127.617    0.0000 
-Residual       53403519683266.719        8665        6163129796.107                       
-Total         223869685111011.031        8678                                             
+Regression    170417381964968.062          13    13109029381920.621    2125.067    0.0000 
+Residual       53452303146043.156        8665        6168759739.878                       
+Total         223869685111011.219        8678                                             
 ------------------------------------------------------------------------------------------
 
                                              Parameter Estimates                                              
 -------------------------------------------------------------------------------------------------------------
            model           Beta    Std. Error    Std. Beta       t        Sig           lower          upper 
 -------------------------------------------------------------------------------------------------------------
-     (Intercept)    1081180.563      5873.482                 184.078    0.000    1069667.142    1092693.984 
-     FLOOR_LEVEL       5853.856       146.301        0.232     40.013    0.000       5567.072       6140.640 
-        AGE_2025      -5390.455        65.359       -0.473    -82.474    0.000      -5518.574      -5262.336 
-      DIST_CBD_M        -19.831         0.327       -0.542    -60.650    0.000        -20.472        -19.190 
-      DIST_MRT_M        -56.780         2.633       -0.132    -21.561    0.000        -61.943        -51.618 
-DIST_ELDERCARE_M        -10.470         1.502       -0.041     -6.970    0.000        -13.415         -7.526 
-   DIST_HAWKER_M        -25.344         1.996       -0.072    -12.695    0.000        -29.258        -21.431 
- DIST_SUPERMKT_M         16.269         4.948        0.018      3.288    0.001          6.569         25.969 
-     DIST_MALL_M        -27.510         2.712       -0.064    -10.144    0.000        -32.826        -22.194 
- DIST_ELITEPRI_M          1.864         0.421        0.035      4.428    0.000          1.039          2.689 
-  CNT_KINDER_350      10196.160       930.157        0.068     10.962    0.000       8372.831      12019.489 
-   CNT_CHILD_350      -1953.087       465.630       -0.028     -4.195    0.000      -2865.833      -1040.342 
-     CNT_BUS_350       1461.605       320.541        0.026      4.560    0.000        833.269       2089.941 
-CNT_PRIMARY_1000     -12074.626       656.393       -0.117    -18.395    0.000     -13361.312     -10787.939 
+     (Intercept)    1080917.470      5877.211                 183.917    0.000    1069396.739    1092438.200 
+     FLOOR_LEVEL       5855.071       146.370        0.232     40.002    0.000       5568.151       6141.992 
+        AGE_2025      -5387.515        65.402       -0.473    -82.375    0.000      -5515.719      -5259.312 
+      DIST_CBD_M        -19.855         0.327       -0.543    -60.702    0.000        -20.496        -19.214 
+      DIST_MRT_M        -56.593         2.634       -0.132    -21.484    0.000        -61.757        -51.430 
+DIST_ELDERCARE_M        -10.525         1.504       -0.042     -6.999    0.000        -13.473         -7.577 
+   DIST_HAWKER_M        -25.272         1.997       -0.072    -12.654    0.000        -29.186        -21.357 
+ DIST_SUPERMKT_M         16.461         4.950        0.018      3.325    0.001          6.758         26.165 
+     DIST_MALL_M        -27.477         2.714       -0.064    -10.125    0.000        -32.796        -22.157 
+ DIST_ELITEPRI_M          1.849         0.421        0.035      4.389    0.000          1.023          2.675 
+  CNT_KINDER_350      10169.777       930.907        0.068     10.925    0.000       8344.978      11994.576 
+   CNT_CHILD_350      -1962.758       465.987       -0.028     -4.212    0.000      -2876.203      -1049.313 
+     CNT_BUS_350       1434.565       320.607        0.025      4.475    0.000        806.100       2063.030 
+CNT_PRIMARY_1000     -11889.305       654.393       -0.116    -18.168    0.000     -13172.070     -10606.539 
 -------------------------------------------------------------------------------------------------------------</code></pre>
 </div>
 </div>
@@ -2015,28 +2015,21 @@ CNT_PRIMARY_1000     -12074.626       656.393       -0.117    -18.395    0.000  
 <p>The variance inflation profile answers a simple question. Are predictors supplying distinct information or echoing each other? Values near one suggest little redundancy, while larger values warn of unstable estimates. The accompanying plot highlights any terms approaching concern thresholds and supports reasoned choices about retention in the revised equation.</p>
 <p>In the code chunk below, we test if there are sign of multicollinearity.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb82"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb82-1"><a href="#cb82-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Check for Multicollinearity</span></span>
-<span id="cb82-2"><a href="#cb82-2" aria-hidden="true" tabindex="-1"></a><span class="co"># check_collinearity(mlr1.full)</span></span>
-<span id="cb82-3"><a href="#cb82-3" aria-hidden="true" tabindex="-1"></a><span class="fu">ols_vif_tol</span>(mlr1.full)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>          Variables Tolerance      VIF
-1       FLOOR_LEVEL 0.8181507 1.222269
-2          AGE_2025 0.8358685 1.196360
-3        DIST_CBD_M 0.3442546 2.904827
-4        DIST_MRT_M 0.7342463 1.361941
-5  DIST_ELDERCARE_M 0.7827319 1.277577
-6     DIST_HAWKER_M 0.8473710 1.180121
-7   DIST_SUPERMKT_M 0.8912908 1.121968
-8       DIST_MALL_M 0.6896892 1.449928
-9   DIST_ELITEPRI_M 0.4456876 2.243724
-10   CNT_KINDER_350 0.7220808 1.384887
-11    CNT_CHILD_350 0.6249226 1.600198
-12      CNT_BUS_350 0.8543371 1.170498
-13 CNT_PRIMARY_1000 0.6810065 1.468415</code></pre>
-</div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb84"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb84-1"><a href="#cb84-1" aria-hidden="true" tabindex="-1"></a><span class="co"># plot the </span></span>
-<span id="cb84-2"><a href="#cb84-2" aria-hidden="true" tabindex="-1"></a>mlr1.vif <span class="ot">&lt;-</span> <span class="fu">check_collinearity</span>(mlr1.full)</span>
-<span id="cb84-3"><a href="#cb84-3" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(mlr1.vif)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb82"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb82-1"><a href="#cb82-1" aria-hidden="true" tabindex="-1"></a><span class="co"># compute VIF for multicollinearity</span></span>
+<span id="cb82-2"><a href="#cb82-2" aria-hidden="true" tabindex="-1"></a>mlr1.vif <span class="ot">=</span> <span class="fu">check_collinearity</span>(mlr1.full)</span>
+<span id="cb82-3"><a href="#cb82-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb82-4"><a href="#cb82-4" aria-hidden="true" tabindex="-1"></a><span class="co"># get the default collinearity plot as a ggplot object</span></span>
+<span id="cb82-5"><a href="#cb82-5" aria-hidden="true" tabindex="-1"></a>p_vif <span class="ot">=</span> <span class="fu">plot</span>(mlr1.vif)</span>
+<span id="cb82-6"><a href="#cb82-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb82-7"><a href="#cb82-7" aria-hidden="true" tabindex="-1"></a><span class="co"># rotate and space x axis labels</span></span>
+<span id="cb82-8"><a href="#cb82-8" aria-hidden="true" tabindex="-1"></a>p_vif <span class="sc">+</span></span>
+<span id="cb82-9"><a href="#cb82-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb82-10"><a href="#cb82-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.text.x =</span> <span class="fu">element_text</span>(</span>
+<span id="cb82-11"><a href="#cb82-11" aria-hidden="true" tabindex="-1"></a>      <span class="at">angle =</span> <span class="dv">45</span>,   <span class="co"># try 60 or 90 if you prefer</span></span>
+<span id="cb82-12"><a href="#cb82-12" aria-hidden="true" tabindex="-1"></a>      <span class="at">hjust =</span> <span class="dv">1</span>,</span>
+<span id="cb82-13"><a href="#cb82-13" aria-hidden="true" tabindex="-1"></a>      <span class="at">vjust =</span> <span class="dv">1</span></span>
+<span id="cb82-14"><a href="#cb82-14" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb82-15"><a href="#cb82-15" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -2044,6 +2037,8 @@ CNT_PRIMARY_1000     -12074.626       656.393       -0.117    -18.395    0.000  
 </figure>
 </div>
 </div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb83"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb83-1"><a href="#cb83-1" aria-hidden="true" tabindex="-1"></a><span class="co"># optional - use performance package</span></span>
+<span id="cb83-2"><a href="#cb83-2" aria-hidden="true" tabindex="-1"></a><span class="co"># check_collinearity(mlr1.full)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>The variance inflation results show that the revised model has very little multi collinearity and the coefficients should be numerically stable. All 13 predictors have variance inflation factor values between about 1.1 and 2.9, with tolerances above 0.34. Common rules of thumb treat variance inflation factor values below 5 as low concern and values above 10 as serious, so every predictor is well inside the safe zone.</p>
 <p>The 2 strongest correlations are reflected in DIST_CBD_M with variance inflation factor about 2.9 and DIST_ELITEPRI_M with variance inflation factor about 2.2. These confirm some shared spatial structure between centrality and distance to elite primary schools but still indicate that each variable contributes enough unique information to justify retention. All other predictors, including AGE_2025, FLOOR_LEVEL and the amenity counts, have variance inflation factor values close to 1, meaning they are largely independent once the others are controlled.</p>
@@ -2054,10 +2049,10 @@ CNT_PRIMARY_1000     -12074.626       656.393       -0.117    -18.395    0.000  
 <p>Residuals should show no systematic curve against fitted values if the linear form is appropriate. A smooth trend line provides a quick visual guide. A flat band supports the additive form, whereas pronounced curvature indicates that transformations or interactions may be warranted in later extensions.</p>
 <p>In the code chunk below, the <code>ols_plot_resid_fit()</code> of olsrr package is used to perform linearity assumption test.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb85"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb85-1"><a href="#cb85-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ols_plot_resid_fit(mlr1.full)</span></span>
-<span id="cb85-2"><a href="#cb85-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb85-3"><a href="#cb85-3" aria-hidden="true" tabindex="-1"></a><span class="fu">check_model</span>(mlr1.full,</span>
-<span id="cb85-4"><a href="#cb85-4" aria-hidden="true" tabindex="-1"></a>            <span class="at">check =</span> <span class="st">"linearity"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb84"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb84-1"><a href="#cb84-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ols_plot_resid_fit(mlr1.full)</span></span>
+<span id="cb84-2"><a href="#cb84-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb84-3"><a href="#cb84-3" aria-hidden="true" tabindex="-1"></a><span class="fu">check_model</span>(mlr1.full,</span>
+<span id="cb84-4"><a href="#cb84-4" aria-hidden="true" tabindex="-1"></a>            <span class="at">check =</span> <span class="st">"linearity"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -2074,7 +2069,7 @@ CNT_PRIMARY_1000     -12074.626       656.393       -0.117    -18.395    0.000  
 <p>Studentised residuals are tested and visualised to judge whether the normal approximation that underpins interval estimates is reasonable. The Q Q display should track the reference line except at the tails. When formal tests detect minor deviations in large samples, practical interpretation relies on the visual pattern and on the robustness of conclusions.</p>
 <p>In the code chunk below, <code>ols_plot_resid_hist()</code> of <strong>olssr</strong> package is used to perform normality assumption test on <code>mlr1.full</code> model.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb86"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb86-1"><a href="#cb86-1" aria-hidden="true" tabindex="-1"></a>olsrr<span class="sc">::</span><span class="fu">ols_plot_resid_hist</span>(mlr1.full)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb85"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb85-1"><a href="#cb85-1" aria-hidden="true" tabindex="-1"></a>olsrr<span class="sc">::</span><span class="fu">ols_plot_resid_hist</span>(mlr1.full)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -2082,13 +2077,13 @@ CNT_PRIMARY_1000     -12074.626       656.393       -0.117    -18.395    0.000  
 </figure>
 </div>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb87"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb87-1"><a href="#cb87-1" aria-hidden="true" tabindex="-1"></a><span class="co"># check_normality(mlr1.full)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb86"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb86-1"><a href="#cb86-1" aria-hidden="true" tabindex="-1"></a><span class="co"># check_normality(mlr1.full)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>This pattern suggests that the normality assumption is acceptable for inference on regression coefficients and mean effects, although prediction intervals for extreme high priced units will be less reliable. The mild skewness also reinforces the earlier evidence of non constant variance and non linearity, motivating later refinements such as geographically weighted regression and possibly robust or transformed specifications to improve fit in the tails of the price distribution.</p>
 <p>Instead of showing the test statistic, <code>plot()</code> of <strong>see</strong> package can be used to plot a the output of <code>check_normality()</code> for visual inspection as shown below.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb88"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb88-1"><a href="#cb88-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(performance<span class="sc">::</span><span class="fu">check_normality</span>(mlr1.full), </span>
-<span id="cb88-2"><a href="#cb88-2" aria-hidden="true" tabindex="-1"></a>     <span class="at">type =</span> <span class="st">"qq"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb87"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb87-1"><a href="#cb87-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(performance<span class="sc">::</span><span class="fu">check_normality</span>(mlr1.full), </span>
+<span id="cb87-2"><a href="#cb87-2" aria-hidden="true" tabindex="-1"></a>     <span class="at">type =</span> <span class="st">"qq"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -2101,8 +2096,8 @@ CNT_PRIMARY_1000     -12074.626       656.393       -0.117    -18.395    0.000  
 <p>Departures appear mainly in the upper tail, where points bend above the line and move outside the band, indicating more large positive residuals than a normal distribution would predict. A mild deviation is also visible in the extreme lower tail. These patterns confirm slight right skew and heavier tails, consistent with the histogram. In practice this means that coefficient estimates and their confidence intervals remain trustworthy given the very large sample, but prediction intervals for the most expensive condominiums are less accurate and a small number of high priced outliers or omitted local factors are not fully captured by the global model.</p>
 <p>Another way to check for normality assumption visual is by using <code>check_model()</code> of <strong>performance</strong> package as shown in the code chunk below.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb89"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb89-1"><a href="#cb89-1" aria-hidden="true" tabindex="-1"></a>performance<span class="sc">::</span><span class="fu">check_model</span>(mlr1.full,</span>
-<span id="cb89-2"><a href="#cb89-2" aria-hidden="true" tabindex="-1"></a>            <span class="at">check=</span> <span class="st">"normality"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb88"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb88-1"><a href="#cb88-1" aria-hidden="true" tabindex="-1"></a>performance<span class="sc">::</span><span class="fu">check_model</span>(mlr1.full,</span>
+<span id="cb88-2"><a href="#cb88-2" aria-hidden="true" tabindex="-1"></a>            <span class="at">check=</span> <span class="st">"normality"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -2118,36 +2113,36 @@ CNT_PRIMARY_1000     -12074.626       656.393       -0.117    -18.395    0.000  
 <p>Residuals are attached to the feature layer, mapped in quantile classes for visual screening, and then assessed with a distance band Moran test using row standardised weights and 999 permutations. A significant positive statistic indicates clustering of errors and suggests that spatial processes remain unmodelled. Evidence of such structure motivates the spatially aware methods that follow in the broader study.</p>
 <p>In order to perform spatial autocorrelation test, we need to export the residual of the hedonic pricing model and save it as a data frame first.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb90"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb90-1"><a href="#cb90-1" aria-hidden="true" tabindex="-1"></a>mlr1.output <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(mlr1.full<span class="sc">$</span>residuals)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb89"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb89-1"><a href="#cb89-1" aria-hidden="true" tabindex="-1"></a>mlr1.output <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(mlr1.full<span class="sc">$</span>residuals)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>Next, we will join the newly created data frame with <code>mlr1_resale.sf</code> object.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb91"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb91-1"><a href="#cb91-1" aria-hidden="true" tabindex="-1"></a>mlr1_resale.sf <span class="ot">&lt;-</span> <span class="fu">cbind</span>(analysis_sf, </span>
-<span id="cb91-2"><a href="#cb91-2" aria-hidden="true" tabindex="-1"></a>                        mlr1.full<span class="sc">$</span>residuals) <span class="sc">%&gt;%</span></span>
-<span id="cb91-3"><a href="#cb91-3" aria-hidden="true" tabindex="-1"></a><span class="fu">rename</span>(<span class="st">`</span><span class="at">MLR_RES</span><span class="st">`</span> <span class="ot">=</span> <span class="st">`</span><span class="at">mlr1.full.residuals</span><span class="st">`</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb90"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb90-1"><a href="#cb90-1" aria-hidden="true" tabindex="-1"></a>mlr1_resale.sf <span class="ot">&lt;-</span> <span class="fu">cbind</span>(analysis_sf, </span>
+<span id="cb90-2"><a href="#cb90-2" aria-hidden="true" tabindex="-1"></a>                        mlr1.full<span class="sc">$</span>residuals) <span class="sc">%&gt;%</span></span>
+<span id="cb90-3"><a href="#cb90-3" aria-hidden="true" tabindex="-1"></a><span class="fu">rename</span>(<span class="st">`</span><span class="at">MLR_RES</span><span class="st">`</span> <span class="ot">=</span> <span class="st">`</span><span class="at">mlr1.full.residuals</span><span class="st">`</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>Next, we will use <strong>tmap</strong> package to display the distribution of the residuals on an interactive map.</p>
 <p>The code churn below will turn on the interactive mode of tmap.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb92"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb92-1"><a href="#cb92-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tmap_mode</span>(<span class="st">"plot"</span>)</span>
-<span id="cb92-2"><a href="#cb92-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb92-3"><a href="#cb92-3" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_shape</span>(mpsz) <span class="sc">+</span></span>
-<span id="cb92-4"><a href="#cb92-4" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_polygons</span>(<span class="at">fill_alpha =</span> <span class="fl">0.4</span>) <span class="sc">+</span> <span class="co"># semi‑transparent base</span></span>
-<span id="cb92-5"><a href="#cb92-5" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_shape</span>(mlr1_resale.sf) <span class="sc">+</span></span>
-<span id="cb92-6"><a href="#cb92-6" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_dots</span>(</span>
-<span id="cb92-7"><a href="#cb92-7" aria-hidden="true" tabindex="-1"></a><span class="at">fill =</span> <span class="st">"MLR_RES"</span>, <span class="co"># color by residual value</span></span>
-<span id="cb92-8"><a href="#cb92-8" aria-hidden="true" tabindex="-1"></a><span class="at">size =</span> <span class="fl">0.5</span>, <span class="co"># point size</span></span>
-<span id="cb92-9"><a href="#cb92-9" aria-hidden="true" tabindex="-1"></a><span class="at">col =</span> <span class="st">"black"</span>, <span class="co"># thin border</span></span>
-<span id="cb92-10"><a href="#cb92-10" aria-hidden="true" tabindex="-1"></a><span class="at">fill.scale =</span> <span class="fu">tm_scale</span>( <span class="co"># custom diverging palette</span></span>
-<span id="cb92-11"><a href="#cb92-11" aria-hidden="true" tabindex="-1"></a><span class="at">n =</span> <span class="dv">10</span>,</span>
-<span id="cb92-12"><a href="#cb92-12" aria-hidden="true" tabindex="-1"></a><span class="at">values =</span> <span class="fu">rev</span>(<span class="fu">brewer.pal</span>(<span class="dv">11</span>, <span class="st">"RdBu"</span>)), <span class="co"># red‑blue diverging</span></span>
-<span id="cb92-13"><a href="#cb92-13" aria-hidden="true" tabindex="-1"></a><span class="at">style =</span> <span class="st">"quantile"</span>,</span>
-<span id="cb92-14"><a href="#cb92-14" aria-hidden="true" tabindex="-1"></a><span class="at">midpoint =</span> <span class="cn">NA</span>),</span>
-<span id="cb92-15"><a href="#cb92-15" aria-hidden="true" tabindex="-1"></a><span class="at">fill.legend =</span> <span class="fu">tm_legend</span>(<span class="at">title =</span> <span class="st">"Residuals"</span>)</span>
-<span id="cb92-16"><a href="#cb92-16" aria-hidden="true" tabindex="-1"></a>) <span class="sc">+</span></span>
-<span id="cb92-17"><a href="#cb92-17" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_title</span>(<span class="st">"LM Residuals (Quantile Classification)"</span>) <span class="sc">+</span></span>
-<span id="cb92-18"><a href="#cb92-18" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_layout</span>(<span class="at">legend.outside =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
-<span id="cb92-19"><a href="#cb92-19" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_view</span>(<span class="at">set_zoom_limits =</span> <span class="fu">c</span>(<span class="dv">11</span>,<span class="dv">14</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb91"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb91-1"><a href="#cb91-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tmap_mode</span>(<span class="st">"plot"</span>)</span>
+<span id="cb91-2"><a href="#cb91-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb91-3"><a href="#cb91-3" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_shape</span>(mpsz) <span class="sc">+</span></span>
+<span id="cb91-4"><a href="#cb91-4" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_polygons</span>(<span class="at">fill_alpha =</span> <span class="fl">0.4</span>) <span class="sc">+</span> <span class="co"># semi‑transparent base</span></span>
+<span id="cb91-5"><a href="#cb91-5" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_shape</span>(mlr1_resale.sf) <span class="sc">+</span></span>
+<span id="cb91-6"><a href="#cb91-6" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_dots</span>(</span>
+<span id="cb91-7"><a href="#cb91-7" aria-hidden="true" tabindex="-1"></a><span class="at">fill =</span> <span class="st">"MLR_RES"</span>, <span class="co"># color by residual value</span></span>
+<span id="cb91-8"><a href="#cb91-8" aria-hidden="true" tabindex="-1"></a><span class="at">size =</span> <span class="fl">0.5</span>, <span class="co"># point size</span></span>
+<span id="cb91-9"><a href="#cb91-9" aria-hidden="true" tabindex="-1"></a><span class="at">col =</span> <span class="st">"black"</span>, <span class="co"># thin border</span></span>
+<span id="cb91-10"><a href="#cb91-10" aria-hidden="true" tabindex="-1"></a><span class="at">fill.scale =</span> <span class="fu">tm_scale</span>( <span class="co"># custom diverging palette</span></span>
+<span id="cb91-11"><a href="#cb91-11" aria-hidden="true" tabindex="-1"></a><span class="at">n =</span> <span class="dv">10</span>,</span>
+<span id="cb91-12"><a href="#cb91-12" aria-hidden="true" tabindex="-1"></a><span class="at">values =</span> <span class="fu">rev</span>(<span class="fu">brewer.pal</span>(<span class="dv">11</span>, <span class="st">"RdBu"</span>)), <span class="co"># red‑blue diverging</span></span>
+<span id="cb91-13"><a href="#cb91-13" aria-hidden="true" tabindex="-1"></a><span class="at">style =</span> <span class="st">"quantile"</span>,</span>
+<span id="cb91-14"><a href="#cb91-14" aria-hidden="true" tabindex="-1"></a><span class="at">midpoint =</span> <span class="cn">NA</span>),</span>
+<span id="cb91-15"><a href="#cb91-15" aria-hidden="true" tabindex="-1"></a><span class="at">fill.legend =</span> <span class="fu">tm_legend</span>(<span class="at">title =</span> <span class="st">"Residuals"</span>)</span>
+<span id="cb91-16"><a href="#cb91-16" aria-hidden="true" tabindex="-1"></a>) <span class="sc">+</span></span>
+<span id="cb91-17"><a href="#cb91-17" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_title</span>(<span class="st">"LM Residuals (Quantile Classification)"</span>) <span class="sc">+</span></span>
+<span id="cb91-18"><a href="#cb91-18" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_layout</span>(<span class="at">legend.outside =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
+<span id="cb91-19"><a href="#cb91-19" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_view</span>(<span class="at">set_zoom_limits =</span> <span class="fu">c</span>(<span class="dv">11</span>,<span class="dv">14</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -2155,32 +2150,32 @@ CNT_PRIMARY_1000     -12074.626       656.393       -0.117    -18.395    0.000  
 </figure>
 </div>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb93"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb93-1"><a href="#cb93-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tmap_mode</span>(<span class="st">"plot"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb92"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb92-1"><a href="#cb92-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tmap_mode</span>(<span class="st">"plot"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>The residual map reveals that model errors are not spatially random. Large positive residuals in dark red form clusters in several neighbourhoods, meaning resale prices there are systematically higher than the global model predicts. Large negative residuals in dark blue cluster elsewhere, indicating over prediction of prices in those areas. Pale symbols around zero are more scattered and show locations where the model fits reasonably well.</p>
 <p>This spatial clustering implies that important local influences on price are not fully captured by the current global ordinary least squares equation. The strength or direction of covariate effects likely varies across space, and unobserved neighbourhood attributes are exerting local impacts. These patterns justify the next step of applying spatial diagnostics and geographically weighted regression in Section 10, so that coefficients can vary by location and the fitted values can better reflect local housing market conditions rather than a single city wide average relationship.</p>
 <p>To proof that our observation is indeed true, Global Moran’s I test will be performed</p>
 <p>First, we will compute the distance-based weight matrix by using <code>st_dist_band()</code> function of <strong>sfdep</strong>.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb94"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb94-1"><a href="#cb94-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Build distance‑band neighbors and row‑standardized weights ------------------</span></span>
-<span id="cb94-2"><a href="#cb94-2" aria-hidden="true" tabindex="-1"></a>analysis_sf <span class="ot">&lt;-</span> analysis_sf <span class="sc">%&gt;%</span></span>
-<span id="cb94-3"><a href="#cb94-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb94-4"><a href="#cb94-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">nb =</span> sfdep<span class="sc">::</span><span class="fu">st_dist_band</span>(</span>
-<span id="cb94-5"><a href="#cb94-5" aria-hidden="true" tabindex="-1"></a>      <span class="fu">st_geometry</span>(geometry), </span>
-<span id="cb94-6"><a href="#cb94-6" aria-hidden="true" tabindex="-1"></a>      <span class="at">upper =</span> <span class="dv">1500</span>), <span class="co"># neighbors &lt;= 1.5 km</span></span>
-<span id="cb94-7"><a href="#cb94-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">wt =</span> <span class="fu">st_weights</span>(</span>
-<span id="cb94-8"><a href="#cb94-8" aria-hidden="true" tabindex="-1"></a>      nb, <span class="at">style =</span> <span class="st">"W"</span>), <span class="co"># row‑standardized W</span></span>
-<span id="cb94-9"><a href="#cb94-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">.before =</span> <span class="dv">1</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb93"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb93-1"><a href="#cb93-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Build distance‑band neighbors and row‑standardized weights</span></span>
+<span id="cb93-2"><a href="#cb93-2" aria-hidden="true" tabindex="-1"></a>analysis_sf <span class="ot">&lt;-</span> analysis_sf <span class="sc">%&gt;%</span></span>
+<span id="cb93-3"><a href="#cb93-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb93-4"><a href="#cb93-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">nb =</span> sfdep<span class="sc">::</span><span class="fu">st_dist_band</span>(</span>
+<span id="cb93-5"><a href="#cb93-5" aria-hidden="true" tabindex="-1"></a>      <span class="fu">st_geometry</span>(geometry), </span>
+<span id="cb93-6"><a href="#cb93-6" aria-hidden="true" tabindex="-1"></a>      <span class="at">upper =</span> <span class="dv">1500</span>), <span class="co"># neighbors &lt;= 1.5 km</span></span>
+<span id="cb93-7"><a href="#cb93-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">wt =</span> <span class="fu">st_weights</span>(</span>
+<span id="cb93-8"><a href="#cb93-8" aria-hidden="true" tabindex="-1"></a>      nb, <span class="at">style =</span> <span class="st">"W"</span>), <span class="co"># row‑standardized W</span></span>
+<span id="cb93-9"><a href="#cb93-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">.before =</span> <span class="dv">1</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>Next, <code>global_moran_perm()</code> of <strong>sfdep</strong> package will be used to perform Moran’s I test for residual spatial autocorrelation</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb95"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb95-1"><a href="#cb95-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Permutation Moran’s I test on residuals -------------------------------------</span></span>
-<span id="cb95-2"><a href="#cb95-2" aria-hidden="true" tabindex="-1"></a>sfdep<span class="sc">::</span><span class="fu">global_moran_perm</span>(</span>
-<span id="cb95-3"><a href="#cb95-3" aria-hidden="true" tabindex="-1"></a>  mlr1_resale.sf<span class="sc">$</span>MLR_RES,</span>
-<span id="cb95-4"><a href="#cb95-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">nb =</span> analysis_sf<span class="sc">$</span>nb,</span>
-<span id="cb95-5"><a href="#cb95-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">wt =</span> analysis_sf<span class="sc">$</span>wt,</span>
-<span id="cb95-6"><a href="#cb95-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">alternative =</span> <span class="st">"two.sided"</span>,</span>
-<span id="cb95-7"><a href="#cb95-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">nsim =</span> <span class="dv">999</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb94"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb94-1"><a href="#cb94-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Permutation Moran’s I test on residuals</span></span>
+<span id="cb94-2"><a href="#cb94-2" aria-hidden="true" tabindex="-1"></a>sfdep<span class="sc">::</span><span class="fu">global_moran_perm</span>(</span>
+<span id="cb94-3"><a href="#cb94-3" aria-hidden="true" tabindex="-1"></a>  mlr1_resale.sf<span class="sc">$</span>MLR_RES,</span>
+<span id="cb94-4"><a href="#cb94-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">nb =</span> analysis_sf<span class="sc">$</span>nb,</span>
+<span id="cb94-5"><a href="#cb94-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">wt =</span> analysis_sf<span class="sc">$</span>wt,</span>
+<span id="cb94-6"><a href="#cb94-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">alternative =</span> <span class="st">"two.sided"</span>,</span>
+<span id="cb94-7"><a href="#cb94-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">nsim =</span> <span class="dv">999</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
     Monte-Carlo simulation of Moran I
@@ -2189,7 +2184,7 @@ data:  x
 weights: listw  
 number of simulations + 1: 1000 
 
-statistic = 0.32591, observed rank = 1000, p-value &lt;
+statistic = 0.32604, observed rank = 1000, p-value &lt;
 0.00000000000000022
 alternative hypothesis: two.sided</code></pre>
 </div>
@@ -2209,64 +2204,64 @@ alternative hypothesis: two.sided</code></pre>
 <h4 data-number="10.1.1" class="anchored" data-anchor-id="computing-fixed-bandwith"><span class="header-section-number">10.1.1</span> Computing fixed bandwith</h4>
 <p>What radius best balances bias and variance for our data support? The cross validation search evaluates candidate distances and returns the one minimizing prediction error. This step sets the spatial scale for local regressions and anchors all subsequent estimates.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb97"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb97-1"><a href="#cb97-1" aria-hidden="true" tabindex="-1"></a>bw.fixed <span class="ot">&lt;-</span> <span class="fu">bw.gwr</span>(</span>
-<span id="cb97-2"><a href="#cb97-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">formula =</span> resale_price <span class="sc">~</span></span>
-<span id="cb97-3"><a href="#cb97-3" aria-hidden="true" tabindex="-1"></a>    FLOOR_LEVEL <span class="sc">+</span> AGE_2025 <span class="sc">+</span></span>
-<span id="cb97-4"><a href="#cb97-4" aria-hidden="true" tabindex="-1"></a>    DIST_CBD_M <span class="sc">+</span> DIST_MRT_M <span class="sc">+</span></span>
-<span id="cb97-5"><a href="#cb97-5" aria-hidden="true" tabindex="-1"></a>    DIST_ELDERCARE_M <span class="sc">+</span> DIST_HAWKER_M <span class="sc">+</span></span>
-<span id="cb97-6"><a href="#cb97-6" aria-hidden="true" tabindex="-1"></a>    DIST_SUPERMKT_M <span class="sc">+</span> DIST_MALL_M <span class="sc">+</span> DIST_ELITEPRI_M <span class="sc">+</span></span>
-<span id="cb97-7"><a href="#cb97-7" aria-hidden="true" tabindex="-1"></a>    CNT_KINDER_350 <span class="sc">+</span> CNT_CHILD_350 <span class="sc">+</span> CNT_BUS_350 <span class="sc">+</span> CNT_PRIMARY_1000,</span>
-<span id="cb97-8"><a href="#cb97-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> analysis_sf, </span>
-<span id="cb97-9"><a href="#cb97-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">approach=</span><span class="st">"CV"</span>, </span>
-<span id="cb97-10"><a href="#cb97-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">kernel=</span><span class="st">"gaussian"</span>, </span>
-<span id="cb97-11"><a href="#cb97-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">adaptive=</span><span class="cn">FALSE</span>, </span>
-<span id="cb97-12"><a href="#cb97-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">longlat=</span><span class="cn">FALSE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb96"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb96-1"><a href="#cb96-1" aria-hidden="true" tabindex="-1"></a>bw.fixed <span class="ot">&lt;-</span> <span class="fu">bw.gwr</span>(</span>
+<span id="cb96-2"><a href="#cb96-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">formula =</span> resale_price <span class="sc">~</span></span>
+<span id="cb96-3"><a href="#cb96-3" aria-hidden="true" tabindex="-1"></a>    FLOOR_LEVEL <span class="sc">+</span> AGE_2025 <span class="sc">+</span></span>
+<span id="cb96-4"><a href="#cb96-4" aria-hidden="true" tabindex="-1"></a>    DIST_CBD_M <span class="sc">+</span> DIST_MRT_M <span class="sc">+</span></span>
+<span id="cb96-5"><a href="#cb96-5" aria-hidden="true" tabindex="-1"></a>    DIST_ELDERCARE_M <span class="sc">+</span> DIST_HAWKER_M <span class="sc">+</span></span>
+<span id="cb96-6"><a href="#cb96-6" aria-hidden="true" tabindex="-1"></a>    DIST_SUPERMKT_M <span class="sc">+</span> DIST_MALL_M <span class="sc">+</span> DIST_ELITEPRI_M <span class="sc">+</span></span>
+<span id="cb96-7"><a href="#cb96-7" aria-hidden="true" tabindex="-1"></a>    CNT_KINDER_350 <span class="sc">+</span> CNT_CHILD_350 <span class="sc">+</span> CNT_BUS_350 <span class="sc">+</span> CNT_PRIMARY_1000,</span>
+<span id="cb96-8"><a href="#cb96-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> analysis_sf, </span>
+<span id="cb96-9"><a href="#cb96-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">approach=</span><span class="st">"CV"</span>, </span>
+<span id="cb96-10"><a href="#cb96-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">kernel=</span><span class="st">"gaussian"</span>, </span>
+<span id="cb96-11"><a href="#cb96-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">adaptive=</span><span class="cn">FALSE</span>, </span>
+<span id="cb96-12"><a href="#cb96-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">longlat=</span><span class="cn">FALSE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Take a cup of tea and have a break, it will take a few minutes.
           -----A kind suggestion from GWmodel development group
-Fixed bandwidth: 22980.96 CV score: 52392049893594 
-Fixed bandwidth: 14205.85 CV score: 50356574610703 
-Fixed bandwidth: 8782.54 CV score: 45167073241578 
-Fixed bandwidth: 5430.749 CV score: 36051674118746 
-Fixed bandwidth: 3359.228 CV score: 26770547784048 
-Fixed bandwidth: 2078.957 CV score: 19608338479414 
-Fixed bandwidth: 1287.706 CV score: 15831700528257 
-Fixed bandwidth: 798.6866 CV score: 13350423800665 
-Fixed bandwidth: 496.4557 CV score: 12094482301403 
-Fixed bandwidth: 309.6667 CV score: 36920475508267 
-Fixed bandwidth: 611.8976 CV score: 12497490757783 
-Fixed bandwidth: 425.1087 CV score: 12666604861680 
-Fixed bandwidth: 540.5506 CV score: 12190731274360 
-Fixed bandwidth: 469.2035 CV score: 12132063412439 
-Fixed bandwidth: 513.2984 CV score: 12115230799514 
-Fixed bandwidth: 486.0463 CV score: 12095955988873 
-Fixed bandwidth: 502.889 CV score: 12099452420345 
-Fixed bandwidth: 492.4797 CV score: 12093537446156 
-Fixed bandwidth: 490.0223 CV score: 12093853356218 
-Fixed bandwidth: 493.9984 CV score: 12093692843150 
-Fixed bandwidth: 491.541 CV score: 12093573595050 
-Fixed bandwidth: 493.0597 CV score: 12093565977647 
-Fixed bandwidth: 492.1211 CV score: 12093539125534 
-Fixed bandwidth: 492.7012 CV score: 12093543850438 
-Fixed bandwidth: 492.3427 CV score: 12093536323213 
-Fixed bandwidth: 492.2581 CV score: 12093536593114 
-Fixed bandwidth: 492.395 CV score: 12093536590777 
-Fixed bandwidth: 492.3104 CV score: 12093536358694 
-Fixed bandwidth: 492.3627 CV score: 12093536370392 
-Fixed bandwidth: 492.3304 CV score: 12093536291654 
-Fixed bandwidth: 492.3227 CV score: 12093536318766 
-Fixed bandwidth: 492.3351 CV score: 12093536265622 
-Fixed bandwidth: 492.338 CV score: 12093536248669 
-Fixed bandwidth: 492.3398 CV score: 12093536289563 
-Fixed bandwidth: 492.3369 CV score: 12093536336119 
-Fixed bandwidth: 492.3387 CV score: 12093536350291 
-Fixed bandwidth: 492.3376 CV score: 12093536360103 
-Fixed bandwidth: 492.3383 CV score: 12093536315755 
-Fixed bandwidth: 492.3378 CV score: 12093536304390 
-Fixed bandwidth: 492.3381 CV score: 12093536258440 
-Fixed bandwidth: 492.3379 CV score: 12093536245718 
-Fixed bandwidth: 492.3379 CV score: 12093536260521 
-Fixed bandwidth: 492.338 CV score: 12093536359900 </code></pre>
+Fixed bandwidth: 22980.96 CV score: 52436211307754 
+Fixed bandwidth: 14205.85 CV score: 50393958320511 
+Fixed bandwidth: 8782.54 CV score: 45192225398191 
+Fixed bandwidth: 5430.749 CV score: 36064905687222 
+Fixed bandwidth: 3359.228 CV score: 26772119977944 
+Fixed bandwidth: 2078.957 CV score: 19597720901812 
+Fixed bandwidth: 1287.706 CV score: 15829795667382 
+Fixed bandwidth: 798.6866 CV score: 13357876934086 
+Fixed bandwidth: 496.4557 CV score: 12098982201552 
+Fixed bandwidth: 309.6667 CV score: 36957323931762 
+Fixed bandwidth: 611.8976 CV score: 12504842030159 
+Fixed bandwidth: 425.1087 CV score: 12668312514308 
+Fixed bandwidth: 540.5506 CV score: 12196699338898 
+Fixed bandwidth: 469.2035 CV score: 12135461909779 
+Fixed bandwidth: 513.2984 CV score: 12120344188628 
+Fixed bandwidth: 486.0463 CV score: 12100048347564 
+Fixed bandwidth: 502.889 CV score: 12104193793724 
+Fixed bandwidth: 492.4797 CV score: 12097884023913 
+Fixed bandwidth: 490.0223 CV score: 12098103629884 
+Fixed bandwidth: 493.9984 CV score: 12098098291200 
+Fixed bandwidth: 491.541 CV score: 12097883561582 
+Fixed bandwidth: 490.9609 CV score: 12097935050409 
+Fixed bandwidth: 491.8996 CV score: 12097871688399 
+Fixed bandwidth: 492.1211 CV score: 12097871639223 
+Fixed bandwidth: 492.2581 CV score: 12097874483899 
+Fixed bandwidth: 492.0365 CV score: 12097870953982 
+Fixed bandwidth: 491.9842 CV score: 12097870909636 
+Fixed bandwidth: 491.9519 CV score: 12097871104039 
+Fixed bandwidth: 492.0042 CV score: 12097871001472 
+Fixed bandwidth: 491.9718 CV score: 12097870904437 
+Fixed bandwidth: 491.9642 CV score: 12097870994001 
+Fixed bandwidth: 491.9766 CV score: 12097870945911 
+Fixed bandwidth: 491.9689 CV score: 12097871015301 
+Fixed bandwidth: 491.9736 CV score: 12097871086712 
+Fixed bandwidth: 491.9707 CV score: 12097870991408 
+Fixed bandwidth: 491.9725 CV score: 12097871150421 
+Fixed bandwidth: 491.9714 CV score: 12097870889298 
+Fixed bandwidth: 491.9712 CV score: 12097871079782 
+Fixed bandwidth: 491.9716 CV score: 12097870986246 
+Fixed bandwidth: 491.9713 CV score: 12097870865726 
+Fixed bandwidth: 491.9713 CV score: 12097870988438 
+Fixed bandwidth: 491.9714 CV score: 12097870965809 
+Fixed bandwidth: 491.9713 CV score: 12097870927928 </code></pre>
 </div>
 </div>
 </section>
@@ -2274,25 +2269,25 @@ Fixed bandwidth: 492.338 CV score: 12093536359900 </code></pre>
 <h4 data-number="10.1.2" class="anchored" data-anchor-id="gwmodel-method---fixed-bandwith"><span class="header-section-number">10.1.2</span> GWModel method - fixed bandwith</h4>
 <p>With the fixed bandwidth in hand, the model is fitted using the full predictor set. GWmodel reports both local fits and an embedded global OLS summary for orientation. The output will later be transformed for mapping and coefficient interpretation.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb99"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb99-1"><a href="#cb99-1" aria-hidden="true" tabindex="-1"></a>gwr.fixed <span class="ot">&lt;-</span> <span class="fu">gwr.basic</span>(</span>
-<span id="cb99-2"><a href="#cb99-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">formula =</span> resale_price <span class="sc">~</span></span>
-<span id="cb99-3"><a href="#cb99-3" aria-hidden="true" tabindex="-1"></a>    FLOOR_LEVEL <span class="sc">+</span> AGE_2025 <span class="sc">+</span></span>
-<span id="cb99-4"><a href="#cb99-4" aria-hidden="true" tabindex="-1"></a>    DIST_CBD_M <span class="sc">+</span> DIST_MRT_M <span class="sc">+</span></span>
-<span id="cb99-5"><a href="#cb99-5" aria-hidden="true" tabindex="-1"></a>    DIST_ELDERCARE_M <span class="sc">+</span> DIST_HAWKER_M <span class="sc">+</span></span>
-<span id="cb99-6"><a href="#cb99-6" aria-hidden="true" tabindex="-1"></a>    DIST_SUPERMKT_M <span class="sc">+</span> DIST_MALL_M <span class="sc">+</span> DIST_ELITEPRI_M <span class="sc">+</span></span>
-<span id="cb99-7"><a href="#cb99-7" aria-hidden="true" tabindex="-1"></a>    CNT_KINDER_350 <span class="sc">+</span> CNT_CHILD_350 <span class="sc">+</span> CNT_BUS_350 <span class="sc">+</span> CNT_PRIMARY_1000,</span>
-<span id="cb99-8"><a href="#cb99-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> analysis_sf, </span>
-<span id="cb99-9"><a href="#cb99-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">bw=</span>bw.fixed, </span>
-<span id="cb99-10"><a href="#cb99-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">kernel =</span> <span class="st">'gaussian'</span>, </span>
-<span id="cb99-11"><a href="#cb99-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">longlat =</span> <span class="cn">FALSE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb98"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb98-1"><a href="#cb98-1" aria-hidden="true" tabindex="-1"></a>gwr.fixed <span class="ot">&lt;-</span> <span class="fu">gwr.basic</span>(</span>
+<span id="cb98-2"><a href="#cb98-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">formula =</span> resale_price <span class="sc">~</span></span>
+<span id="cb98-3"><a href="#cb98-3" aria-hidden="true" tabindex="-1"></a>    FLOOR_LEVEL <span class="sc">+</span> AGE_2025 <span class="sc">+</span></span>
+<span id="cb98-4"><a href="#cb98-4" aria-hidden="true" tabindex="-1"></a>    DIST_CBD_M <span class="sc">+</span> DIST_MRT_M <span class="sc">+</span></span>
+<span id="cb98-5"><a href="#cb98-5" aria-hidden="true" tabindex="-1"></a>    DIST_ELDERCARE_M <span class="sc">+</span> DIST_HAWKER_M <span class="sc">+</span></span>
+<span id="cb98-6"><a href="#cb98-6" aria-hidden="true" tabindex="-1"></a>    DIST_SUPERMKT_M <span class="sc">+</span> DIST_MALL_M <span class="sc">+</span> DIST_ELITEPRI_M <span class="sc">+</span></span>
+<span id="cb98-7"><a href="#cb98-7" aria-hidden="true" tabindex="-1"></a>    CNT_KINDER_350 <span class="sc">+</span> CNT_CHILD_350 <span class="sc">+</span> CNT_BUS_350 <span class="sc">+</span> CNT_PRIMARY_1000,</span>
+<span id="cb98-8"><a href="#cb98-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> analysis_sf, </span>
+<span id="cb98-9"><a href="#cb98-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">bw=</span>bw.fixed, </span>
+<span id="cb98-10"><a href="#cb98-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">kernel =</span> <span class="st">'gaussian'</span>, </span>
+<span id="cb98-11"><a href="#cb98-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">longlat =</span> <span class="cn">FALSE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb100"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb100-1"><a href="#cb100-1" aria-hidden="true" tabindex="-1"></a>gwr.fixed</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb99"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb99-1"><a href="#cb99-1" aria-hidden="true" tabindex="-1"></a>gwr.fixed</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>   ***********************************************************************
    *                       Package   GWmodel                             *
    ***********************************************************************
-   Program starts at: 2025-11-16 23:07:34.950438 
+   Program starts at: 2025-11-17 09:15:15.796244 
    Call:
    gwr.basic(formula = resale_price ~ FLOOR_LEVEL + AGE_2025 + DIST_CBD_M + 
     DIST_MRT_M + DIST_ELDERCARE_M + DIST_HAWKER_M + DIST_SUPERMKT_M + 
@@ -2312,91 +2307,91 @@ Fixed bandwidth: 492.338 CV score: 12093536359900 </code></pre>
 
    Residuals:
     Min      1Q  Median      3Q     Max 
--315906  -51235    -549   48570  496052 
+-316054  -51155    -516   48494  496379 
 
    Coefficients:
                         Estimate   Std. Error t value             Pr(&gt;|t|)    
-   (Intercept)      1081180.5627    5873.4817 184.078 &lt; 0.0000000000000002 ***
-   FLOOR_LEVEL         5853.8558     146.3006  40.013 &lt; 0.0000000000000002 ***
-   AGE_2025           -5390.4551      65.3591 -82.474 &lt; 0.0000000000000002 ***
-   DIST_CBD_M           -19.8313       0.3270 -60.650 &lt; 0.0000000000000002 ***
-   DIST_MRT_M           -56.7805       2.6334 -21.561 &lt; 0.0000000000000002 ***
-   DIST_ELDERCARE_M     -10.4704       1.5022  -6.970      0.0000000000034 ***
-   DIST_HAWKER_M        -25.3443       1.9964 -12.695 &lt; 0.0000000000000002 ***
-   DIST_SUPERMKT_M       16.2692       4.9483   3.288              0.00101 ** 
-   DIST_MALL_M          -27.5099       2.7120 -10.144 &lt; 0.0000000000000002 ***
-   DIST_ELITEPRI_M        1.8638       0.4209   4.428      0.0000096076479 ***
-   CNT_KINDER_350     10196.1602     930.1569  10.962 &lt; 0.0000000000000002 ***
-   CNT_CHILD_350      -1953.0874     465.6300  -4.195      0.0000276192396 ***
-   CNT_BUS_350         1461.6051     320.5408   4.560      0.0000051902793 ***
-   CNT_PRIMARY_1000  -12074.6258     656.3931 -18.395 &lt; 0.0000000000000002 ***
+   (Intercept)      1080917.4696    5877.2107 183.917 &lt; 0.0000000000000002 ***
+   FLOOR_LEVEL         5855.0714     146.3704  40.002 &lt; 0.0000000000000002 ***
+   AGE_2025           -5387.5153      65.4019 -82.375 &lt; 0.0000000000000002 ***
+   DIST_CBD_M           -19.8548       0.3271 -60.702 &lt; 0.0000000000000002 ***
+   DIST_MRT_M           -56.5934       2.6342 -21.484 &lt; 0.0000000000000002 ***
+   DIST_ELDERCARE_M     -10.5247       1.5039  -6.999     0.00000000000278 ***
+   DIST_HAWKER_M        -25.2715       1.9971 -12.654 &lt; 0.0000000000000002 ***
+   DIST_SUPERMKT_M       16.4612       4.9502   3.325             0.000887 ***
+   DIST_MALL_M          -27.4767       2.7137 -10.125 &lt; 0.0000000000000002 ***
+   DIST_ELITEPRI_M        1.8489       0.4212   4.389     0.00001150730477 ***
+   CNT_KINDER_350     10169.7771     930.9069  10.925 &lt; 0.0000000000000002 ***
+   CNT_CHILD_350      -1962.7583     465.9868  -4.212     0.00002556290081 ***
+   CNT_BUS_350         1434.5653     320.6066   4.475     0.00000775550196 ***
+   CNT_PRIMARY_1000  -11889.3046     654.3927 -18.168 &lt; 0.0000000000000002 ***
 
    ---Significance stars
    Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1 
-   Residual standard error: 78510 on 8665 degrees of freedom
-   Multiple R-squared: 0.7615
-   Adjusted R-squared: 0.7611 
-   F-statistic:  2128 on 13 and 8665 DF,  p-value: &lt; 0.00000000000000022 
+   Residual standard error: 78540 on 8665 degrees of freedom
+   Multiple R-squared: 0.7612
+   Adjusted R-squared: 0.7609 
+   F-statistic:  2125 on 13 and 8665 DF,  p-value: &lt; 0.00000000000000022 
    ***Extra Diagnostic information
-   Residual sum of squares: 53403519683267
-   Sigma(hat): 78451.3
-   AIC:  220286.6
-   AICc:  220286.7
-   BIC:  211849.7
+   Residual sum of squares: 53452303146043
+   Sigma(hat): 78487.12
+   AIC:  220294.6
+   AICc:  220294.6
+   BIC:  211857.6
    ***********************************************************************
    *          Results of Geographically Weighted Regression              *
    ***********************************************************************
 
    *********************Model calibration information*********************
    Kernel function: gaussian 
-   Fixed bandwidth: 492.3379 
+   Fixed bandwidth: 491.9713 
    Regression points: the same locations as observations are used.
    Distance metric: Euclidean distance metric is used.
 
    ****************Summary of GWR coefficient estimates:******************
                              Min.       1st Qu.        Median       3rd Qu.
-   Intercept        -9691812.9492   487393.6737  1095595.0363  1799456.7940
-   FLOOR_LEVEL          1810.4892     3922.8815     4580.7283     5342.3275
-   AGE_2025           -60602.0360    -8072.2124    -5376.5415    -4008.2850
-   DIST_CBD_M          -1423.0500      -93.7795      -19.7608       35.3103
-   DIST_MRT_M          -1177.5377     -120.3100      -56.2344      -18.8214
-   DIST_ELDERCARE_M     -984.8730      -35.7176        7.6035       54.5526
-   DIST_HAWKER_M       -1548.8695      -61.5760      -21.3902       37.2136
-   DIST_SUPERMKT_M     -1078.1663      -41.2874        4.0802       46.1575
-   DIST_MALL_M         -2379.6795      -78.0348      -24.5326       20.3826
-   DIST_ELITEPRI_M      -961.8105      -77.4070       12.9733       83.5971
-   CNT_KINDER_350    -108699.5515    -7561.9978      -87.9998     4305.0773
-   CNT_CHILD_350      -66148.4086    -3055.4548     -129.6014     1911.1327
-   CNT_BUS_350        -39605.4561    -2012.2563      325.5323     2361.9436
-   CNT_PRIMARY_1000  -189594.7032    -5640.4046     -381.7289     4756.7456
+   Intercept        -9714155.8307   486491.4024  1094977.1010  1801859.6200
+   FLOOR_LEVEL          1809.9491     3923.6260     4591.4430     5345.2620
+   AGE_2025           -61375.1878    -8074.8747    -5385.8793    -4007.0014
+   DIST_CBD_M          -1425.3242      -94.4146      -20.0719       34.8634
+   DIST_MRT_M          -1179.9093     -119.1305      -55.8108      -18.3775
+   DIST_ELDERCARE_M     -997.3445      -36.1005        6.5873       53.7247
+   DIST_HAWKER_M       -1558.7217      -61.9552      -22.1784       37.8514
+   DIST_SUPERMKT_M     -1081.1179      -42.1032        3.9953       45.8324
+   DIST_MALL_M         -2379.9939      -79.6750      -25.0606       20.9265
+   DIST_ELITEPRI_M     -1044.1988      -76.4077       13.9506       86.4732
+   CNT_KINDER_350    -108877.4417    -7793.3508      -86.1384     4452.8656
+   CNT_CHILD_350      -66154.6555    -3089.1155     -193.2975     1903.2825
+   CNT_BUS_350        -39689.4601    -2034.5444      269.4623     2395.3243
+   CNT_PRIMARY_1000  -190124.7290    -4759.2652     -153.9909     4826.6785
                            Max.
-   Intercept        15271185.21
-   FLOOR_LEVEL         23113.36
-   AGE_2025             5101.08
-   DIST_CBD_M           1379.90
-   DIST_MRT_M           2059.99
-   DIST_ELDERCARE_M      929.88
-   DIST_HAWKER_M         848.74
-   DIST_SUPERMKT_M      1768.27
-   DIST_MALL_M           913.75
-   DIST_ELITEPRI_M      1306.41
-   CNT_KINDER_350     193712.54
-   CNT_CHILD_350       29021.86
-   CNT_BUS_350         23605.43
-   CNT_PRIMARY_1000   118356.30
+   Intercept        15294670.80
+   FLOOR_LEVEL         23122.16
+   AGE_2025             5111.68
+   DIST_CBD_M           1396.71
+   DIST_MRT_M           2060.21
+   DIST_ELDERCARE_M      931.44
+   DIST_HAWKER_M         849.78
+   DIST_SUPERMKT_M      1776.85
+   DIST_MALL_M           915.79
+   DIST_ELITEPRI_M      1308.43
+   CNT_KINDER_350     193767.89
+   CNT_CHILD_350       29097.97
+   CNT_BUS_350         22692.19
+   CNT_PRIMARY_1000   119267.45
    ************************Diagnostic information*************************
    Number of data points: 8679 
-   Effective number of parameters (2trace(S) - trace(S'S)): 1134.333 
-   Effective degrees of freedom (n-2trace(S) + trace(S'S)): 7544.667 
-   AICc (GWR book, Fotheringham, et al. 2002, p. 61, eq 2.33): 206365.8 
-   AIC (GWR book, Fotheringham, et al. 2002,GWR p. 96, eq. 4.22): 205230.1 
-   BIC (GWR book, Fotheringham, et al. 2002,GWR p. 61, eq. 2.34): 203946 
-   Residual sum of squares: 8507189175489 
-   R-square value:  0.9619994 
-   Adjusted R-square value:  0.9562853 
+   Effective number of parameters (2trace(S) - trace(S'S)): 1135.009 
+   Effective degrees of freedom (n-2trace(S) + trace(S'S)): 7543.991 
+   AICc (GWR book, Fotheringham, et al. 2002, p. 61, eq 2.33): 206365.1 
+   AIC (GWR book, Fotheringham, et al. 2002,GWR p. 96, eq. 4.22): 205228.5 
+   BIC (GWR book, Fotheringham, et al. 2002,GWR p. 61, eq. 2.34): 203949.1 
+   Residual sum of squares: 8505081093359 
+   R-square value:  0.9620088 
+   Adjusted R-square value:  0.9562922 
 
    ***********************************************************************
-   Program stops at: 2025-11-16 23:08:05.434838 </code></pre>
+   Program stops at: 2025-11-17 09:15:45.876164 </code></pre>
 </div>
 </div>
 <p>The embedded global regression in the GWmodel run is essentially the same multiple OLS model we reported earlier. All 13 predictors are highly significant with p values below 0.001. The key global effects are: each extra floor adds about 5,853 dollars to resale price, each additional year of AGE_2025 reduces price by about 5 389 dollars, every extra meter from the central business district reduces price by about 19.8 dollars and every extra meter from the nearest MRT station reduces price by about 56.8 dollars, holding other factors constant. Distances to eldercare, hawker centres and malls also have global negative coefficients, while distance to supermarkets and elite primary schools, counts of kindergartens and bus stops have positive global effects, and counts of childcare centres and nearby primary schools have negative global effects. Overall fit is strong with R squared about 0.761, residual sum of squares about 53.4 trillion and AICc about 220,289.</p>
@@ -2413,51 +2408,51 @@ Fixed bandwidth: 492.338 CV score: 12093536359900 </code></pre>
 <h4 data-number="10.2.1" class="anchored" data-anchor-id="computing-the-adaptive-bandwidth"><span class="header-section-number">10.2.1</span> Computing the adaptive bandwidth</h4>
 <p>The search process now optimizes the number of neighbors. For each trial size, cross validation measures out of sample error. The winning size defines a location specific distance for each point that encloses the chosen neighbor count.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb102"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb102-1"><a href="#cb102-1" aria-hidden="true" tabindex="-1"></a>bw.adaptive <span class="ot">&lt;-</span> <span class="fu">bw.gwr</span>(</span>
-<span id="cb102-2"><a href="#cb102-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">formula =</span> resale_price <span class="sc">~</span></span>
-<span id="cb102-3"><a href="#cb102-3" aria-hidden="true" tabindex="-1"></a>    FLOOR_LEVEL <span class="sc">+</span> AGE_2025 <span class="sc">+</span></span>
-<span id="cb102-4"><a href="#cb102-4" aria-hidden="true" tabindex="-1"></a>    DIST_CBD_M <span class="sc">+</span> DIST_MRT_M <span class="sc">+</span></span>
-<span id="cb102-5"><a href="#cb102-5" aria-hidden="true" tabindex="-1"></a>    DIST_ELDERCARE_M <span class="sc">+</span> DIST_HAWKER_M <span class="sc">+</span></span>
-<span id="cb102-6"><a href="#cb102-6" aria-hidden="true" tabindex="-1"></a>    DIST_SUPERMKT_M <span class="sc">+</span> DIST_MALL_M <span class="sc">+</span> DIST_ELITEPRI_M <span class="sc">+</span></span>
-<span id="cb102-7"><a href="#cb102-7" aria-hidden="true" tabindex="-1"></a>    CNT_KINDER_350 <span class="sc">+</span> CNT_CHILD_350 <span class="sc">+</span> CNT_BUS_350 <span class="sc">+</span> CNT_PRIMARY_1000,</span>
-<span id="cb102-8"><a href="#cb102-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> analysis_sf,</span>
-<span id="cb102-9"><a href="#cb102-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">approach=</span><span class="st">"CV"</span>, </span>
-<span id="cb102-10"><a href="#cb102-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">kernel=</span><span class="st">"gaussian"</span>, </span>
-<span id="cb102-11"><a href="#cb102-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">adaptive=</span><span class="cn">TRUE</span>, </span>
-<span id="cb102-12"><a href="#cb102-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">longlat=</span><span class="cn">FALSE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb101"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb101-1"><a href="#cb101-1" aria-hidden="true" tabindex="-1"></a>bw.adaptive <span class="ot">&lt;-</span> <span class="fu">bw.gwr</span>(</span>
+<span id="cb101-2"><a href="#cb101-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">formula =</span> resale_price <span class="sc">~</span></span>
+<span id="cb101-3"><a href="#cb101-3" aria-hidden="true" tabindex="-1"></a>    FLOOR_LEVEL <span class="sc">+</span> AGE_2025 <span class="sc">+</span></span>
+<span id="cb101-4"><a href="#cb101-4" aria-hidden="true" tabindex="-1"></a>    DIST_CBD_M <span class="sc">+</span> DIST_MRT_M <span class="sc">+</span></span>
+<span id="cb101-5"><a href="#cb101-5" aria-hidden="true" tabindex="-1"></a>    DIST_ELDERCARE_M <span class="sc">+</span> DIST_HAWKER_M <span class="sc">+</span></span>
+<span id="cb101-6"><a href="#cb101-6" aria-hidden="true" tabindex="-1"></a>    DIST_SUPERMKT_M <span class="sc">+</span> DIST_MALL_M <span class="sc">+</span> DIST_ELITEPRI_M <span class="sc">+</span></span>
+<span id="cb101-7"><a href="#cb101-7" aria-hidden="true" tabindex="-1"></a>    CNT_KINDER_350 <span class="sc">+</span> CNT_CHILD_350 <span class="sc">+</span> CNT_BUS_350 <span class="sc">+</span> CNT_PRIMARY_1000,</span>
+<span id="cb101-8"><a href="#cb101-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> analysis_sf,</span>
+<span id="cb101-9"><a href="#cb101-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">approach=</span><span class="st">"CV"</span>, </span>
+<span id="cb101-10"><a href="#cb101-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">kernel=</span><span class="st">"gaussian"</span>, </span>
+<span id="cb101-11"><a href="#cb101-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">adaptive=</span><span class="cn">TRUE</span>, </span>
+<span id="cb101-12"><a href="#cb101-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">longlat=</span><span class="cn">FALSE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Take a cup of tea and have a break, it will take a few minutes.
           -----A kind suggestion from GWmodel development group
-Adaptive bandwidth: 5371 CV score: 49438681234211 
-Adaptive bandwidth: 3327 CV score: 45804301985023 
-Adaptive bandwidth: 2063 CV score: 40613968456352 
-Adaptive bandwidth: 1282 CV score: 33631587116541 
-Adaptive bandwidth: 799 CV score: 27110516923525 
-Adaptive bandwidth: 501 CV score: 22614461875755 
-Adaptive bandwidth: 316 CV score: 19354462639156 
-Adaptive bandwidth: 202 CV score: 16714806915953 
-Adaptive bandwidth: 131 CV score: 14839340890505 
-Adaptive bandwidth: 88 CV score: 13502993143099 
-Adaptive bandwidth: 60 CV score: 12506657744850 
-Adaptive bandwidth: 44 CV score: 11783391330857 
+Adaptive bandwidth: 5371 CV score: 49470158007622 
+Adaptive bandwidth: 3327 CV score: 45828222563206 
+Adaptive bandwidth: 2063 CV score: 40631237962788 
+Adaptive bandwidth: 1282 CV score: 33643428599657 
+Adaptive bandwidth: 799 CV score: 27119597737345 
+Adaptive bandwidth: 501 CV score: 22618863055309 
+Adaptive bandwidth: 316 CV score: 19348922117395 
+Adaptive bandwidth: 202 CV score: 16716492538020 
+Adaptive bandwidth: 131 CV score: 14853738869558 
+Adaptive bandwidth: 88 CV score: 13510549154175 
+Adaptive bandwidth: 60 CV score: 12503063039163 
+Adaptive bandwidth: 44 CV score: 11773334701658 
 Adaptive bandwidth: 33 CV score: Inf 
-Adaptive bandwidth: 50 CV score: 11989958686380 
+Adaptive bandwidth: 50 CV score: 11982322787186 
 Adaptive bandwidth: 39 CV score: Inf 
-Adaptive bandwidth: 45 CV score: 11817563590297 
+Adaptive bandwidth: 45 CV score: 11807701622276 
 Adaptive bandwidth: 41 CV score: Inf 
-Adaptive bandwidth: 43 CV score: 11757456734254 
-Adaptive bandwidth: 45 CV score: 11817563590297 
-Adaptive bandwidth: 44 CV score: 11783391330857 
-Adaptive bandwidth: 45 CV score: 11817563590297 
-Adaptive bandwidth: 44 CV score: 11783391330857 
-Adaptive bandwidth: 44 CV score: 11783391330857 
-Adaptive bandwidth: 43 CV score: 11757456734254 </code></pre>
+Adaptive bandwidth: 43 CV score: 11739569989251 
+Adaptive bandwidth: 45 CV score: 11807701622276 
+Adaptive bandwidth: 44 CV score: 11773334701658 
+Adaptive bandwidth: 45 CV score: 11807701622276 
+Adaptive bandwidth: 44 CV score: 11773334701658 
+Adaptive bandwidth: 44 CV score: 11773334701658 
+Adaptive bandwidth: 43 CV score: 11739569989251 </code></pre>
 </div>
 </div>
 <p>The following code chunk displays the adaptive bandwidth.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb104"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb104-1"><a href="#cb104-1" aria-hidden="true" tabindex="-1"></a><span class="co"># display adaptive bw</span></span>
-<span id="cb104-2"><a href="#cb104-2" aria-hidden="true" tabindex="-1"></a>bw.adaptive</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb103"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb103-1"><a href="#cb103-1" aria-hidden="true" tabindex="-1"></a><span class="co"># display adaptive bw</span></span>
+<span id="cb103-2"><a href="#cb103-2" aria-hidden="true" tabindex="-1"></a>bw.adaptive</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 43</code></pre>
 </div>
@@ -2467,27 +2462,27 @@ Adaptive bandwidth: 43 CV score: 11757456734254 </code></pre>
 <h4 data-number="10.2.2" class="anchored" data-anchor-id="constructing-the-adaptive-bandwidth-gwr-model"><span class="header-section-number">10.2.2</span> Constructing the adaptive bandwidth gwr model</h4>
 <p>Using the selected neighbour count, the adaptive GWR is calibrated with the same predictors. Outputs include local coefficients, standard errors, fitted values, and diagnostics, which we will convert to spatial features for visualization.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb106"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb106-1"><a href="#cb106-1" aria-hidden="true" tabindex="-1"></a>gwr.adaptive <span class="ot">&lt;-</span> <span class="fu">gwr.basic</span>(</span>
-<span id="cb106-2"><a href="#cb106-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">formula =</span> resale_price <span class="sc">~</span></span>
-<span id="cb106-3"><a href="#cb106-3" aria-hidden="true" tabindex="-1"></a>    FLOOR_LEVEL <span class="sc">+</span> AGE_2025 <span class="sc">+</span></span>
-<span id="cb106-4"><a href="#cb106-4" aria-hidden="true" tabindex="-1"></a>    DIST_CBD_M <span class="sc">+</span> DIST_MRT_M <span class="sc">+</span></span>
-<span id="cb106-5"><a href="#cb106-5" aria-hidden="true" tabindex="-1"></a>    DIST_ELDERCARE_M <span class="sc">+</span> DIST_HAWKER_M <span class="sc">+</span></span>
-<span id="cb106-6"><a href="#cb106-6" aria-hidden="true" tabindex="-1"></a>    DIST_SUPERMKT_M <span class="sc">+</span> DIST_MALL_M <span class="sc">+</span> DIST_ELITEPRI_M <span class="sc">+</span></span>
-<span id="cb106-7"><a href="#cb106-7" aria-hidden="true" tabindex="-1"></a>    CNT_KINDER_350 <span class="sc">+</span> CNT_CHILD_350 <span class="sc">+</span> CNT_BUS_350 <span class="sc">+</span> CNT_PRIMARY_1000,</span>
-<span id="cb106-8"><a href="#cb106-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> analysis_sf,</span>
-<span id="cb106-9"><a href="#cb106-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">bw=</span>bw.adaptive, </span>
-<span id="cb106-10"><a href="#cb106-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">kernel =</span> <span class="st">'gaussian'</span>, </span>
-<span id="cb106-11"><a href="#cb106-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">adaptive=</span><span class="cn">TRUE</span>, </span>
-<span id="cb106-12"><a href="#cb106-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">longlat =</span> <span class="cn">FALSE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb105"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb105-1"><a href="#cb105-1" aria-hidden="true" tabindex="-1"></a>gwr.adaptive <span class="ot">&lt;-</span> <span class="fu">gwr.basic</span>(</span>
+<span id="cb105-2"><a href="#cb105-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">formula =</span> resale_price <span class="sc">~</span></span>
+<span id="cb105-3"><a href="#cb105-3" aria-hidden="true" tabindex="-1"></a>    FLOOR_LEVEL <span class="sc">+</span> AGE_2025 <span class="sc">+</span></span>
+<span id="cb105-4"><a href="#cb105-4" aria-hidden="true" tabindex="-1"></a>    DIST_CBD_M <span class="sc">+</span> DIST_MRT_M <span class="sc">+</span></span>
+<span id="cb105-5"><a href="#cb105-5" aria-hidden="true" tabindex="-1"></a>    DIST_ELDERCARE_M <span class="sc">+</span> DIST_HAWKER_M <span class="sc">+</span></span>
+<span id="cb105-6"><a href="#cb105-6" aria-hidden="true" tabindex="-1"></a>    DIST_SUPERMKT_M <span class="sc">+</span> DIST_MALL_M <span class="sc">+</span> DIST_ELITEPRI_M <span class="sc">+</span></span>
+<span id="cb105-7"><a href="#cb105-7" aria-hidden="true" tabindex="-1"></a>    CNT_KINDER_350 <span class="sc">+</span> CNT_CHILD_350 <span class="sc">+</span> CNT_BUS_350 <span class="sc">+</span> CNT_PRIMARY_1000,</span>
+<span id="cb105-8"><a href="#cb105-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> analysis_sf,</span>
+<span id="cb105-9"><a href="#cb105-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">bw=</span>bw.adaptive, </span>
+<span id="cb105-10"><a href="#cb105-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">kernel =</span> <span class="st">'gaussian'</span>, </span>
+<span id="cb105-11"><a href="#cb105-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">adaptive=</span><span class="cn">TRUE</span>, </span>
+<span id="cb105-12"><a href="#cb105-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">longlat =</span> <span class="cn">FALSE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>The code below can be used to display the model output.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb107"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb107-1"><a href="#cb107-1" aria-hidden="true" tabindex="-1"></a>gwr.adaptive</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb106"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb106-1"><a href="#cb106-1" aria-hidden="true" tabindex="-1"></a>gwr.adaptive</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>   ***********************************************************************
    *                       Package   GWmodel                             *
    ***********************************************************************
-   Program starts at: 2025-11-16 23:14:39.796087 
+   Program starts at: 2025-11-17 09:22:19.360046 
    Call:
    gwr.basic(formula = resale_price ~ FLOOR_LEVEL + AGE_2025 + DIST_CBD_M + 
     DIST_MRT_M + DIST_ELDERCARE_M + DIST_HAWKER_M + DIST_SUPERMKT_M + 
@@ -2507,37 +2502,37 @@ Adaptive bandwidth: 43 CV score: 11757456734254 </code></pre>
 
    Residuals:
     Min      1Q  Median      3Q     Max 
--315906  -51235    -549   48570  496052 
+-316054  -51155    -516   48494  496379 
 
    Coefficients:
                         Estimate   Std. Error t value             Pr(&gt;|t|)    
-   (Intercept)      1081180.5627    5873.4817 184.078 &lt; 0.0000000000000002 ***
-   FLOOR_LEVEL         5853.8558     146.3006  40.013 &lt; 0.0000000000000002 ***
-   AGE_2025           -5390.4551      65.3591 -82.474 &lt; 0.0000000000000002 ***
-   DIST_CBD_M           -19.8313       0.3270 -60.650 &lt; 0.0000000000000002 ***
-   DIST_MRT_M           -56.7805       2.6334 -21.561 &lt; 0.0000000000000002 ***
-   DIST_ELDERCARE_M     -10.4704       1.5022  -6.970      0.0000000000034 ***
-   DIST_HAWKER_M        -25.3443       1.9964 -12.695 &lt; 0.0000000000000002 ***
-   DIST_SUPERMKT_M       16.2692       4.9483   3.288              0.00101 ** 
-   DIST_MALL_M          -27.5099       2.7120 -10.144 &lt; 0.0000000000000002 ***
-   DIST_ELITEPRI_M        1.8638       0.4209   4.428      0.0000096076479 ***
-   CNT_KINDER_350     10196.1602     930.1569  10.962 &lt; 0.0000000000000002 ***
-   CNT_CHILD_350      -1953.0874     465.6300  -4.195      0.0000276192396 ***
-   CNT_BUS_350         1461.6051     320.5408   4.560      0.0000051902793 ***
-   CNT_PRIMARY_1000  -12074.6258     656.3931 -18.395 &lt; 0.0000000000000002 ***
+   (Intercept)      1080917.4696    5877.2107 183.917 &lt; 0.0000000000000002 ***
+   FLOOR_LEVEL         5855.0714     146.3704  40.002 &lt; 0.0000000000000002 ***
+   AGE_2025           -5387.5153      65.4019 -82.375 &lt; 0.0000000000000002 ***
+   DIST_CBD_M           -19.8548       0.3271 -60.702 &lt; 0.0000000000000002 ***
+   DIST_MRT_M           -56.5934       2.6342 -21.484 &lt; 0.0000000000000002 ***
+   DIST_ELDERCARE_M     -10.5247       1.5039  -6.999     0.00000000000278 ***
+   DIST_HAWKER_M        -25.2715       1.9971 -12.654 &lt; 0.0000000000000002 ***
+   DIST_SUPERMKT_M       16.4612       4.9502   3.325             0.000887 ***
+   DIST_MALL_M          -27.4767       2.7137 -10.125 &lt; 0.0000000000000002 ***
+   DIST_ELITEPRI_M        1.8489       0.4212   4.389     0.00001150730477 ***
+   CNT_KINDER_350     10169.7771     930.9069  10.925 &lt; 0.0000000000000002 ***
+   CNT_CHILD_350      -1962.7583     465.9868  -4.212     0.00002556290081 ***
+   CNT_BUS_350         1434.5653     320.6066   4.475     0.00000775550196 ***
+   CNT_PRIMARY_1000  -11889.3046     654.3927 -18.168 &lt; 0.0000000000000002 ***
 
    ---Significance stars
    Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1 
-   Residual standard error: 78510 on 8665 degrees of freedom
-   Multiple R-squared: 0.7615
-   Adjusted R-squared: 0.7611 
-   F-statistic:  2128 on 13 and 8665 DF,  p-value: &lt; 0.00000000000000022 
+   Residual standard error: 78540 on 8665 degrees of freedom
+   Multiple R-squared: 0.7612
+   Adjusted R-squared: 0.7609 
+   F-statistic:  2125 on 13 and 8665 DF,  p-value: &lt; 0.00000000000000022 
    ***Extra Diagnostic information
-   Residual sum of squares: 53403519683267
-   Sigma(hat): 78451.3
-   AIC:  220286.6
-   AICc:  220286.7
-   BIC:  211849.7
+   Residual sum of squares: 53452303146043
+   Sigma(hat): 78487.12
+   AIC:  220294.6
+   AICc:  220294.6
+   BIC:  211857.6
    ***********************************************************************
    *          Results of Geographically Weighted Regression              *
    ***********************************************************************
@@ -2550,48 +2545,48 @@ Adaptive bandwidth: 43 CV score: 11757456734254 </code></pre>
 
    ****************Summary of GWR coefficient estimates:******************
                               Min.        1st Qu.         Median        3rd Qu.
-   Intercept        -75757417.2874    409773.4005   1181220.6985   2676602.7520
-   FLOOR_LEVEL           1666.4109      3928.1718      4633.9967      5411.3176
-   AGE_2025           -100201.2717     -8448.0373     -5013.9184     -3773.3492
-   DIST_CBD_M          -12633.3460      -193.0836       -23.4580        41.8454
-   DIST_MRT_M          -17514.2292      -118.8915       -56.0866        -3.0742
-   DIST_ELDERCARE_M    -19500.4163       -27.1476        21.4099        79.6569
-   DIST_HAWKER_M       -11750.0244       -73.7205       -17.8461        47.4362
-   DIST_SUPERMKT_M      -9236.3100       -54.8218         3.9836        57.4492
-   DIST_MALL_M         -20167.5661       -84.0771       -28.8356        22.5139
-   DIST_ELITEPRI_M     -17313.8718       -75.7153         9.2729       150.3986
-   CNT_KINDER_350      -91932.8000     -8325.5453      -196.1971      4978.7145
-   CNT_CHILD_350       -83814.3208     -2072.0983       218.7891      2854.2842
-   CNT_BUS_350         -21251.9013     -2101.8634       303.9757      2729.6537
-   CNT_PRIMARY_1000  -2089387.0446     -6948.7400      -485.5829      5158.9479
-                            Max.
-   Intercept        117885924.45
-   FLOOR_LEVEL          10871.15
-   AGE_2025             20310.39
-   DIST_CBD_M           12954.58
-   DIST_MRT_M           13785.35
-   DIST_ELDERCARE_M      5473.92
-   DIST_HAWKER_M         8485.23
-   DIST_SUPERMKT_M        924.59
-   DIST_MALL_M          14056.69
-   DIST_ELITEPRI_M      12628.54
-   CNT_KINDER_350     2401971.91
-   CNT_CHILD_350       701382.56
-   CNT_BUS_350         359569.63
-   CNT_PRIMARY_1000    249176.42
+   Intercept        -75819926.7516    420886.4146   1180054.6016   2724322.0534
+   FLOOR_LEVEL           1666.4109      3931.9052      4634.9959      5411.5324
+   AGE_2025           -100201.2717     -8461.9155     -5060.1476     -3777.7257
+   DIST_CBD_M          -12102.2820      -187.6482       -22.9116        43.3146
+   DIST_MRT_M          -17537.9547      -118.9366       -55.7142        -3.0363
+   DIST_ELDERCARE_M    -19500.4163       -29.4387        20.5425        78.1805
+   DIST_HAWKER_M       -11750.0244       -73.4540       -18.8545        47.0662
+   DIST_SUPERMKT_M      -9236.3100       -54.9341         4.8461        59.4664
+   DIST_MALL_M         -20167.5901       -84.0841       -27.7171        23.6320
+   DIST_ELITEPRI_M     -17313.8718       -73.5388         9.7556       150.6174
+   CNT_KINDER_350      -91796.1481     -8494.0684      -251.6721      5047.1983
+   CNT_CHILD_350       -83852.1302     -2160.5685       114.5144      2722.6767
+   CNT_BUS_350         -21260.8150     -2080.0998       272.8805      2686.8223
+   CNT_PRIMARY_1000  -2097474.3417     -6316.5921      -265.7621      5415.4944
+                           Max.
+   Intercept        91304468.78
+   FLOOR_LEVEL         10871.15
+   AGE_2025            12582.62
+   DIST_CBD_M          12954.58
+   DIST_MRT_M          13785.36
+   DIST_ELDERCARE_M     5393.27
+   DIST_HAWKER_M        8485.23
+   DIST_SUPERMKT_M       924.59
+   DIST_MALL_M         14056.69
+   DIST_ELITEPRI_M      8113.86
+   CNT_KINDER_350    2401971.91
+   CNT_CHILD_350      701382.56
+   CNT_BUS_350        359569.63
+   CNT_PRIMARY_1000   249176.75
    ************************Diagnostic information*************************
    Number of data points: 8679 
-   Effective number of parameters (2trace(S) - trace(S'S)): 1261.738 
-   Effective degrees of freedom (n-2trace(S) + trace(S'S)): 7417.262 
-   AICc (GWR book, Fotheringham, et al. 2002, p. 61, eq 2.33): 206973.3 
-   AIC (GWR book, Fotheringham, et al. 2002,GWR p. 96, eq. 4.22): 205695 
-   BIC (GWR book, Fotheringham, et al. 2002,GWR p. 61, eq. 2.34): 205162.4 
-   Residual sum of squares: 8879474156237 
-   R-square value:  0.9603364 
-   Adjusted R-square value:  0.9535884 
+   Effective number of parameters (2trace(S) - trace(S'S)): 1261.618 
+   Effective degrees of freedom (n-2trace(S) + trace(S'S)): 7417.382 
+   AICc (GWR book, Fotheringham, et al. 2002, p. 61, eq 2.33): 206970.3 
+   AIC (GWR book, Fotheringham, et al. 2002,GWR p. 96, eq. 4.22): 205692.3 
+   BIC (GWR book, Fotheringham, et al. 2002,GWR p. 61, eq. 2.34): 205158 
+   Residual sum of squares: 8876907400595 
+   R-square value:  0.9603479 
+   Adjusted R-square value:  0.9536026 
 
    ***********************************************************************
-   Program stops at: 2025-11-16 23:15:14.626614 </code></pre>
+   Program stops at: 2025-11-17 09:22:54.183822 </code></pre>
 </div>
 </div>
 <p>The adaptive geographically weighted regression refines the global hedonic model by letting each location borrow information from its <strong>43</strong> nearest neighbours, so dense estates use tight windows while sparse areas use wider ones.</p>
@@ -2621,72 +2616,72 @@ Adaptive bandwidth: 43 CV score: 11757456734254 </code></pre>
 <h4 data-number="10.3.1" class="anchored" data-anchor-id="converting-sdf-into-sf-data.frame"><span class="header-section-number">10.3.1</span> Converting SDF into sf data.frame</h4>
 <p>GWmodel returns a Spatial Data Frame structure. For consistent handling with the rest of the workflow, we convert the model output into an sf object and enforce EPSG 3414. This conversion preserves attributes such as coefficients, t values, and fitted values while attaching valid geometry. A brief glimpse confirms column names and types. The resulting layer integrates seamlessly with tmap and dplyr, allowing clean joins, selections, and map composition without coercion errors.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb109"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb109-1"><a href="#cb109-1" aria-hidden="true" tabindex="-1"></a>analysis.sf.adaptive <span class="ot">&lt;-</span></span>
-<span id="cb109-2"><a href="#cb109-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_as_sf</span>(gwr.adaptive<span class="sc">$</span>SDF) <span class="sc">%&gt;%</span></span>
-<span id="cb109-3"><a href="#cb109-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_transform</span>(<span class="at">crs=</span><span class="dv">3414</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb108"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb108-1"><a href="#cb108-1" aria-hidden="true" tabindex="-1"></a>analysis.sf.adaptive <span class="ot">&lt;-</span></span>
+<span id="cb108-2"><a href="#cb108-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_as_sf</span>(gwr.adaptive<span class="sc">$</span>SDF) <span class="sc">%&gt;%</span></span>
+<span id="cb108-3"><a href="#cb108-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">st_transform</span>(<span class="at">crs=</span><span class="dv">3414</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb110"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb110-1"><a href="#cb110-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(analysis.sf.adaptive)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb109"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb109-1"><a href="#cb109-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(analysis.sf.adaptive)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Rows: 8,679
 Columns: 49
-$ Intercept           &lt;dbl&gt; 1374903, 1386785, 1374903, 1217950, 1386785, 12179…
-$ FLOOR_LEVEL         &lt;dbl&gt; 5277.432, 6002.142, 5277.432, 7308.207, 6002.142, …
-$ AGE_2025            &lt;dbl&gt; -9009.658, -8029.718, -9009.658, -8184.863, -8029.…
-$ DIST_CBD_M          &lt;dbl&gt; -32.66705, -55.03257, -32.66705, -45.96045, -55.03…
-$ DIST_MRT_M          &lt;dbl&gt; -49.11932, 66.28118, -49.11932, 56.05148, 66.28118…
-$ DIST_ELDERCARE_M    &lt;dbl&gt; 78.22071, 154.00055, 78.22071, 80.72166, 154.00055…
-$ DIST_HAWKER_M       &lt;dbl&gt; 56.64781, 46.18170, 56.64781, 107.03918, 46.18170,…
-$ DIST_SUPERMKT_M     &lt;dbl&gt; -9.665631, 121.346718, -9.665631, 45.835332, 121.3…
-$ DIST_MALL_M         &lt;dbl&gt; -23.02675, -93.58701, -23.02675, -17.54431, -93.58…
-$ DIST_ELITEPRI_M     &lt;dbl&gt; -48.667048, -47.066341, -48.667048, -3.074145, -47…
-$ CNT_KINDER_350      &lt;dbl&gt; 3658.406, 8311.043, 3658.406, 3669.709, 8311.043, …
-$ CNT_CHILD_350       &lt;dbl&gt; 4247.138, 3204.654, 4247.138, 3640.797, 3204.654, …
-$ CNT_BUS_350         &lt;dbl&gt; 147.1248, 6139.5015, 147.1248, 2920.5888, 6139.501…
-$ CNT_PRIMARY_1000    &lt;dbl&gt; -19204.168, -7754.240, -19204.168, -3407.202, -775…
+$ Intercept           &lt;dbl&gt; 1372611, 1378403, 1372611, 1220761, 1378403, 12207…
+$ FLOOR_LEVEL         &lt;dbl&gt; 5273.715, 5958.302, 5273.715, 7309.421, 5958.302, …
+$ AGE_2025            &lt;dbl&gt; -9043.527, -8096.687, -9043.527, -8171.505, -8096.…
+$ DIST_CBD_M          &lt;dbl&gt; -32.39158, -54.41816, -32.39158, -46.73114, -54.41…
+$ DIST_MRT_M          &lt;dbl&gt; -50.418513, 63.015593, -50.418513, 56.030906, 63.0…
+$ DIST_ELDERCARE_M    &lt;dbl&gt; 78.52689, 155.33493, 78.52689, 80.98130, 155.33493…
+$ DIST_HAWKER_M       &lt;dbl&gt; 58.60382, 59.75263, 58.60382, 108.04486, 59.75263,…
+$ DIST_SUPERMKT_M     &lt;dbl&gt; -13.027782, 113.331892, -13.027782, 45.809992, 113…
+$ DIST_MALL_M         &lt;dbl&gt; -18.78535, -87.24034, -18.78535, -15.50219, -87.24…
+$ DIST_ELITEPRI_M     &lt;dbl&gt; -49.532805, -50.985132, -49.532805, -3.041654, -50…
+$ CNT_KINDER_350      &lt;dbl&gt; 3637.694, 7968.247, 3637.694, 3589.385, 7968.247, …
+$ CNT_CHILD_350       &lt;dbl&gt; 3741.448, 2294.173, 3741.448, 3476.573, 2294.173, …
+$ CNT_BUS_350         &lt;dbl&gt; -74.14264, 5907.85122, -74.14264, 2819.22534, 5907…
+$ CNT_PRIMARY_1000    &lt;dbl&gt; -17636.8619, -2841.3086, -17636.8619, -2005.5695, …
 $ y                   &lt;dbl&gt; 582000, 865000, 530000, 560000, 1038000, 542000, 6…
-$ yhat                &lt;dbl&gt; 629211.5, 919120.6, 613379.2, 565113.5, 1027159.1,…
-$ residual            &lt;dbl&gt; -47211.5040, -54120.5658, -83379.2089, -5113.4785,…
+$ yhat                &lt;dbl&gt; 629711.9, 918046.1, 613890.7, 564810.8, 1025295.6,…
+$ residual            &lt;dbl&gt; -47711.8644, -53046.1246, -83890.7202, -4810.7857,…
 $ CV_Score            &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,…
-$ Stud_residual       &lt;dbl&gt; -1.412162419, -1.622737639, -2.477421258, -0.15759…
-$ Intercept_SE        &lt;dbl&gt; 73791.83, 128930.54, 73791.83, 73351.44, 128930.54…
-$ FLOOR_LEVEL_SE      &lt;dbl&gt; 420.1065, 603.1228, 420.1065, 525.1575, 603.1228, …
-$ AGE_2025_SE         &lt;dbl&gt; 220.3508, 313.3994, 220.3508, 242.5908, 313.3994, …
-$ DIST_CBD_M_SE       &lt;dbl&gt; 6.327724, 13.184596, 6.327724, 8.863603, 13.184596…
-$ DIST_MRT_M_SE       &lt;dbl&gt; 14.84159, 18.40148, 14.84159, 14.30122, 18.40148, …
-$ DIST_ELDERCARE_M_SE &lt;dbl&gt; 12.26876, 17.83651, 12.26876, 13.76716, 17.83651, …
-$ DIST_HAWKER_M_SE    &lt;dbl&gt; 24.31817, 28.60073, 24.31817, 21.99188, 28.60073, …
-$ DIST_SUPERMKT_M_SE  &lt;dbl&gt; 24.08814, 38.22529, 24.08814, 24.69431, 38.22529, …
-$ DIST_MALL_M_SE      &lt;dbl&gt; 19.22362, 19.67735, 19.22362, 13.94482, 19.67735, …
-$ DIST_ELITEPRI_M_SE  &lt;dbl&gt; 8.679052, 9.986913, 8.679052, 7.901863, 9.986913, …
-$ CNT_KINDER_350_SE   &lt;dbl&gt; 3515.168, 4620.614, 3515.168, 3927.209, 4620.614, …
-$ CNT_CHILD_350_SE    &lt;dbl&gt; 2647.410, 3544.774, 2647.410, 2315.222, 3544.774, …
-$ CNT_BUS_350_SE      &lt;dbl&gt; 1449.635, 1887.351, 1449.635, 1564.252, 1887.351, …
-$ CNT_PRIMARY_1000_SE &lt;dbl&gt; 4257.002, 5321.439, 4257.002, 4234.401, 5321.439, …
-$ Intercept_TV        &lt;dbl&gt; 18.63219, 10.75606, 18.63219, 16.60432, 10.75606, …
-$ FLOOR_LEVEL_TV      &lt;dbl&gt; 12.562129, 9.951775, 12.562129, 13.916219, 9.95177…
-$ AGE_2025_TV         &lt;dbl&gt; -40.88780, -25.62135, -40.88780, -33.73938, -25.62…
-$ DIST_CBD_M_TV       &lt;dbl&gt; -5.162527, -4.174005, -5.162527, -5.185301, -4.174…
-$ DIST_MRT_M_TV       &lt;dbl&gt; -3.3095732, 3.6019482, -3.3095732, 3.9193489, 3.60…
-$ DIST_ELDERCARE_M_TV &lt;dbl&gt; 6.375602, 8.634004, 6.375602, 5.863350, 8.634004, …
-$ DIST_HAWKER_M_TV    &lt;dbl&gt; 2.329444, 1.614704, 2.329444, 4.867214, 1.614704, …
-$ DIST_SUPERMKT_M_TV  &lt;dbl&gt; -0.4012610, 3.1745137, -0.4012610, 1.8561092, 3.17…
-$ DIST_MALL_M_TV      &lt;dbl&gt; -1.1978364, -4.7560776, -1.1978364, -1.2581241, -4…
-$ DIST_ELITEPRI_M_TV  &lt;dbl&gt; -5.6074155, -4.7128018, -5.6074155, -0.3890406, -4…
-$ CNT_KINDER_350_TV   &lt;dbl&gt; 1.0407485, 1.7986882, 1.0407485, 0.9344317, 1.7986…
-$ CNT_CHILD_350_TV    &lt;dbl&gt; 1.6042613, 0.9040504, 1.6042613, 1.5725473, 0.9040…
-$ CNT_BUS_350_TV      &lt;dbl&gt; 0.1014909, 3.2529734, 0.1014909, 1.8670832, 3.2529…
-$ CNT_PRIMARY_1000_TV &lt;dbl&gt; -4.5111953, -1.4571697, -4.5111953, -0.8046480, -1…
-$ Local_R2            &lt;dbl&gt; 0.9513180, 0.9492120, 0.9513180, 0.9562596, 0.9492…
+$ Stud_residual       &lt;dbl&gt; -1.427709351, -1.591615070, -2.493658318, -0.14831…
+$ Intercept_SE        &lt;dbl&gt; 74719.69, 129359.09, 74719.69, 73593.63, 129359.09…
+$ FLOOR_LEVEL_SE      &lt;dbl&gt; 420.1514, 603.2191, 420.1514, 525.0790, 603.2191, …
+$ AGE_2025_SE         &lt;dbl&gt; 219.2037, 311.4543, 219.2037, 243.2858, 311.4543, …
+$ DIST_CBD_M_SE       &lt;dbl&gt; 6.379956, 13.183936, 6.379956, 8.891780, 13.183936…
+$ DIST_MRT_M_SE       &lt;dbl&gt; 14.85203, 18.65225, 14.85203, 14.34278, 18.65225, …
+$ DIST_ELDERCARE_M_SE &lt;dbl&gt; 12.25789, 17.87305, 12.25789, 13.77678, 17.87305, …
+$ DIST_HAWKER_M_SE    &lt;dbl&gt; 24.53084, 28.61523, 24.53084, 22.04778, 28.61523, …
+$ DIST_SUPERMKT_M_SE  &lt;dbl&gt; 23.91401, 37.98413, 23.91401, 24.68759, 37.98413, …
+$ DIST_MALL_M_SE      &lt;dbl&gt; 19.08060, 19.42858, 19.08060, 13.89451, 19.42858, …
+$ DIST_ELITEPRI_M_SE  &lt;dbl&gt; 8.681579, 10.002921, 8.681579, 7.905792, 10.002921…
+$ CNT_KINDER_350_SE   &lt;dbl&gt; 3513.672, 4580.611, 3513.672, 3925.832, 4580.611, …
+$ CNT_CHILD_350_SE    &lt;dbl&gt; 2623.324, 3462.951, 2623.324, 2302.699, 3462.951, …
+$ CNT_BUS_350_SE      &lt;dbl&gt; 1464.982, 1901.061, 1464.982, 1568.528, 1901.061, …
+$ CNT_PRIMARY_1000_SE &lt;dbl&gt; 4238.693, 5249.414, 4238.693, 4229.671, 5249.414, …
+$ Intercept_TV        &lt;dbl&gt; 18.37014, 10.65563, 18.37014, 16.58787, 10.65563, …
+$ FLOOR_LEVEL_TV      &lt;dbl&gt; 12.551937, 9.877509, 12.551937, 13.920612, 9.87750…
+$ AGE_2025_TV         &lt;dbl&gt; -41.25627, -25.99639, -41.25627, -33.58809, -25.99…
+$ DIST_CBD_M_TV       &lt;dbl&gt; -5.077086, -4.127611, -5.077086, -5.255544, -4.127…
+$ DIST_MRT_M_TV       &lt;dbl&gt; -3.3947208, 3.3784452, -3.3947208, 3.9065589, 3.37…
+$ DIST_ELDERCARE_M_TV &lt;dbl&gt; 6.406230, 8.691013, 6.406230, 5.878099, 8.691013, …
+$ DIST_HAWKER_M_TV    &lt;dbl&gt; 2.388985, 2.088141, 2.388985, 4.900486, 2.088141, …
+$ DIST_SUPERMKT_M_TV  &lt;dbl&gt; -0.5447761, 2.9836645, -0.5447761, 1.8555877, 2.98…
+$ DIST_MALL_M_TV      &lt;dbl&gt; -0.9845261, -4.4903095, -0.9845261, -1.1157062, -4…
+$ DIST_ELITEPRI_M_TV  &lt;dbl&gt; -5.7055063, -5.0970244, -5.7055063, -0.3847374, -5…
+$ CNT_KINDER_350_TV   &lt;dbl&gt; 1.0352969, 1.7395597, 1.0352969, 0.9142991, 1.7395…
+$ CNT_CHILD_350_TV    &lt;dbl&gt; 1.4262242, 0.6624909, 1.4262242, 1.5097814, 0.6624…
+$ CNT_BUS_350_TV      &lt;dbl&gt; -0.05060994, 3.10766009, -0.05060994, 1.79736968, …
+$ CNT_PRIMARY_1000_TV &lt;dbl&gt; -4.16091945, -0.54126207, -4.16091945, -0.47416678…
+$ Local_R2            &lt;dbl&gt; 0.9508844, 0.9490104, 0.9508844, 0.9561350, 0.9490…
 $ geometry            &lt;POINT [m]&gt; POINT (30036.29 38360.76), POINT (29283.45 3…</code></pre>
 </div>
 </div>
 <p>The adaptive GWR output now attaches local coefficients, standard errors, t values, fitted prices, and residuals to every condominium. This enables mapping spatial variation in effects, identifying neighbourhoods where specific predictors matter most, and diagnosing where the global hedonic model under or over estimates resale prices.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb112"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb112-1"><a href="#cb112-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(gwr.adaptive<span class="sc">$</span>SDF<span class="sc">$</span>yhat)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb111"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb111-1"><a href="#cb111-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(gwr.adaptive<span class="sc">$</span>SDF<span class="sc">$</span>yhat)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
- 396418  564536  628366  672137  723932 1485595 </code></pre>
+ 396418  564691  628366  672149  723899 1485595 </code></pre>
 </div>
 </div>
 <p>Adaptive GWR fitted prices range from about 396622 to 1485595. Median predicted price about 628332 and mean about 672147 indicate a slightly right skewed distribution with relatively few high value condominiums pulling the average above the middle of the market.</p>
@@ -2695,15 +2690,15 @@ $ geometry            &lt;POINT [m]&gt; POINT (30036.29 38360.76), POINT (29283.
 <h4 data-number="10.3.2" class="anchored" data-anchor-id="visualising-local-r2"><span class="header-section-number">10.3.2</span> Visualising local <span class="math inline">\(R^2\)</span></h4>
 <p>How well does the model fit in different neighborhoods? Local <span class="math inline">\(R^2\)</span> indicates the share of variance explained by each local regression, revealing zones of strong and weak explanatory power. We render Local <span class="math inline">\(R^2\)</span> on top of the planning subzones, using a clean legend inside the frame and appropriate zoom bounds. Interpreting this map helps diagnose scale misspecification, missing predictors, or unmodeled spatial processes. High values suggest that the chosen predictors capture local dynamics, while low values motivate refinement or alternative spatial structures.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb114"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb114-1"><a href="#cb114-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tmap_mode</span>(<span class="st">"plot"</span>)</span>
-<span id="cb114-2"><a href="#cb114-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb114-3"><a href="#cb114-3" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_shape</span>(mpsz)<span class="sc">+</span></span>
-<span id="cb114-4"><a href="#cb114-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_polygons</span>(<span class="at">fill_alpha =</span> <span class="fl">0.1</span>) <span class="sc">+</span></span>
-<span id="cb114-5"><a href="#cb114-5" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_shape</span>(analysis.sf.adaptive) <span class="sc">+</span></span>
-<span id="cb114-6"><a href="#cb114-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_dots</span>(<span class="at">col =</span> <span class="st">"Local_R2"</span>,</span>
-<span id="cb114-7"><a href="#cb114-7" aria-hidden="true" tabindex="-1"></a>          <span class="at">border.col =</span> <span class="st">"gray60"</span>,</span>
-<span id="cb114-8"><a href="#cb114-8" aria-hidden="true" tabindex="-1"></a>          <span class="at">border.lwd =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
-<span id="cb114-9"><a href="#cb114-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_view</span>(<span class="at">set.zoom.limits =</span> <span class="fu">c</span>(<span class="dv">11</span>,<span class="dv">14</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb113"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb113-1"><a href="#cb113-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tmap_mode</span>(<span class="st">"plot"</span>)</span>
+<span id="cb113-2"><a href="#cb113-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb113-3"><a href="#cb113-3" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_shape</span>(mpsz)<span class="sc">+</span></span>
+<span id="cb113-4"><a href="#cb113-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_polygons</span>(<span class="at">fill_alpha =</span> <span class="fl">0.1</span>) <span class="sc">+</span></span>
+<span id="cb113-5"><a href="#cb113-5" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_shape</span>(analysis.sf.adaptive) <span class="sc">+</span></span>
+<span id="cb113-6"><a href="#cb113-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_dots</span>(<span class="at">col =</span> <span class="st">"Local_R2"</span>,</span>
+<span id="cb113-7"><a href="#cb113-7" aria-hidden="true" tabindex="-1"></a>          <span class="at">border.col =</span> <span class="st">"gray60"</span>,</span>
+<span id="cb113-8"><a href="#cb113-8" aria-hidden="true" tabindex="-1"></a>          <span class="at">border.lwd =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb113-9"><a href="#cb113-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_view</span>(<span class="at">set.zoom.limits =</span> <span class="fu">c</span>(<span class="dv">11</span>,<span class="dv">14</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -2711,7 +2706,7 @@ $ geometry            &lt;POINT [m]&gt; POINT (30036.29 38360.76), POINT (29283.
 </figure>
 </div>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb115"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb115-1"><a href="#cb115-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tmap_mode</span>(<span class="st">"plot"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb114"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb114-1"><a href="#cb114-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tmap_mode</span>(<span class="st">"plot"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>The Local <span class="math inline">\(R^2\)</span> map shows that the adaptive GWR explains condo prices very well in most neighbourhoods. Darker blue clusters (Local <span class="math inline">\(R^2\)</span> between 0.8 and 1.0) dominate the island, meaning the local regressions capture more than 80% of price variation in these areas. Here, the chosen structural and accessibility variables provide an excellent description of market behaviour and the global conclusions are strongly supported.</p>
 <p>Lighter patches (Local <span class="math inline">\(R^2\)</span> between 0.5 and 0.7) appear only in a few planning subzones. In these locations the model leaves more unexplained variation, suggesting that additional local factors such as project specific amenities, tenure mix, redevelopment expectations, or micro environmental qualities may be important. These areas are prime candidates for further refinement, either by enriching the covariate set or exploring alternative spatial scales. Overall, the map confirms that the adaptive GWR greatly improves explanatory power across Singapore while also revealing a small number of neighbourhoods where current predictors are less adequate and targeted model extensions are warranted.</p>
@@ -2720,24 +2715,24 @@ $ geometry            &lt;POINT [m]&gt; POINT (30036.29 38360.76), POINT (29283.
 <h4 data-number="10.3.3" class="anchored" data-anchor-id="visualising-coefficient-estimates"><span class="header-section-number">10.3.3</span> Visualising coefficient estimates</h4>
 <p>Coefficient maps reveal how the marginal effect of each predictor varies across space. By plotting estimates together with their uncertainty metrics when needed, we distinguish robust spatial trends from noise. The goal is not decoration but decision support. Positive and negative zones guide policy interpretation, for example where proximity to transit associates with larger premiums or where park access effects attenuate. Side by side arrangements facilitate comparison across variables and between fixed and adaptive bandwidths, helping to identify consistent patterns and locations where model assumptions warrant further scrutiny.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb116"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb116-1"><a href="#cb116-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tmap_mode</span>(<span class="st">"plot"</span>)</span>
-<span id="cb116-2"><a href="#cb116-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb116-3"><a href="#cb116-3" aria-hidden="true" tabindex="-1"></a>DIST_MRT_M_SE <span class="ot">&lt;-</span> <span class="fu">tm_shape</span>(mpsz)<span class="sc">+</span></span>
-<span id="cb116-4"><a href="#cb116-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_polygons</span>(<span class="at">alpha =</span> <span class="fl">0.1</span>) <span class="sc">+</span></span>
-<span id="cb116-5"><a href="#cb116-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_shape</span>(analysis.sf.adaptive) <span class="sc">+</span></span>
-<span id="cb116-6"><a href="#cb116-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_dots</span>(<span class="at">col =</span> <span class="st">"DIST_MRT_M_SE"</span>,</span>
-<span id="cb116-7"><a href="#cb116-7" aria-hidden="true" tabindex="-1"></a>          <span class="at">border.col =</span> <span class="st">"gray60"</span>, <span class="at">border.lwd =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
-<span id="cb116-8"><a href="#cb116-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_view</span>(<span class="at">set.zoom.limits =</span> <span class="fu">c</span>(<span class="dv">11</span>,<span class="dv">14</span>))</span>
-<span id="cb116-9"><a href="#cb116-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb116-10"><a href="#cb116-10" aria-hidden="true" tabindex="-1"></a>DIST_MRT_M_TV <span class="ot">&lt;-</span> <span class="fu">tm_shape</span>(mpsz)<span class="sc">+</span></span>
-<span id="cb116-11"><a href="#cb116-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_polygons</span>(<span class="at">alpha =</span> <span class="fl">0.1</span>) <span class="sc">+</span></span>
-<span id="cb116-12"><a href="#cb116-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_shape</span>(analysis.sf.adaptive) <span class="sc">+</span></span>
-<span id="cb116-13"><a href="#cb116-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_dots</span>(<span class="at">col =</span> <span class="st">"DIST_MRT_M_TV"</span>,</span>
-<span id="cb116-14"><a href="#cb116-14" aria-hidden="true" tabindex="-1"></a>          <span class="at">border.col =</span> <span class="st">"gray60"</span>, <span class="at">border.lwd =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
-<span id="cb116-15"><a href="#cb116-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_view</span>(<span class="at">set.zoom.limits =</span> <span class="fu">c</span>(<span class="dv">11</span>,<span class="dv">14</span>))</span>
-<span id="cb116-16"><a href="#cb116-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb116-17"><a href="#cb116-17" aria-hidden="true" tabindex="-1"></a><span class="co"># … build DIST_MRT_M_SE and DIST_MRT_M_TV exactly as you have …</span></span>
-<span id="cb116-18"><a href="#cb116-18" aria-hidden="true" tabindex="-1"></a><span class="fu">tmap_arrange</span>(DIST_MRT_M_SE, DIST_MRT_M_TV, <span class="at">asp =</span> <span class="dv">1</span>, <span class="at">ncol =</span> <span class="dv">2</span>, <span class="at">sync =</span> <span class="cn">TRUE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb115"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb115-1"><a href="#cb115-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tmap_mode</span>(<span class="st">"plot"</span>)</span>
+<span id="cb115-2"><a href="#cb115-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb115-3"><a href="#cb115-3" aria-hidden="true" tabindex="-1"></a>DIST_MRT_M_SE <span class="ot">&lt;-</span> <span class="fu">tm_shape</span>(mpsz)<span class="sc">+</span></span>
+<span id="cb115-4"><a href="#cb115-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_polygons</span>(<span class="at">alpha =</span> <span class="fl">0.1</span>) <span class="sc">+</span></span>
+<span id="cb115-5"><a href="#cb115-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_shape</span>(analysis.sf.adaptive) <span class="sc">+</span></span>
+<span id="cb115-6"><a href="#cb115-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_dots</span>(<span class="at">col =</span> <span class="st">"DIST_MRT_M_SE"</span>,</span>
+<span id="cb115-7"><a href="#cb115-7" aria-hidden="true" tabindex="-1"></a>          <span class="at">border.col =</span> <span class="st">"gray60"</span>, <span class="at">border.lwd =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb115-8"><a href="#cb115-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_view</span>(<span class="at">set.zoom.limits =</span> <span class="fu">c</span>(<span class="dv">11</span>,<span class="dv">14</span>))</span>
+<span id="cb115-9"><a href="#cb115-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb115-10"><a href="#cb115-10" aria-hidden="true" tabindex="-1"></a>DIST_MRT_M_TV <span class="ot">&lt;-</span> <span class="fu">tm_shape</span>(mpsz)<span class="sc">+</span></span>
+<span id="cb115-11"><a href="#cb115-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_polygons</span>(<span class="at">alpha =</span> <span class="fl">0.1</span>) <span class="sc">+</span></span>
+<span id="cb115-12"><a href="#cb115-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_shape</span>(analysis.sf.adaptive) <span class="sc">+</span></span>
+<span id="cb115-13"><a href="#cb115-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_dots</span>(<span class="at">col =</span> <span class="st">"DIST_MRT_M_TV"</span>,</span>
+<span id="cb115-14"><a href="#cb115-14" aria-hidden="true" tabindex="-1"></a>          <span class="at">border.col =</span> <span class="st">"gray60"</span>, <span class="at">border.lwd =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb115-15"><a href="#cb115-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_view</span>(<span class="at">set.zoom.limits =</span> <span class="fu">c</span>(<span class="dv">11</span>,<span class="dv">14</span>))</span>
+<span id="cb115-16"><a href="#cb115-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb115-17"><a href="#cb115-17" aria-hidden="true" tabindex="-1"></a><span class="co"># … build DIST_MRT_M_SE and DIST_MRT_M_TV exactly as you have …</span></span>
+<span id="cb115-18"><a href="#cb115-18" aria-hidden="true" tabindex="-1"></a><span class="fu">tmap_arrange</span>(DIST_MRT_M_SE, DIST_MRT_M_TV, <span class="at">asp =</span> <span class="dv">1</span>, <span class="at">ncol =</span> <span class="dv">2</span>, <span class="at">sync =</span> <span class="cn">TRUE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -2745,7 +2740,7 @@ $ geometry            &lt;POINT [m]&gt; POINT (30036.29 38360.76), POINT (29283.
 </figure>
 </div>
 </div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb117"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb117-1"><a href="#cb117-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tmap_mode</span>(<span class="st">"plot"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb116"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb116-1"><a href="#cb116-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tmap_mode</span>(<span class="st">"plot"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>The paired maps show both the precision and the strength of the local MRT effect. On the left, most standard errors for the MRT distance coefficient are small and spatially even, so local estimates are quite precise across the island. Larger standard errors (SE) only appear in a few peripheral clusters where data are sparse. On the right, local <span class="math inline">\(t\)</span> values are strongly negative over wide areas, confirming that greater distance from MRT stations is associated with significantly lower resale prices in most neighbourhoods. Small or near zero <span class="math inline">\(t\)</span> values in a few zones indicate weaker and possibly unstable MRT effects there. Together, these maps suggest that MRT accessibility is a robust and spatially pervasive price driver, but its influence is not uniform, so transport planning and valuation should account for local variation in how strongly buyers capitalise rail access.</p>
 </section>
@@ -2757,42 +2752,42 @@ $ geometry            &lt;POINT [m]&gt; POINT (30036.29 38360.76), POINT (29283.
 <h4 data-number="10.4.1" class="anchored" data-anchor-id="selecting-the-tampines-planning-area-polygon"><span class="header-section-number">10.4.1</span> Selecting the Tampines planning area polygon</h4>
 <p>This section extracts the Tampines polygon from the Master Plan layer using its planning area field, preserving CRS and geometry validity established earlier. The result is a single, auditable spatial unit that constrains all joins and overlays. By fixing the study footprint at the outset, we prevent leakage from adjacent towns, maintain comparability with official statistics, and ensure that any localised signal we observe later is not an artefact of inconsistent geography but a genuine characteristic of Tampines.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb118"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb118-1"><a href="#cb118-1" aria-hidden="true" tabindex="-1"></a><span class="co"># --- 1) Select the Tampines planning area polygon ------------------------------</span></span>
-<span id="cb118-2"><a href="#cb118-2" aria-hidden="true" tabindex="-1"></a><span class="co"># (Common MP14 fields are PLN_AREA_N (planning area) and SUBZONE_N (subzone).)</span></span>
-<span id="cb118-3"><a href="#cb118-3" aria-hidden="true" tabindex="-1"></a>tampines_pa <span class="ot">&lt;-</span> mpsz <span class="sc">%&gt;%</span> </span>
-<span id="cb118-4"><a href="#cb118-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(PLN_AREA_N <span class="sc">==</span> <span class="st">"TAMPINES"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb117"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb117-1"><a href="#cb117-1" aria-hidden="true" tabindex="-1"></a><span class="co"># --- 1) Select the Tampines planning area polygon ------------------------------</span></span>
+<span id="cb117-2"><a href="#cb117-2" aria-hidden="true" tabindex="-1"></a><span class="co"># (Common MP14 fields are PLN_AREA_N (planning area) and SUBZONE_N (subzone).)</span></span>
+<span id="cb117-3"><a href="#cb117-3" aria-hidden="true" tabindex="-1"></a>tampines_pa <span class="ot">&lt;-</span> mpsz <span class="sc">%&gt;%</span> </span>
+<span id="cb117-4"><a href="#cb117-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(PLN_AREA_N <span class="sc">==</span> <span class="st">"TAMPINES"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
 <section id="retaining-only-hdb-resale-points-inside-tampines" class="level4" data-number="10.4.2">
 <h4 data-number="10.4.2" class="anchored" data-anchor-id="retaining-only-hdb-resale-points-inside-tampines"><span class="header-section-number">10.4.2</span> Retaining only HDB resale points inside Tampines</h4>
 <p>Start with the data that matter most for inference. We intersect the adaptive GWR results with the Tampines polygon to keep only transactions whose coordinates fall within the planning area. This step aligns attributes such as Local R² with the town specific sample, removes off boundary outliers, and guarantees that subsequent summaries reflect the population of interest. The operation also preserves row integrity for reproducibility, since no recalculation of GWR occurs here. The outcome is a clean sf layer of Tampines observations ready for mapping and statistics, with geometry driven selection ensuring methodological coherence.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb119"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb119-1"><a href="#cb119-1" aria-hidden="true" tabindex="-1"></a><span class="co"># --- 2) Keep only condo points that fall inside Tampines -----------------------</span></span>
-<span id="cb119-2"><a href="#cb119-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Our GWR results were attached to `condo_resale.sf.adaptive` and include `Local_R2`.</span></span>
-<span id="cb119-3"><a href="#cb119-3" aria-hidden="true" tabindex="-1"></a>tampines_pts <span class="ot">&lt;-</span> analysis.sf.adaptive[tampines_pa, , op <span class="ot">=</span> st_within]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb118"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb118-1"><a href="#cb118-1" aria-hidden="true" tabindex="-1"></a><span class="co"># --- 2) Keep only condo points that fall inside Tampines -----------------------</span></span>
+<span id="cb118-2"><a href="#cb118-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Our GWR results were attached to `condo_resale.sf.adaptive` and include `Local_R2`.</span></span>
+<span id="cb118-3"><a href="#cb118-3" aria-hidden="true" tabindex="-1"></a>tampines_pts <span class="ot">&lt;-</span> analysis.sf.adaptive[tampines_pa, , op <span class="ot">=</span> st_within]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
 <section id="visualising-tampines-boundary-with-points-coloured-by-local-r2" class="level4" data-number="10.4.3">
 <h4 data-number="10.4.3" class="anchored" data-anchor-id="visualising-tampines-boundary-with-points-coloured-by-local-r2"><span class="header-section-number">10.4.3</span> Visualising Tampines boundary with points coloured by Local <span class="math inline">\(R^2\)</span></h4>
 <p>See the pattern before measuring it. This visualization overlays the Tampines boundary and plots each retained transaction coloured by Local <span class="math inline">\(R^2\)</span> using quantile classes and an internal legend. The map exposes pockets where the model explains a larger share of variance, often near strong accessibility or amenity gradients, and areas where fit attenuates, suggesting missing predictors or scale mismatch. Using a consistent palette and zoom limits supports side by side comparison with other towns. The figure is not decorative. It is a diagnostic surface that guides targeted refinement and grounds narrative claims in observable spatial structure.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb120"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb120-1"><a href="#cb120-1" aria-hidden="true" tabindex="-1"></a><span class="co"># --- 3) Visualise: Tampines boundary + points coloured by Local R² -------------</span></span>
-<span id="cb120-2"><a href="#cb120-2" aria-hidden="true" tabindex="-1"></a><span class="fu">tmap_mode</span>(<span class="st">"plot"</span>)</span>
-<span id="cb120-3"><a href="#cb120-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb120-4"><a href="#cb120-4" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_shape</span>(tampines_pa) <span class="sc">+</span></span>
-<span id="cb120-5"><a href="#cb120-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_polygons</span>(<span class="at">fill_alpha =</span> <span class="fl">0.1</span>) <span class="sc">+</span></span>
-<span id="cb120-6"><a href="#cb120-6" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_shape</span>(tampines_pts) <span class="sc">+</span></span>
-<span id="cb120-7"><a href="#cb120-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_dots</span>(</span>
-<span id="cb120-8"><a href="#cb120-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">fill =</span> <span class="st">"Local_R2"</span>,           <span class="co"># tmap v4: 'fill' controls symbol fill colour</span></span>
-<span id="cb120-9"><a href="#cb120-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">col =</span> <span class="st">"grey30"</span>,              <span class="co"># thin outline</span></span>
-<span id="cb120-10"><a href="#cb120-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">size =</span> <span class="fl">0.6</span>,</span>
-<span id="cb120-11"><a href="#cb120-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">fill.scale =</span> <span class="fu">tm_scale</span>(</span>
-<span id="cb120-12"><a href="#cb120-12" aria-hidden="true" tabindex="-1"></a>      <span class="at">n =</span> <span class="dv">7</span>,</span>
-<span id="cb120-13"><a href="#cb120-13" aria-hidden="true" tabindex="-1"></a>      <span class="at">style =</span> <span class="st">"quantile"</span>         <span class="co"># consistent with the tutorial’s quantile breaks</span></span>
-<span id="cb120-14"><a href="#cb120-14" aria-hidden="true" tabindex="-1"></a>    ),</span>
-<span id="cb120-15"><a href="#cb120-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">fill.legend =</span> <span class="fu">tm_legend</span>(<span class="at">title =</span> <span class="st">"Local R²"</span>)</span>
-<span id="cb120-16"><a href="#cb120-16" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb120-17"><a href="#cb120-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_view</span>(<span class="at">set_zoom_limits =</span> <span class="fu">c</span>(<span class="dv">11</span>, <span class="dv">14</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb119"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb119-1"><a href="#cb119-1" aria-hidden="true" tabindex="-1"></a><span class="co"># --- 3) Visualise: Tampines boundary + points coloured by Local R² -------------</span></span>
+<span id="cb119-2"><a href="#cb119-2" aria-hidden="true" tabindex="-1"></a><span class="fu">tmap_mode</span>(<span class="st">"plot"</span>)</span>
+<span id="cb119-3"><a href="#cb119-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb119-4"><a href="#cb119-4" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_shape</span>(tampines_pa) <span class="sc">+</span></span>
+<span id="cb119-5"><a href="#cb119-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_polygons</span>(<span class="at">fill_alpha =</span> <span class="fl">0.1</span>) <span class="sc">+</span></span>
+<span id="cb119-6"><a href="#cb119-6" aria-hidden="true" tabindex="-1"></a><span class="fu">tm_shape</span>(tampines_pts) <span class="sc">+</span></span>
+<span id="cb119-7"><a href="#cb119-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_dots</span>(</span>
+<span id="cb119-8"><a href="#cb119-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">fill =</span> <span class="st">"Local_R2"</span>,           <span class="co"># tmap v4: 'fill' controls symbol fill colour</span></span>
+<span id="cb119-9"><a href="#cb119-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">col =</span> <span class="st">"grey30"</span>,              <span class="co"># thin outline</span></span>
+<span id="cb119-10"><a href="#cb119-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">size =</span> <span class="fl">0.6</span>,</span>
+<span id="cb119-11"><a href="#cb119-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">fill.scale =</span> <span class="fu">tm_scale</span>(</span>
+<span id="cb119-12"><a href="#cb119-12" aria-hidden="true" tabindex="-1"></a>      <span class="at">n =</span> <span class="dv">7</span>,</span>
+<span id="cb119-13"><a href="#cb119-13" aria-hidden="true" tabindex="-1"></a>      <span class="at">style =</span> <span class="st">"quantile"</span>         <span class="co"># consistent with the tutorial’s quantile breaks</span></span>
+<span id="cb119-14"><a href="#cb119-14" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb119-15"><a href="#cb119-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">fill.legend =</span> <span class="fu">tm_legend</span>(<span class="at">title =</span> <span class="st">"Local R²"</span>)</span>
+<span id="cb119-16"><a href="#cb119-16" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb119-17"><a href="#cb119-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tm_view</span>(<span class="at">set_zoom_limits =</span> <span class="fu">c</span>(<span class="dv">11</span>, <span class="dv">14</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -2800,6 +2795,7 @@ $ geometry            &lt;POINT [m]&gt; POINT (30036.29 38360.76), POINT (29283.
 </figure>
 </div>
 </div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb120"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb120-1"><a href="#cb120-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tmap_mode</span>(<span class="st">"plot"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
 <section id="summarising-local-r2-for-tampines" class="level4" data-number="10.4.4">
@@ -2823,11 +2819,11 @@ $ geometry            &lt;POINT [m]&gt; POINT (30036.29 38360.76), POINT (29283.
 <span id="cb121-15"><a href="#cb121-15" aria-hidden="true" tabindex="-1"></a>tampines_r2_summary</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>    n    r2_min     r2_q1    r2_med   r2_mean     r2_q3    r2_max
-1 712 0.6851969 0.8231481 0.8758055 0.8708912 0.9537619 0.9671227</code></pre>
+1 712 0.6852392 0.8231366 0.8756293 0.8703175 0.9506585 0.9651716</code></pre>
 </div>
 </div>
 <p>The updated Local R² results for Tampines show that the adaptive GWR still fits very well but with more variation than in the smaller earlier sample. Across 712 condominiums, Local R² ranges from about 0.685 to 0.965 with a median around 0.876 and upper quartile near 0.951.</p>
-<p>On the map, darker blue clusters in the west and south east indicate locations where the model explains more than 0.95 of local price variation. Here the hedonic predictors such as floor level, age and accessibility capture condominium prices extremely well. Lighter areas in the central belt correspond to Local R² around 0.75 to 0.85, meaning that prices there depend more on factors not included in the model, for example project specific facilities or micro environment qualities.</p>
+<p>On the map, darker blue clusters in the north west and south east indicate locations where the model explains more than 0.95 of local price variation. Here the hedonic predictors such as floor level, age and accessibility capture condominium prices extremely well. Lighter areas in the central belt correspond to Local R² around 0.75 to 0.85, meaning that prices there depend more on factors not included in the model, for example project specific facilities or micro environment qualities.</p>
 <p>Overall, the <strong>adaptive geographically weighted regression (adaptive GWR) model</strong> remains highly reliable for Tampines, but the central neighbourhoods merit further refinement or additional covariates to fully explain local price dynamics.</p>
 </section>
 </section>
@@ -2876,7 +2872,7 @@ $ geometry            &lt;POINT [m]&gt; POINT (30036.29 38360.76), POINT (29283.
 <p>Overall, the project contributes a rigorous, practice orientated methodology that can be adopted and adapted by planners, valuers, and researchers who wish to integrate spatial analytics and geographically weighted regression into routine housing market assessment.</p>
 </section>
 <section id="references" class="level2" data-number="13">
-<h2 data-number="13" class="anchored" data-anchor-id="references"><span class="header-section-number">13</span> References:</h2>
+<h2 data-number="13" class="anchored" data-anchor-id="references"><span class="header-section-number">13</span> References</h2>
 <ol type="1">
 <li><p>Brunsdon, C, Fotheringham, A S and Charlton, M 1996, Geographically weighted regression: a method for exploring spatial nonstationarity, Geographical Analysis, vol 28, no 4, pp 281 to 298.</p></li>
 <li><p>Brunsdon, C, Fotheringham, A S and Charlton, M 1999, Some notes on parametric significance tests for geographically weighted regression, Journal of Regional Science, vol 39, no 3, pp 497 to 524.</p></li>

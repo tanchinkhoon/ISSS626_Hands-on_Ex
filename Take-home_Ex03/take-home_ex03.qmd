@@ -138,16 +138,16 @@ pacman::p_load(
   progress,     # simple progress bars for batch jobs
   knitr,        # report tables
   kableExtra,   # table styling for HTML output
-  purrr,
-  stringr,
-  Hmisc,
-  ggpubr,
-  gtsummary,
-  RColorBrewer, 
-  see,
+  purrr,        # functional programming mappers for list and data workflows
+  stringr,      # consistent tools for string detection cleaning and formatting
+  Hmisc,        # regression utilities descriptive statistics and data preparation
+  ggpubr,       # publication ready plots that extend ggplot2
+  gtsummary,    # regression and summary tables for reporting models
+  RColorBrewer, # curated colour palettes for maps and statistical graphics
+  see,          # visual diagnostics for checking model assumptions
   performance,  # used to test multicollinearity.
   olsrr,        # building OLS and performing diagnostics tests 
-  qqplotr,
+  qqplotr,      # quantile quantile plots for residual and distribution checks
   corrplot      # multivariate data visualisation and analysis
 )
 
@@ -214,29 +214,29 @@ geocode_addr <- function(block, streetname) {                                   
 # path to the cache file
 cache_path <- "data/aspatial/geocode_hdb_cache.csv" # csv cache for address results
 
-if (file.exists(cache_path)) {                      # use cache if it exists
+if (file.exists(cache_path)) {            # use cache if it exists
   hdb_cache <- readr::read_csv(cache_path, show_col_types = FALSE)   # load cached coordinates
-} else {                                            # otherwise build the cache now
+} else {                                  # otherwise build the cache now
 
-  uniq_addr <- HDBresale %>%                        # start from filtered HDB table
-    dplyr::distinct(block, street_name)             # keep unique block street pairs
+  uniq_addr <- HDBresale %>%              # start from filtered HDB table
+    dplyr::distinct(block, street_name)   # keep unique block street pairs
 
   pb <- progress::progress_bar$new(total = nrow(uniq_addr)) # progress indicator
 
-  hdb_cache <- uniq_addr %>%                        # begin cache pipeline
-    dplyr::mutate(                                  # add a list column named geo
-      geo = purrr::map2(                            # call function for each pair
-        block,                                      # first argument is block
-        street_name,                                # second argument is street name
-        function(.x, .y) {                          # inline function wrapper
-          pb$tick()                                 # advance the progress bar
-          geocode_addr(.x, .y)                      # call OneMap geocoder and return tibble
+  hdb_cache <- uniq_addr %>%              # begin cache pipeline
+    dplyr::mutate(                        # add a list column named geo
+      geo = purrr::map2(                  # call function for each pair
+        block,                            # first argument is block
+        street_name,                      # second argument is street name
+        function(.x, .y) {                # inline function wrapper
+          pb$tick()                       # advance the progress bar
+          geocode_addr(.x, .y)            # call OneMap geocoder and return tibble
         }
       )
-    ) %>%                                           # end mutate and continue pipe
-    tidyr::unnest(cols = c(geo))                    # expand LATITUDE and LONGITUDE columns
+    ) %>%                                 # end mutate and continue pipe
+    tidyr::unnest(cols = c(geo))          # expand LATITUDE and LONGITUDE columns
 
-  readr::write_csv(hdb_cache, cache_path)           # save cache to disk for reuse
+  readr::write_csv(hdb_cache, cache_path) # save cache to disk for reuse
 }
 
 ```
@@ -300,15 +300,15 @@ primary_schools <- primary_schools %>%
 ```{r}
 
 # query OneMap by postcode to get X Y in SVY21
-om_url <- "https://onemap.gov.sg/api/common/elastic/search"                              # endpoint
-postcodes <- unique(primary_schools$postal_code)                                         # unique codes
-found_xy <- tibble::tibble()                                                             # holder
+om_url <- "https://onemap.gov.sg/api/common/elastic/search"    # endpoint
+postcodes <- unique(primary_schools$postal_code)               # unique codes
+found_xy <- tibble::tibble()                                   # holder
 
-for (pc in postcodes) {                                                                  # loop codes
-  q <- list(searchVal = pc, returnGeom = "Y", getAddrDetails = "Y", pageNum = "1")       # params
-  js <- httr::content(httr::GET(om_url, query = q))                                      # request parse
-  if (!is.null(js$found) && js$found > 0) {                                              # keep matches
-    df <- as.data.frame(js$results, stringsAsFactors = FALSE)                            # to data frame
+for (pc in postcodes) {                                        # loop codes
+  q <- list(searchVal = pc, returnGeom = "Y", getAddrDetails = "Y", pageNum = "1")  # params
+  js <- httr::content(httr::GET(om_url, query = q))            # request parse
+  if (!is.null(js$found) && js$found > 0) {                    # keep matches
+    df <- as.data.frame(js$results, stringsAsFactors = FALSE)  # to data frame
     found_xy <- dplyr::bind_rows(found_xy, tibble::as_tibble(df[, c("POSTAL","X","Y")])) # keep fields
   }
 }
@@ -316,8 +316,8 @@ for (pc in postcodes) {                                                         
 # coerce and keep one row per code
 found_xy_clean <- found_xy %>%
   dplyr::mutate(POSTAL = as.character(POSTAL), X = as.numeric(X), Y = as.numeric(Y)) %>% # numeric
-  dplyr::filter(!is.na(X), !is.na(Y)) %>%                                                # drop NA
-  dplyr::group_by(POSTAL) %>% dplyr::slice_head(n = 1) %>% dplyr::ungroup()              # one per code
+  dplyr::filter(!is.na(X), !is.na(Y)) %>%                      # drop NA
+  dplyr::group_by(POSTAL) %>% dplyr::slice_head(n = 1) %>% dplyr::ungroup() # one per code
 
 ```
 
@@ -327,7 +327,7 @@ found_xy_clean <- found_xy %>%
 
 # attach X Y to school table
 primary_schools_xy <- primary_schools %>%
-  dplyr::left_join(found_xy_clean, by = c("postal_code" = "POSTAL"))                       # join coords
+  dplyr::left_join(found_xy_clean, by = c("postal_code" = "POSTAL"))   # join coords
 
 # convert to sf POINT in SVY21
 primary_schools_sf <- sf::st_as_sf(primary_schools_xy, coords = c("X","Y"), crs = 3414)    # build POINT
@@ -453,7 +453,7 @@ HDBresale_sf <- HDBresale_sf %>%   # continue same table
     AGE_2025 = suppressWarnings(   # new numeric field        
       as.numeric(analysis_year - as.integer(lease_commence_date))                
     ),                                                                          
-    AGE_2025 = dplyr::if_else(AGE_2025 >= 0, AGE_2025, as.numeric(NA))      # guard
+    AGE_2025 = dplyr::if_else(AGE_2025 >= 0, AGE_2025, as.numeric(NA)) # guard
   )
 
 # validate                                                                         
@@ -772,7 +772,7 @@ Access to rail transit is a well known driver of residential prices in compact c
 HDBresale_sf <- HDBresale_sf %>%
   dplyr::mutate(DIST_MRT_M = nearest_distance_m(geometry, mrt_pt))
 
-# Quick check and inspection 
+# quick check and inspection 
 glimpse(HDBresale_sf$DIST_MRT_M)
 
 ```
@@ -786,7 +786,7 @@ Green space can influence prices by improving neighborhood comfort, providing re
 HDBresale_sf <- HDBresale_sf %>%
   dplyr::mutate(DIST_PARK_M = nearest_distance_m(geometry, parks_pt))
 
-# Quick check and inspection
+# quick check and inspection
 glimpse(HDBresale_sf$DIST_PARK_M)
 
 ```
@@ -800,7 +800,7 @@ Eldercare access matters to multi-generational households and can be reflected i
 HDBresale_sf <- HDBresale_sf %>%
   dplyr::mutate(DIST_ELDERCARE_M = nearest_distance_m(geometry, eldercare_pt))
 
-# Quick check and inspection
+# quick check and inspection
 glimpse(HDBresale_sf$DIST_ELDERCARE_M)
 
 ```
@@ -814,7 +814,7 @@ Food access is a daily need. Hawker centres provide affordable options and are c
 HDBresale_sf <- HDBresale_sf %>%
   dplyr::mutate(DIST_HAWKER_M = nearest_distance_m(geometry, hawker_pt))
 
-# Quick check and inspection
+# quick check and inspection
 glimpse(HDBresale_sf$DIST_HAWKER_M)
 
 ```
@@ -828,9 +828,8 @@ Supermarkets indicate stable food supply and often co locate with other services
 HDBresale_sf <- HDBresale_sf %>%
   dplyr::mutate(DIST_SUPERMKT_M = nearest_distance_m(geometry, supermarket_pt))
 
-# Quick check and inspection
+# quick check and inspection
 glimpse(HDBresale_sf$DIST_SUPERMKT_M)
-
 
 ```
 
@@ -843,7 +842,7 @@ Regional and town centre malls bundle retail, dining, and services in one place.
 HDBresale_sf <- HDBresale_sf %>%
   dplyr::mutate(DIST_MALL_M = nearest_distance_m(geometry, mall_pt))
 
-# Quick check and inspection
+# quick check and inspection
 glimpse(HDBresale_sf$DIST_MALL_M)
 
 ```
@@ -857,21 +856,21 @@ The central business district concentrates high wage employment and premium serv
 HDBresale_sf <- HDBresale_sf %>%
   dplyr::mutate(DIST_CBD_M = nearest_distance_m(geometry, cbd_pt))
 
-# Quick check and inspection
+# quick check and inspection
 glimpse(HDBresale_sf$DIST_CBD_M)
 
 ```
 
 #### Proximity to elite primary schools
 
-School prestige can affect price expectations for families with young children. We already derived an elite subset with twenty schools from the full primary list. We compute a continuous distance to the nearest elite school point. This gives a clear and interpretable number in meters that can be compared across towns. In later robustness checks, we may also include the distance to the nearest ordinary primary school to differentiate general access from prestige access. For now we focus on the prestige signal since that is more likely to be reflected in marginal willingness to pay.
+School prestige can affect price expectations for families with young children. We already derived an elite subset with twenty schools from the full primary list (Creative Campus, 2024). We compute a continuous distance to the nearest elite school point. This gives a clear and interpretable number in meters that can be compared across towns. In later robustness checks, we may also include the distance to the nearest ordinary primary school to differentiate general access from prestige access. For now we focus on the prestige signal since that is more likely to be reflected in marginal willingness to pay.
 
 ```{r}
 
 HDBresale_sf <- HDBresale_sf %>%
   dplyr::mutate(DIST_ELITEPRI_M = nearest_distance_m(geometry, elite_primary_pt))
 
-# Quick check and inspection
+# quick check and inspection
 glimpse(HDBresale_sf$DIST_ELITEPRI_M)
 
 ```
@@ -891,7 +890,7 @@ HDBresale_sf <- HDBresale_sf %>%
     CNT_BUS_350    = count_within_m(geometry, busstop_pt,       RADIUS_SHORT)
   )
 
-# Quick check and inspection
+# quick check and inspection
 glimpse(HDBresale_sf$CNT_KINDER_350)
 glimpse(HDBresale_sf$CNT_CHILD_350)
 glimpse(HDBresale_sf$CNT_BUS_350)
@@ -907,7 +906,7 @@ General access to basic education is best represented by the number of primary s
 HDBresale_sf <- HDBresale_sf %>%
   dplyr::mutate(CNT_PRIMARY_1000 = count_within_m(geometry, primary_pt, 1000))
 
-# Quick check and inspection
+# quick check and inspection
 glimpse(HDBresale_sf$CNT_PRIMARY_1000)
 
 ```
@@ -1067,7 +1066,7 @@ Spatial exploration starts with maps. Because we have a dense point sample, it i
 
 ```{r,fig.width=8,fig.height=6}
 
-# use tmap in static mode
+# use tmap in static or view mode
 tmap_mode("plot")
 
 # 5 explicit colours for v4 (actual colours, not a palette name string)
@@ -1270,15 +1269,28 @@ In the code chunk below, we test if there are sign of multicollinearity.
 
 ```{r}
 
-# Check for Multicollinearity
-# check_collinearity(mlr1.full)
-ols_vif_tol(mlr1.full)
+# compute VIF for multicollinearity
+mlr1.vif = check_collinearity(mlr1.full)
 
-# plot the 
-mlr1.vif <- check_collinearity(mlr1.full)
-plot(mlr1.vif)
+# get the default collinearity plot as a ggplot object
+p_vif = plot(mlr1.vif)
+
+# rotate and space x axis labels
+p_vif +
+  theme(
+    axis.text.x = element_text(
+      angle = 45,   # try 60 or 90 if you prefer
+      hjust = 1,
+      vjust = 1
+    )
+  )
+
+# optional - use performance package
+# check_collinearity(mlr1.full)
 
 ```
+
+
 
 The variance inflation results show that the revised model has very little multi collinearity and the coefficients should be numerically stable. All 13 predictors have variance inflation factor values between about 1.1 and 2.9, with tolerances above 0.34. Common rules of thumb treat variance inflation factor values below 5 as low concern and values above 10 as serious, so every predictor is well inside the safe zone.
 
@@ -1407,7 +1419,7 @@ First, we will compute the distance-based weight matrix by using `st_dist_band()
 
 ```{r}
 
-# Build distance‑band neighbors and row‑standardized weights ------------------
+# Build distance‑band neighbors and row‑standardized weights
 analysis_sf <- analysis_sf %>%
   mutate(
     nb = sfdep::st_dist_band(
@@ -1423,7 +1435,7 @@ Next, `global_moran_perm()` of **sfdep** package will be used to perform Moran's
 
 ```{r}
 
-# Permutation Moran’s I test on residuals -------------------------------------
+# Permutation Moran’s I test on residuals
 sfdep::global_moran_perm(
   mlr1_resale.sf$MLR_RES,
   nb = analysis_sf$nb,
@@ -1730,6 +1742,8 @@ tm_shape(tampines_pts) +
   ) +
   tm_view(set_zoom_limits = c(11, 14))
 
+tmap_mode("plot")
+
 ```
 
 #### Summarising Local $R^2$ for Tampines
@@ -1757,7 +1771,7 @@ tampines_r2_summary
 ```
 The updated Local R² results for Tampines show that the adaptive GWR still fits very well but with more variation than in the smaller earlier sample. Across 712 condominiums, Local R² ranges from about 0.685 to 0.965 with a median around 0.876 and upper quartile near 0.951.
 
-On the map, darker blue clusters in the west and south east indicate locations where the model explains more than 0.95 of local price variation. Here the hedonic predictors such as floor level, age and accessibility capture condominium prices extremely well. Lighter areas in the central belt correspond to Local R² around 0.75 to 0.85, meaning that prices there depend more on factors not included in the model, for example project specific facilities or micro environment qualities.
+On the map, darker blue clusters in the north west and south east indicate locations where the model explains more than 0.95 of local price variation. Here the hedonic predictors such as floor level, age and accessibility capture condominium prices extremely well. Lighter areas in the central belt correspond to Local R² around 0.75 to 0.85, meaning that prices there depend more on factors not included in the model, for example project specific facilities or micro environment qualities.
 
 Overall, the **adaptive geographically weighted regression (adaptive GWR) model** remains highly reliable for Tampines, but the central neighbourhoods merit further refinement or additional covariates to fully explain local price dynamics.
 
