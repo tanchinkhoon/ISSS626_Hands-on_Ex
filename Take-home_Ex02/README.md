@@ -1,6 +1,6 @@
-# Take-home Ex02 Bus Mobility and Urban Trends
+# Take-home Ex02: Bus Mobility and Urban Trends
 
-This folder contains the Quarto source, data, and outputs for Take-home Exercise 02 of ISSS626 Geospatial Analytics and Applications. The project examines how public bus trips vary across space and time in Singapore, and uses local spatial statistics to reveal neighbourhood clusters of high and low demand together with their temporal evolution.
+This folder contains the Quarto source, data, and outputs for Take-home Exercise 02 of ISSS626 Geospatial Analytics and Applications. The project examines how public bus trips vary across space and time in Singapore. It uses local spatial statistics to reveal neighbourhood clusters of high and low demand together with their temporal evolution.
 
 ## Learning goals
 
