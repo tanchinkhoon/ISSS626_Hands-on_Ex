@@ -15,19 +15,19 @@ execute:
 
 ## Introduction
 
-This study examines the determinants of Housing and Development Board resale prices in Singapore using an explanatory spatial modelling framework. We focus on **4** room flats during **1 January 2025 to 30 September 2025** to maintain comparability and reflect current family preferences for this size category (EdgeProp Singapore, 2024). The objective is to identify structural and locational attributes associated with transaction prices and to reveal how those associations vary across space. Structural variables include floor level, age in years, and remaining lease in years. Locational variables include proximity to rail transit, parks and open space, primary schools including selected high performing or elite schools (Creative Campus, 2024), childcare and preschool supply, supermarkets, shopping malls, and bus stops. Count variables are computed within 350 meters and 1,000 meters buffers, and point to point proximity is measured in meters after projecting all layers to SVY21. The remainder of this report states the research questions, documents reproducible data preparation, specifies the global and geographically weighted models, and presents spatially explicit findings with concise implications.
+This study examines the determinants of Housing and Development Board (HDB) resale prices in Singapore using an explanatory spatial modelling framework. We focus on **4** room flats during **1 January 2025 to 30 September 2025** to maintain comparability and reflect current family preferences for this size category (EdgeProp Singapore, 2024). The objective is to identify structural and locational attributes associated with transaction prices and to reveal how those associations vary across space. Structural variables include floor level, age in years, and remaining lease in years. Locational variables include proximity to rail transit, parks and open space, primary schools including selected high performing or elite schools (Creative Campus, 2024), childcare and preschool supply, supermarkets, shopping malls, and bus stops. Count variables are computed within 350 meters and 1,000 meters buffers, and point to point proximity is measured in meters after projecting all layers to SVY21. The remainder of this report states the research questions, documents reproducible data preparation, specifies the global and geographically weighted models, and presents spatially explicit findings with concise implications.
 
 ## Research Questions
 
 This section states operational questions that guide an explanatory analysis of HDB resale prices for 4-room flats from 1 January 2025 to 30 September 2025. The questions align variable construction, model calibration, and interpretation with the objective of identifying price drivers and their spatial variation using a global Multiple Linear Regression baseline and a local geographically weighted model.
 
-**RQ1**: Which structural attributes of a flat such as floor area, floor level, age, and remaining lease are significantly associated with resale price during the study window
+**RQ1**: Which structural attributes of a flat such as floor level, age, and remaining lease are significantly associated with resale price during the study window
 
 **RQ2**: Which locational attributes such as proximity to rail transit, parks, primary schools, childcare supply, supermarkets, shopping malls, and bus stops are significantly associated with resale price
 
 **RQ3**: To what extent do these associations vary across space, as evidenced by spatially varying coefficients from a geographically weighted model
 
-**RQ4**: Does the geographically weighted model materially improve fit and residual behaviour relative to a global Multiple Linear Regression specification
+**RQ4**: Does the Geographically Weighted model (GWmodel) materially improve fit and residual behaviour relative to a global Multiple Linear Regression (MLR) specification
 
 **RQ5**: Where are local effects notably stronger or weaker, and what practical implications follow for buyers, valuers, and planners
 
@@ -863,7 +863,7 @@ glimpse(HDBresale_sf$DIST_CBD_M)
 
 #### Proximity to elite primary schools
 
-School prestige can affect price expectations for families with young children. We already derived an elite subset with twenty schools from the full primary list (Creative Campus, 2024). We compute a continuous distance to the nearest elite school point. This gives a clear and interpretable number in meters that can be compared across towns. In later robustness checks, we may also include the distance to the nearest ordinary primary school to differentiate general access from prestige access. For now we focus on the prestige signal since that is more likely to be reflected in marginal willingness to pay.
+School prestige can affect price expectations for families with young children. We already derived an elite subset with twenty schools from the full primary list. We compute a continuous distance to the nearest elite school point. This gives a clear and interpretable number in meters that can be compared across towns. In later robustness checks, we may also include the distance to the nearest ordinary primary school to differentiate general access from prestige access. For now we focus on the prestige signal since that is more likely to be reflected in marginal willingness to pay.
 
 ```{r}
 
@@ -1179,7 +1179,7 @@ corrplot(               # draw the heat map
 
 First, REMAINING_LEASE_MTH and AGE_2025 have a correlation of about −0.9996. They are almost perfect substitutes: a flat that is older in AGE_2025 almost always has a shorter remaining lease, and vice versa. In the multiple model this pair will create extremely severe multicollinearity, so in later steps we must either drop one of them or be prepared for very unstable coefficient estimates and very high variance inflation.
 
-Second, the largest correlation among the location variables is between DIST_CBD_M and DIST_ELITEPRI_M, around 0.71. Condos that are farther from the CBD also tend to be farther from elite primary schools. This means these 2 distance measures share substantial spatial pattern, so their individual coefficients in the multiple model will be harder to interpret cleanly, even though they are not perfectly redundant.
+Second, the largest correlation among the location variables is between DIST_CBD_M and DIST_ELITEPRI_M, around 0.71. HDBs that are farther from the CBD also tend to be farther from elite primary schools. This means these 2 distance measures share substantial spatial pattern, so their individual coefficients in the multiple model will be harder to interpret cleanly, even though they are not perfectly redundant.
 
 Other distance measures are only moderately associated. For example, DIST_CBD_M with DIST_PARK_M, DIST_ELDERCARE_M, and DIST_HAWKER_M are in the 0.33 to 0.40 range, and most other pairs are below 0.30 in magnitude. DIST_MALL_M has modest negative correlation with DIST_CBD_M (about −0.23). These suggest some shared geography but not critical multicollinearity.
 
@@ -1255,7 +1255,7 @@ $$
 
 Interpreting unit changes: holding all other variables constant, moving up 1 floor raises expected price by about 5,855. An increase of 1 unit in AGE_2025 reduces price by about 5,393, confirming that newer developments command higher prices. Every additional unit of distance from the central business district reduces price by about 19.9, and every additional unit of distance from the nearest MRT station reduces price by about 56.6. Distances from eldercare, hawker centres and malls also have significant negative effects.
 
-Amenity counts matter as well. Each extra kindergarten within 350 units increases price by roughly 10195, while each extra primary school within 1000 units reduces price by about 11,794 after controlling for the rest, suggesting that the mix of school types in the immediate environment is important rather than sheer number. Bus stop density has a modest positive effect, and the small positive coefficients for distance to supermarkets and elite primary schools indicate that, in this dataset, higher priced condos tend to sit slightly further from those specific facilities once other location attributes are controlled. Overall, the retained predictors describe a coherent hedonic structure in which height, building age, centrality and the surrounding service mix jointly drive resale prices.
+Amenity counts matter as well. Each extra kindergarten within 350 units increases price by roughly 10195, while each extra primary school within 1000 units reduces price by about 11,794 after controlling for the rest, suggesting that the mix of school types in the immediate environment is important rather than sheer number. Bus stop density has a modest positive effect, and the small positive coefficients for distance to supermarkets and elite primary schools indicate that, in this dataset, higher priced HDBs tend to sit slightly further from those specific facilities once other location attributes are controlled. Overall, the retained predictors describe a coherent hedonic structure in which height, building age, centrality and the surrounding service mix jointly drive resale prices.
 
 ### Regression diagnostics
 
@@ -1344,7 +1344,7 @@ plot(performance::check_normality(mlr1.full),
 
 The Q Q plot shows that residuals follow the reference line very closely through the central part of the distribution. From about the 10th to the 90th percentile the points stay inside the grey band, so the normal approximation is reasonable for most observations and standard OLS inference on mean effects is reliable.
 
-Departures appear mainly in the upper tail, where points bend above the line and move outside the band, indicating more large positive residuals than a normal distribution would predict. A mild deviation is also visible in the extreme lower tail. These patterns confirm slight right skew and heavier tails, consistent with the histogram. In practice this means that coefficient estimates and their confidence intervals remain trustworthy given the very large sample, but prediction intervals for the most expensive condominiums are less accurate and a small number of high priced outliers or omitted local factors are not fully captured by the global model.
+Departures appear mainly in the upper tail, where points bend above the line and move outside the band, indicating more large positive residuals than a normal distribution would predict. A mild deviation is also visible in the extreme lower tail. These patterns confirm slight right skew and heavier tails, consistent with the histogram. In practice this means that coefficient estimates and their confidence intervals remain trustworthy given the very large sample, but prediction intervals for the most expensive HDBs are less accurate and a small number of high priced outliers or omitted local factors are not fully captured by the global model.
 
 Another way to check for normality assumption visual is by using `check_model()` of **performance** package as shown in the code chunk below.
 
@@ -1447,7 +1447,7 @@ sfdep::global_moran_perm(
 
 The Monte Carlo Moran I result shows strong and highly significant spatial autocorrelation in the OLS residuals. The statistic is about 0.33 with an observed rank of 1 000 out of 1 000 simulations and a p value effectively equal to 0. This means none of the simulated patterns under spatial randomness produced an I value as large as the observed one, so the null hypothesis of spatially independent residuals is decisively rejected.
 
-In practical terms, nearby condominiums tend to share similar overpricing or underpricing after controlling for the hedonic covariates. This confirms that important spatial structure remains unexplained and that the OLS error term is not independent. As a result, standard errors from the global OLS may be underestimated and significance levels somewhat optimistic, even though the main effect directions are still informative. These findings support the decision to move to spatial models in Section 10, such as geographically weighted regression or spatial error specifications, to capture local market effects and produce more reliable inference and location sensitive fitted values.
+In practical terms, nearby HDBs tend to share similar overpricing or underpricing after controlling for the hedonic covariates. This confirms that important spatial structure remains unexplained and that the OLS error term is not independent. As a result, standard errors from the global OLS may be underestimated and significance levels somewhat optimistic, even though the main effect directions are still informative. These findings support the decision to move to spatial models in Section 10, such as geographically weighted regression or spatial error specifications, to capture local market effects and produce more reliable inference and location sensitive fitted values.
 
 ## Building Hedonic Pricing Models using Geographically-Weighted Model (GWmodel)
 
@@ -1512,7 +1512,7 @@ However the ranges are very wide, which indicates pronounced spatial non station
 
 Model diagnostics confirm that allowing coefficients to vary by location delivers a major improvement in fit even after penalising the increased complexity. The effective number of parameters is about 1 136, and the residual sum of squares falls from about 53.4 trillion under the global model to about 8,498,024,692,874 under GWR. R squared increases from about 0.761 to about 0.962 and adjusted R squared to about 0.956. AICc improves from roughly 220 289 to roughly 206,359, and BIC also decreases substantially. These large reductions in information criteria show that the gain in explanatory power more than justifies the extra flexibility of the local model.
 
-The main implication is that condominium price determinants in Singapore are strongly location specific. The global hedonic model provides a useful baseline and average effects, but it cannot capture local regimes where, for example, proximity to MRT stations or malls is valued very differently, or where older estates remain attractive despite shorter leases. For policy, planning and valuation, this means that city wide coefficients should be treated with caution. Geographically weighted regression offers a more realistic representation by revealing where each attribute is most influential, and the coefficient surfaces and maps derived from this output can guide neighbourhood tailored interventions, pricing strategies and investment decisions.
+The main implication is that HDB resale price determinants in Singapore are strongly location specific. The global hedonic model provides a useful baseline and average effects, but it cannot capture local regimes where, for example, proximity to MRT stations or malls is valued very differently, or where older estates remain attractive despite shorter leases. For policy, planning and valuation, this means that city wide coefficients should be treated with caution. Geographically weighted regression offers a more realistic representation by revealing where each attribute is most influential, and the coefficient surfaces and maps derived from this output can guide neighbourhood tailored interventions, pricing strategies and investment decisions.
 
 ### Building Adaptive Bandwidth GWR Model
 
@@ -1595,7 +1595,7 @@ The adaptive geographically weighted regression refines the global hedonic model
 
 -   Count variables: CNT_KINDER_350, CNT_CHILD_350, CNT_BUS_350 and CNT_PRIMARY_1000 exhibit very wide ranges, from large negative to very large positive values. The same number of kindergartens or primary schools can therefore have opposite price effects in different neighbourhoods, again pointing to strong context dependence.
 
-**Implications:** The adaptive geographically weighted regression confirms that condominium price determinants in Singapore are highly spatially non stationary. The global hedonic model remains useful as a summary of average relationships, but it hides substantial local variation in both the strength and even the direction of key effects. For valuation, planners and investors, this means that:
+**Implications:** The adaptive geographically weighted regression confirms that HDB resale price determinants in Singapore are highly spatially non stationary. The global hedonic model remains useful as a summary of average relationships, but it hides substantial local variation in both the strength and even the direction of key effects. For valuation, planners and investors, this means that:
 
 1.  Premiums for height, age, centrality and amenities are location specific and cannot be applied uniformly across the island.
 
@@ -1627,7 +1627,7 @@ glimpse(analysis.sf.adaptive)
 
 ```
 
-The adaptive GWR output now attaches local coefficients, standard errors, t values, fitted prices, and residuals to every condominium. This enables mapping spatial variation in effects, identifying neighbourhoods where specific predictors matter most, and diagnosing where the global hedonic model under or over estimates resale prices.
+The adaptive GWR output now attaches local coefficients, standard errors, t values, fitted prices, and residuals to every HDB. This enables mapping spatial variation in effects, identifying neighbourhoods where specific predictors matter most, and diagnosing where the global hedonic model under or over estimates resale prices.
 
 ```{r}
 
@@ -1635,7 +1635,7 @@ summary(gwr.adaptive$SDF$yhat)
 
 ```
 
-Adaptive GWR fitted prices range from about 396622 to 1485595. Median predicted price about 628332 and mean about 672147 indicate a slightly right skewed distribution with relatively few high value condominiums pulling the average above the middle of the market.
+Adaptive GWR fitted prices range from about 396,622 to 1,485,595. Median predicted price about 628,332 and mean about 672,147 indicate a slightly right skewed distribution with relatively few high value HDBs pulling the average above the middle of the market.
 
 #### Visualising local $R^2$
 
@@ -1655,7 +1655,7 @@ tm_shape(analysis.sf.adaptive) +
 tmap_mode("plot")
 ```
 
-The Local $R^2$ map shows that the adaptive GWR explains condo prices very well in most neighbourhoods. Darker blue clusters (Local $R^2$ between 0.8 and 1.0) dominate the island, meaning the local regressions capture more than 80% of price variation in these areas. Here, the chosen structural and accessibility variables provide an excellent description of market behaviour and the global conclusions are strongly supported.
+The Local $R^2$ map shows that the adaptive GWR explains HDB resale prices very well in most neighbourhoods. Darker blue clusters (Local $R^2$ between 0.8 and 1.0) dominate the island, meaning the local regressions capture more than 80% of price variation in these areas. Here, the chosen structural and accessibility variables provide an excellent description of market behaviour and the global conclusions are strongly supported.
 
 Lighter patches (Local $R^2$ between 0.5 and 0.7) appear only in a few planning subzones. In these locations the model leaves more unexplained variation, suggesting that additional local factors such as project specific amenities, tenure mix, redevelopment expectations, or micro environmental qualities may be important. These areas are prime candidates for further refinement, either by enriching the covariate set or exploring alternative spatial scales. Overall, the map confirms that the adaptive GWR greatly improves explanatory power across Singapore while also revealing a small number of neighbourhoods where current predictors are less adequate and targeted model extensions are warranted.
 
@@ -1713,8 +1713,8 @@ Start with the data that matter most for inference. We intersect the adaptive GW
 
 ```{r}
 
-# --- 2) Keep only condo points that fall inside Tampines -----------------------
-# Our GWR results were attached to `condo_resale.sf.adaptive` and include `Local_R2`.
+# --- 2) Keep only HDB points that fall inside Tampines -----------------------
+# Our GWR results were attached to `analysis.sf.adaptive` and include `Local_R2`.
 tampines_pts <- analysis.sf.adaptive[tampines_pa, , op = st_within]
 ```
 
@@ -1769,9 +1769,9 @@ tampines_r2_summary <- tampines_pts %>%
 tampines_r2_summary
 
 ```
-The updated Local R² results for Tampines show that the adaptive GWR still fits very well but with more variation than in the smaller earlier sample. Across 712 condominiums, Local R² ranges from about 0.685 to 0.965 with a median around 0.876 and upper quartile near 0.951.
+The updated Local R² results for Tampines show that the adaptive GWR still fits very well but with more variation than in the smaller earlier sample. Across 712 HDBs, Local R² ranges from about 0.685 to 0.965 with a median around 0.876 and upper quartile near 0.951.
 
-On the map, darker blue clusters in the north west and south east indicate locations where the model explains more than 0.95 of local price variation. Here the hedonic predictors such as floor level, age and accessibility capture condominium prices extremely well. Lighter areas in the central belt correspond to Local R² around 0.75 to 0.85, meaning that prices there depend more on factors not included in the model, for example project specific facilities or micro environment qualities.
+On the map, darker blue clusters in the north west and south east indicate locations where the model explains more than 0.95 of local price variation. Here the hedonic predictors such as floor level, age and accessibility capture HDB resale prices extremely well. Lighter areas in the central belt correspond to Local R² around 0.75 to 0.85, meaning that prices there depend more on factors not included in the model, for example project specific facilities or micro environment qualities.
 
 Overall, the **adaptive geographically weighted regression (adaptive GWR) model** remains highly reliable for Tampines, but the central neighbourhoods merit further refinement or additional covariates to fully explain local price dynamics.
 

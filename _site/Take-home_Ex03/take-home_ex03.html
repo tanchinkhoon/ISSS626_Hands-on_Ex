@@ -482,15 +482,15 @@ window.Quarto = {
 <p><img src="HDB.png" class="img-fluid"></p>
 <section id="introduction" class="level2" data-number="1">
 <h2 data-number="1" class="anchored" data-anchor-id="introduction"><span class="header-section-number">1</span> Introduction</h2>
-<p>This study examines the determinants of Housing and Development Board resale prices in Singapore using an explanatory spatial modelling framework. We focus on <strong>4</strong> room flats during <strong>1 January 2025 to 30 September 2025</strong> to maintain comparability and reflect current family preferences for this size category (EdgeProp Singapore, 2024). The objective is to identify structural and locational attributes associated with transaction prices and to reveal how those associations vary across space. Structural variables include floor level, age in years, and remaining lease in years. Locational variables include proximity to rail transit, parks and open space, primary schools including selected high performing or elite schools (Creative Campus, 2024), childcare and preschool supply, supermarkets, shopping malls, and bus stops. Count variables are computed within 350 meters and 1,000 meters buffers, and point to point proximity is measured in meters after projecting all layers to SVY21. The remainder of this report states the research questions, documents reproducible data preparation, specifies the global and geographically weighted models, and presents spatially explicit findings with concise implications.</p>
+<p>This study examines the determinants of Housing and Development Board (HDB) resale prices in Singapore using an explanatory spatial modelling framework. We focus on <strong>4</strong> room flats during <strong>1 January 2025 to 30 September 2025</strong> to maintain comparability and reflect current family preferences for this size category (EdgeProp Singapore, 2024). The objective is to identify structural and locational attributes associated with transaction prices and to reveal how those associations vary across space. Structural variables include floor level, age in years, and remaining lease in years. Locational variables include proximity to rail transit, parks and open space, primary schools including selected high performing or elite schools (Creative Campus, 2024), childcare and preschool supply, supermarkets, shopping malls, and bus stops. Count variables are computed within 350 meters and 1,000 meters buffers, and point to point proximity is measured in meters after projecting all layers to SVY21. The remainder of this report states the research questions, documents reproducible data preparation, specifies the global and geographically weighted models, and presents spatially explicit findings with concise implications.</p>
 </section>
 <section id="research-questions" class="level2" data-number="2">
 <h2 data-number="2" class="anchored" data-anchor-id="research-questions"><span class="header-section-number">2</span> Research Questions</h2>
 <p>This section states operational questions that guide an explanatory analysis of HDB resale prices for 4-room flats from 1 January 2025 to 30 September 2025. The questions align variable construction, model calibration, and interpretation with the objective of identifying price drivers and their spatial variation using a global Multiple Linear Regression baseline and a local geographically weighted model.</p>
-<p><strong>RQ1</strong>: Which structural attributes of a flat such as floor area, floor level, age, and remaining lease are significantly associated with resale price during the study window</p>
+<p><strong>RQ1</strong>: Which structural attributes of a flat such as floor level, age, and remaining lease are significantly associated with resale price during the study window</p>
 <p><strong>RQ2</strong>: Which locational attributes such as proximity to rail transit, parks, primary schools, childcare supply, supermarkets, shopping malls, and bus stops are significantly associated with resale price</p>
 <p><strong>RQ3</strong>: To what extent do these associations vary across space, as evidenced by spatially varying coefficients from a geographically weighted model</p>
-<p><strong>RQ4</strong>: Does the geographically weighted model materially improve fit and residual behaviour relative to a global Multiple Linear Regression specification</p>
+<p><strong>RQ4</strong>: Does the Geographically Weighted model (GWmodel) materially improve fit and residual behaviour relative to a global Multiple Linear Regression (MLR) specification</p>
 <p><strong>RQ5</strong>: Where are local effects notably stronger or weaker, and what practical implications follow for buyers, valuers, and planners</p>
 <p>Together these questions structure the analytical framework and ensure direct alignment between the study objectives and subsequent methods.</p>
 </section>
@@ -1410,7 +1410,7 @@ $ geometry &lt;POINT [m]&gt; POINT (35565.66 41659.52), POINT (21439.91 31253.63
 </section>
 <section id="proximity-to-elite-primary-schools" class="level4" data-number="6.3.9">
 <h4 data-number="6.3.9" class="anchored" data-anchor-id="proximity-to-elite-primary-schools"><span class="header-section-number">6.3.9</span> Proximity to elite primary schools</h4>
-<p>School prestige can affect price expectations for families with young children. We already derived an elite subset with twenty schools from the full primary list (Creative Campus, 2024). We compute a continuous distance to the nearest elite school point. This gives a clear and interpretable number in meters that can be compared across towns. In later robustness checks, we may also include the distance to the nearest ordinary primary school to differentiate general access from prestige access. For now we focus on the prestige signal since that is more likely to be reflected in marginal willingness to pay.</p>
+<p>School prestige can affect price expectations for families with young children. We already derived an elite subset with twenty schools from the full primary list. We compute a continuous distance to the nearest elite school point. This gives a clear and interpretable number in meters that can be compared across towns. In later robustness checks, we may also include the distance to the nearest ordinary primary school to differentiate general access from prestige access. For now we focus on the prestige signal since that is more likely to be reflected in marginal willingness to pay.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb54"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a>HDBresale_sf <span class="ot">&lt;-</span> HDBresale_sf <span class="sc">%&gt;%</span></span>
 <span id="cb54-2"><a href="#cb54-2" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">mutate</span>(<span class="at">DIST_ELITEPRI_M =</span> <span class="fu">nearest_distance_m</span>(geometry, elite_primary_pt))</span>
@@ -1486,7 +1486,7 @@ $ DIST_HAWKER_M    &lt;dbl&gt; 388.7647, 381.4729, 388.7647, 132.0052, 381.4729,
 $ DIST_SUPERMKT_M  &lt;dbl&gt; 284.9091, 314.4801, 284.9091, 186.2702, 314.4801, 186…
 $ DIST_MALL_M      &lt;dbl&gt; 756.2998, 652.1127, 756.2998, 959.9891, 652.1127, 959…
 $ DIST_CBD_M       &lt;dbl&gt; 8485.514, 8717.684, 8485.514, 9185.376, 8717.684, 918…
-$ DIST_ELITEPRI_M  &lt;dbl&gt; 2089.5384, 1389.9549, 2089.5384, 991.5717, 1389.9549,…
+$ DIST_ELITEPRI_M  &lt;dbl&gt; 2089.5381, 1389.9547, 2089.5381, 991.5718, 1389.9547,…
 $ CNT_KINDER_350   &lt;int&gt; 1, 1, 1, 2, 1, 2, 1, 1, 0, 0, 0, 0, 2, 1, 1, 1, 2, 1,…
 $ CNT_CHILD_350    &lt;int&gt; 3, 5, 3, 5, 5, 5, 5, 7, 2, 2, 2, 2, 4, 6, 5, 5, 5, 3,…
 $ CNT_BUS_350      &lt;int&gt; 7, 4, 7, 7, 4, 7, 6, 7, 5, 5, 5, 5, 6, 4, 4, 4, 7, 6,…
@@ -1567,16 +1567,16 @@ $ geometry         &lt;POINT [m]&gt; POINT (30036.29 38360.76), POINT (29283.45 
  Min.   :  25.35   Min.   :   0.0003   Min.   :  39.14   Min.   :   74.37  
  1st Qu.: 376.85   1st Qu.: 179.1599   1st Qu.: 378.70   1st Qu.: 1312.05  
  Median : 647.65   Median : 278.4398   Median : 600.73   Median : 2411.57  
- Mean   : 730.12   Mean   : 308.4312   Mean   : 664.70   Mean   : 3552.04  
+ Mean   : 730.12   Mean   : 308.4312   Mean   : 664.70   Mean   : 3551.93  
  3rd Qu.: 961.37   3rd Qu.: 397.2718   3rd Qu.: 886.89   3rd Qu.: 4997.38  
  Max.   :2500.14   Max.   :1415.3217   Max.   :2446.77   Max.   :11490.86  
  CNT_KINDER_350   CNT_CHILD_350     CNT_BUS_350     CNT_PRIMARY_1000
- Min.   :0.0000   Min.   : 0.000   Min.   : 0.000   Min.   :0.00    
- 1st Qu.:0.0000   1st Qu.: 3.000   1st Qu.: 6.000   1st Qu.:2.00    
- Median :1.0000   Median : 4.000   Median : 8.000   Median :3.00    
- Mean   :0.9289   Mean   : 4.653   Mean   : 7.985   Mean   :3.04    
- 3rd Qu.:1.0000   3rd Qu.: 6.000   3rd Qu.:10.000   3rd Qu.:4.00    
- Max.   :8.0000   Max.   :19.000   Max.   :19.000   Max.   :9.00    </code></pre>
+ Min.   :0.0000   Min.   : 0.000   Min.   : 0.000   Min.   :0.000   
+ 1st Qu.:0.0000   1st Qu.: 3.000   1st Qu.: 6.000   1st Qu.:2.000   
+ Median :1.0000   Median : 4.000   Median : 8.000   Median :3.000   
+ Mean   :0.9289   Mean   : 4.653   Mean   : 7.985   Mean   :3.038   
+ 3rd Qu.:1.0000   3rd Qu.: 6.000   3rd Qu.:10.000   3rd Qu.:4.000   
+ Max.   :8.0000   Max.   :19.000   Max.   :19.000   Max.   :9.000   </code></pre>
 </div>
 </div>
 <section id="eda-using-statistical-graphics" class="level4" data-number="7.2.1">
@@ -1783,11 +1783,11 @@ DIST_ELDERCARE_M    -0.126627904         0.026535546 -0.02503077  0.399274924
 DIST_HAWKER_M       -0.139778703         0.029158714 -0.03004163  0.344602149
 DIST_SUPERMKT_M     -0.038831406         0.045386897 -0.04479530  0.016896068
 DIST_MALL_M         -0.011655741        -0.084027939  0.08562340 -0.225004071
-DIST_ELITEPRI_M     -0.129878208         0.120971689 -0.12016143  0.704979552
+DIST_ELITEPRI_M     -0.129906347         0.120962287 -0.12015208  0.705003681
 CNT_KINDER_350       0.002303374        -0.161439591  0.16082083 -0.004500193
 CNT_CHILD_350        0.019279142         0.021688788 -0.02287158  0.113950711
 CNT_BUS_350         -0.032800232         0.009937946 -0.01054252  0.183472813
-CNT_PRIMARY_1000    -0.097058396        -0.029941398  0.02928089  0.257851920
+CNT_PRIMARY_1000    -0.097708334        -0.033519831  0.03278574  0.257207050
                        DIST_MRT_M DIST_PARK_M DIST_ELDERCARE_M DIST_HAWKER_M
 FLOOR_LEVEL         -0.1077131843 -0.05198686      -0.12662790   -0.13977870
 REMAINING_LEASE_MTH  0.0256770139  0.11101453       0.02653555    0.02915871
@@ -1799,43 +1799,43 @@ DIST_ELDERCARE_M     0.1067668594 -0.03338244       1.00000000    0.13245089
 DIST_HAWKER_M        0.0127721005  0.11819275       0.13245089    1.00000000
 DIST_SUPERMKT_M      0.1765673011 -0.11986959       0.03450565   -0.02562024
 DIST_MALL_M          0.3388069011 -0.04258508       0.02584431   -0.15787007
-DIST_ELITEPRI_M     -0.0002534136  0.23278480       0.35565574    0.23125496
+DIST_ELITEPRI_M     -0.0002394727  0.23278977       0.35566930    0.23127820
 CNT_KINDER_350      -0.0592377617  0.02556129       0.03447085    0.06446977
 CNT_CHILD_350       -0.1840478956  0.16796939      -0.02019895    0.10158066
 CNT_BUS_350         -0.0012617027  0.12903762       0.01914944   -0.01850288
-CNT_PRIMARY_1000    -0.2830693723  0.23354534      -0.08107132    0.06766356
+CNT_PRIMARY_1000    -0.2813912970  0.23461704      -0.08486730    0.06796730
                     DIST_SUPERMKT_M DIST_MALL_M DIST_ELITEPRI_M CNT_KINDER_350
-FLOOR_LEVEL             -0.03883141 -0.01165574   -0.1298782076    0.002303374
-REMAINING_LEASE_MTH      0.04538690 -0.08402794    0.1209716890   -0.161439591
-AGE_2025                -0.04479530  0.08562340   -0.1201614344    0.160820834
-DIST_CBD_M               0.01689607 -0.22500407    0.7049795525   -0.004500193
-DIST_MRT_M               0.17656730  0.33880690   -0.0002534136   -0.059237762
-DIST_PARK_M             -0.11986959 -0.04258508    0.2327847967    0.025561293
-DIST_ELDERCARE_M         0.03450565  0.02584431    0.3556557384    0.034470854
-DIST_HAWKER_M           -0.02562024 -0.15787007    0.2312549607    0.064469774
-DIST_SUPERMKT_M          1.00000000  0.20820232   -0.0678655602   -0.118708737
-DIST_MALL_M              0.20820232  1.00000000   -0.2732205629   -0.050023131
-DIST_ELITEPRI_M         -0.06786556 -0.27322056    1.0000000000   -0.047426160
-CNT_KINDER_350          -0.11870874 -0.05002313   -0.0474261597    1.000000000
-CNT_CHILD_350           -0.23729483 -0.26179038    0.0727533714    0.471435322
-CNT_BUS_350             -0.08543510 -0.23892133    0.0550505741    0.072713779
-CNT_PRIMARY_1000        -0.17738853 -0.35314318    0.1325828260    0.033035931
+FLOOR_LEVEL             -0.03883141 -0.01165574   -0.1299063467    0.002303374
+REMAINING_LEASE_MTH      0.04538690 -0.08402794    0.1209622867   -0.161439591
+AGE_2025                -0.04479530  0.08562340   -0.1201520803    0.160820834
+DIST_CBD_M               0.01689607 -0.22500407    0.7050036806   -0.004500193
+DIST_MRT_M               0.17656730  0.33880690   -0.0002394727   -0.059237762
+DIST_PARK_M             -0.11986959 -0.04258508    0.2327897673    0.025561293
+DIST_ELDERCARE_M         0.03450565  0.02584431    0.3556693015    0.034470854
+DIST_HAWKER_M           -0.02562024 -0.15787007    0.2312781987    0.064469774
+DIST_SUPERMKT_M          1.00000000  0.20820232   -0.0678393097   -0.118708737
+DIST_MALL_M              0.20820232  1.00000000   -0.2732232425   -0.050023131
+DIST_ELITEPRI_M         -0.06783931 -0.27322324    1.0000000000   -0.047435020
+CNT_KINDER_350          -0.11870874 -0.05002313   -0.0474350199    1.000000000
+CNT_CHILD_350           -0.23729483 -0.26179038    0.0727682588    0.471435322
+CNT_BUS_350             -0.08543510 -0.23892133    0.0550755505    0.072713779
+CNT_PRIMARY_1000        -0.17705578 -0.35424874    0.1295342073    0.031194917
                     CNT_CHILD_350  CNT_BUS_350 CNT_PRIMARY_1000
-FLOOR_LEVEL            0.01927914 -0.032800232      -0.09705840
-REMAINING_LEASE_MTH    0.02168879  0.009937946      -0.02994140
-AGE_2025              -0.02287158 -0.010542525       0.02928089
-DIST_CBD_M             0.11395071  0.183472813       0.25785192
-DIST_MRT_M            -0.18404790 -0.001261703      -0.28306937
-DIST_PARK_M            0.16796939  0.129037619       0.23354534
-DIST_ELDERCARE_M      -0.02019895  0.019149444      -0.08107132
-DIST_HAWKER_M          0.10158066 -0.018502881       0.06766356
-DIST_SUPERMKT_M       -0.23729483 -0.085435098      -0.17738853
-DIST_MALL_M           -0.26179038 -0.238921335      -0.35314318
-DIST_ELITEPRI_M        0.07275337  0.055050574       0.13258283
-CNT_KINDER_350         0.47143532  0.072713779       0.03303593
-CNT_CHILD_350          1.00000000  0.240766976       0.31872339
-CNT_BUS_350            0.24076698  1.000000000       0.21181633
-CNT_PRIMARY_1000       0.31872339  0.211816335       1.00000000</code></pre>
+FLOOR_LEVEL            0.01927914 -0.032800232      -0.09770833
+REMAINING_LEASE_MTH    0.02168879  0.009937946      -0.03351983
+AGE_2025              -0.02287158 -0.010542525       0.03278574
+DIST_CBD_M             0.11395071  0.183472813       0.25720705
+DIST_MRT_M            -0.18404790 -0.001261703      -0.28139130
+DIST_PARK_M            0.16796939  0.129037619       0.23461704
+DIST_ELDERCARE_M      -0.02019895  0.019149444      -0.08486730
+DIST_HAWKER_M          0.10158066 -0.018502881       0.06796730
+DIST_SUPERMKT_M       -0.23729483 -0.085435098      -0.17705578
+DIST_MALL_M           -0.26179038 -0.238921335      -0.35424874
+DIST_ELITEPRI_M        0.07276826  0.055075551       0.12953421
+CNT_KINDER_350         0.47143532  0.072713779       0.03119492
+CNT_CHILD_350          1.00000000  0.240766976       0.31791384
+CNT_BUS_350            0.24076698  1.000000000       0.21172533
+CNT_PRIMARY_1000       0.31791384  0.211725326       1.00000000</code></pre>
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb77"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb77-1"><a href="#cb77-1" aria-hidden="true" tabindex="-1"></a><span class="co"># visualise the matrix with a compact upper triangle layout</span></span>
 <span id="cb77-2"><a href="#cb77-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(corrplot)       <span class="co"># load correlation plot package</span></span>
@@ -1857,7 +1857,7 @@ CNT_PRIMARY_1000       0.31872339  0.211816335       1.00000000</code></pre>
 </div>
 </div>
 <p>First, REMAINING_LEASE_MTH and AGE_2025 have a correlation of about −0.9996. They are almost perfect substitutes: a flat that is older in AGE_2025 almost always has a shorter remaining lease, and vice versa. In the multiple model this pair will create extremely severe multicollinearity, so in later steps we must either drop one of them or be prepared for very unstable coefficient estimates and very high variance inflation.</p>
-<p>Second, the largest correlation among the location variables is between DIST_CBD_M and DIST_ELITEPRI_M, around 0.71. Condos that are farther from the CBD also tend to be farther from elite primary schools. This means these 2 distance measures share substantial spatial pattern, so their individual coefficients in the multiple model will be harder to interpret cleanly, even though they are not perfectly redundant.</p>
+<p>Second, the largest correlation among the location variables is between DIST_CBD_M and DIST_ELITEPRI_M, around 0.71. HDBs that are farther from the CBD also tend to be farther from elite primary schools. This means these 2 distance measures share substantial spatial pattern, so their individual coefficients in the multiple model will be harder to interpret cleanly, even though they are not perfectly redundant.</p>
 <p>Other distance measures are only moderately associated. For example, DIST_CBD_M with DIST_PARK_M, DIST_ELDERCARE_M, and DIST_HAWKER_M are in the 0.33 to 0.40 range, and most other pairs are below 0.30 in magnitude. DIST_MALL_M has modest negative correlation with DIST_CBD_M (about −0.23). These suggest some shared geography but not critical multicollinearity.</p>
 <p>The count variables form a loose cluster: CNT_KINDER_350 and CNT_CHILD_350 correlate at about 0.47, and CNT_CHILD_350 with CNT_PRIMARY_1000 at about 0.32, with smaller positive correlations involving CNT_BUS_350. They measure related aspects of family oriented amenities but still contain non overlapping information.</p>
 <p>FLOOR_LEVEL has only small to moderate correlations with all other variables, so it adds largely independent vertical characteristics.</p>
@@ -1883,11 +1883,11 @@ CNT_PRIMARY_1000       0.31872339  0.211816335       1.00000000</code></pre>
 <div class="cell-output cell-output-stdout">
 <pre><code>                              Model Summary                                
 --------------------------------------------------------------------------
-R                           0.873       RMSE                    78396.113 
-R-Squared                   0.762       MSE                6145950572.365 
-Adj. R-Squared              0.761       Coef. Var                  11.669 
-Pred R-Squared              0.761       AIC                    220280.430 
-MAE                     60508.131       SBC                    220400.598 
+R                           0.873       RMSE                    78433.680 
+R-Squared                   0.762       MSE                6151842224.238 
+Adj. R-Squared              0.761       Coef. Var                  11.675 
+Pred R-Squared              0.761       AIC                    220288.746 
+MAE                     60528.909       SBC                    220408.914 
 --------------------------------------------------------------------------
  RMSE: Root Mean Square Error 
  MSE: Mean Square Error 
@@ -1900,31 +1900,31 @@ MAE                     60508.131       SBC                    220400.598
                            Sum of                                                         
                           Squares          DF           Mean Square       F          Sig. 
 ------------------------------------------------------------------------------------------
-Regression    170528980093458.500          15    11368598672897.232     1846.36    0.0000 
-Residual       53340705017552.352        8663        6157301745.071                       
-Total         223869685111010.844        8678                                             
+Regression    170477846446845.875          15    11365189763123.059    1844.039    0.0000 
+Residual       53391838664164.789        8663        6163204278.445                       
+Total         223869685111010.656        8678                                             
 ------------------------------------------------------------------------------------------
 
                                               Parameter Estimates                                               
 ---------------------------------------------------------------------------------------------------------------
               model           Beta    Std. Error    Std. Beta       t        Sig          lower          upper 
 ---------------------------------------------------------------------------------------------------------------
-        (Intercept)    1076529.306    221466.625                   4.861    0.000    642402.043    1510656.569 
-        FLOOR_LEVEL       5848.517       146.257        0.232     39.988    0.000      5561.818       6135.216 
-REMAINING_LEASE_MTH          4.746       185.983        0.005      0.026    0.980      -359.824        369.316 
-           AGE_2025      -5342.432      2234.671       -0.469     -2.391    0.017     -9722.919       -961.945 
-         DIST_CBD_M        -19.758         0.334       -0.540    -59.209    0.000       -20.412        -19.104 
-         DIST_MRT_M        -56.750         2.641       -0.132    -21.485    0.000       -61.927        -51.572 
-        DIST_PARK_M         -2.569         2.355       -0.006     -1.091    0.275        -7.186          2.048 
-   DIST_ELDERCARE_M        -10.763         1.527       -0.042     -7.051    0.000       -13.755         -7.771 
-      DIST_HAWKER_M        -25.287         1.996       -0.072    -12.666    0.000       -29.201        -21.374 
-    DIST_SUPERMKT_M         15.595         4.981        0.018      3.131    0.002         5.832         25.359 
-        DIST_MALL_M        -27.142         2.737       -0.063     -9.916    0.000       -32.507        -21.777 
-    DIST_ELITEPRI_M          1.887         0.421        0.035      4.479    0.000         1.061          2.713 
-     CNT_KINDER_350      10166.925       929.763        0.067     10.935    0.000      8344.368      11989.482 
-      CNT_CHILD_350      -1883.838       466.967       -0.027     -4.034    0.000     -2799.204       -968.472 
-        CNT_BUS_350       1468.623       320.651        0.026      4.580    0.000       840.070       2097.175 
-   CNT_PRIMARY_1000     -12074.831       659.158       -0.117    -18.319    0.000    -13366.938     -10782.724 
+        (Intercept)    1088382.993    221570.955                   4.912    0.000    654051.218    1522714.768 
+        FLOOR_LEVEL       5852.372       146.321        0.232     39.997    0.000      5565.547       6139.196 
+REMAINING_LEASE_MTH         -5.478       186.067       -0.006     -0.029    0.977      -370.212        359.257 
+           AGE_2025      -5460.539      2235.671       -0.479     -2.442    0.015     -9842.985      -1078.092 
+         DIST_CBD_M        -19.762         0.334       -0.540    -59.157    0.000       -20.417        -19.107 
+         DIST_MRT_M        -56.492         2.641       -0.131    -21.390    0.000       -61.669        -51.315 
+        DIST_PARK_M         -2.572         2.357       -0.006     -1.091    0.275        -7.192          2.048 
+   DIST_ELDERCARE_M        -10.813         1.528       -0.043     -7.077    0.000       -13.808         -7.818 
+      DIST_HAWKER_M        -25.242         1.997       -0.072    -12.638    0.000       -29.158        -21.327 
+    DIST_SUPERMKT_M         15.692         4.983        0.018      3.149    0.002         5.924         25.460 
+        DIST_MALL_M        -27.199         2.740       -0.063     -9.927    0.000       -32.570        -21.828 
+    DIST_ELITEPRI_M          1.868         0.422        0.035      4.429    0.000         1.041          2.695 
+     CNT_KINDER_350      10141.563       930.533        0.067     10.899    0.000      8317.497      11965.630 
+      CNT_CHILD_350      -1902.397       467.226       -0.027     -4.072    0.000     -2818.272       -986.522 
+        CNT_BUS_350       1458.490       320.786        0.026      4.547    0.000       829.674       2087.307 
+   CNT_PRIMARY_1000     -11968.301       661.814       -0.116    -18.084    0.000    -13265.615     -10670.987 
 ---------------------------------------------------------------------------------------------------------------</code></pre>
 </div>
 </div>
@@ -1954,11 +1954,11 @@ REMAINING_LEASE_MTH          4.746       185.983        0.005      0.026    0.98
 <div class="cell-output cell-output-stdout">
 <pre><code>                              Model Summary                                
 --------------------------------------------------------------------------
-R                           0.873       RMSE                    78401.511 
-R-Squared                   0.762       MSE                6146796989.020 
-Adj. R-Squared              0.761       Coef. Var                  11.668 
-Pred R-Squared              0.761       AIC                    220277.626 
-MAE                     60475.854       SBC                    220383.655 
+R                           0.873       RMSE                    78439.072 
+R-Squared                   0.761       MSE                6152687963.894 
+Adj. R-Squared              0.761       Coef. Var                  11.674 
+Pred R-Squared              0.761       AIC                    220285.939 
+MAE                     60496.121       SBC                    220391.969 
 --------------------------------------------------------------------------
  RMSE: Root Mean Square Error 
  MSE: Mean Square Error 
@@ -1971,29 +1971,29 @@ MAE                     60475.854       SBC                    220383.655
                            Sum of                                                         
                           Squares          DF           Mean Square       F          Sig. 
 ------------------------------------------------------------------------------------------
-Regression    170521634043306.250          13    13117048772562.020    2130.523    0.0000 
-Residual       53348051067704.805        8665        6156728340.185                       
-Total         223869685111011.062        8678                                             
+Regression    170470506272377.812          13    13113115867105.986    2127.844    0.0000 
+Residual       53399178838633.453        8665        6162628833.079                       
+Total         223869685111011.250        8678                                             
 ------------------------------------------------------------------------------------------
 
                                              Parameter Estimates                                              
 -------------------------------------------------------------------------------------------------------------
            model           Beta    Std. Error    Std. Beta       t        Sig           lower          upper 
 -------------------------------------------------------------------------------------------------------------
-     (Intercept)    1081681.341      5872.477                 184.195    0.000    1070169.890    1093192.792 
-     FLOOR_LEVEL       5847.437       146.239        0.232     39.985    0.000       5560.774       6134.101 
-        AGE_2025      -5392.512        65.316       -0.473    -82.561    0.000      -5520.546      -5264.477 
-      DIST_CBD_M        -19.833         0.326       -0.542    -60.754    0.000        -20.473        -19.193 
-      DIST_MRT_M        -56.979         2.633       -0.132    -21.642    0.000        -62.140        -51.819 
-DIST_ELDERCARE_M        -10.464         1.501       -0.041     -6.972    0.000        -13.406         -7.522 
-   DIST_HAWKER_M        -25.326         1.995       -0.072    -12.694    0.000        -29.237        -21.415 
- DIST_SUPERMKT_M         16.238         4.946        0.018      3.283    0.001          6.544         25.933 
-     DIST_MALL_M        -27.531         2.710       -0.064    -10.159    0.000        -32.843        -22.218 
- DIST_ELITEPRI_M          1.867         0.421        0.035      4.438    0.000          1.042          2.691 
-  CNT_KINDER_350      10167.496       929.699        0.067     10.936    0.000       8345.064      11989.928 
-   CNT_CHILD_350      -1924.097       465.447       -0.027     -4.134    0.000      -2836.483      -1011.711 
-     CNT_BUS_350       1453.319       320.329        0.026      4.537    0.000        825.398       2081.241 
-CNT_PRIMARY_1000     -12172.222       653.004       -0.118    -18.640    0.000     -13452.266     -10892.179 
+     (Intercept)    1081367.945      5875.654                 184.042    0.000    1069850.266    1092885.625 
+     FLOOR_LEVEL       5851.376       146.303        0.232     39.995    0.000       5564.587       6138.164 
+        AGE_2025      -5387.777        65.365       -0.473    -82.426    0.000      -5515.908      -5259.646 
+      DIST_CBD_M        -19.837         0.327       -0.543    -60.685    0.000        -20.478        -19.196 
+      DIST_MRT_M        -56.722         2.632       -0.132    -21.547    0.000        -61.882        -51.562 
+DIST_ELDERCARE_M        -10.518         1.503       -0.042     -7.001    0.000        -13.464         -7.573 
+   DIST_HAWKER_M        -25.278         1.996       -0.072    -12.664    0.000        -29.190        -21.365 
+ DIST_SUPERMKT_M         16.333         4.948        0.018      3.301    0.001          6.634         26.032 
+     DIST_MALL_M        -27.597         2.713       -0.064    -10.174    0.000        -32.914        -22.280 
+ DIST_ELITEPRI_M          1.847         0.421        0.034      4.386    0.000          1.021          2.672 
+  CNT_KINDER_350      10141.870       930.468        0.067     10.900    0.000       8317.932      11965.808 
+   CNT_CHILD_350      -1942.038       465.725       -0.028     -4.170    0.000      -2854.969      -1029.106 
+     CNT_BUS_350       1443.240       320.463        0.026      4.504    0.000        815.056       2071.425 
+CNT_PRIMARY_1000     -12067.533       655.502       -0.117    -18.410    0.000     -13352.472     -10782.593 
 -------------------------------------------------------------------------------------------------------------</code></pre>
 </div>
 </div>
@@ -2004,7 +2004,7 @@ CNT_PRIMARY_1000     -12172.222       653.004       -0.118    -18.640    0.000  
 \hat Y \approx 1,080,598 + 5,855\cdot Floor - 5393 \cdot AGE\_2025 - 20\cdot DIST\_CBD\_M - 57 \cdot DIST\_MRT\_M - 10 \cdot DIST\_ELDERCARE\_M - 25 \cdot DIST\_HAWKER\_M + 17 \cdot DIST\_SUPERMKT\_M - 27 \cdot DIST\_MALL\_M + 1.9 \cdot DIST\_ELITEPRI\_M + 10195 \cdot CNT\_KINDER\_350 - 1967 \cdot CNT\_CHILD\_350 + 1440 \cdot CNT\_BUS\_350 - 11794 \cdot CNT\_PRIMARY\_1000
 \]</span></p>
 <p>Interpreting unit changes: holding all other variables constant, moving up 1 floor raises expected price by about 5,855. An increase of 1 unit in AGE_2025 reduces price by about 5,393, confirming that newer developments command higher prices. Every additional unit of distance from the central business district reduces price by about 19.9, and every additional unit of distance from the nearest MRT station reduces price by about 56.6. Distances from eldercare, hawker centres and malls also have significant negative effects.</p>
-<p>Amenity counts matter as well. Each extra kindergarten within 350 units increases price by roughly 10195, while each extra primary school within 1000 units reduces price by about 11,794 after controlling for the rest, suggesting that the mix of school types in the immediate environment is important rather than sheer number. Bus stop density has a modest positive effect, and the small positive coefficients for distance to supermarkets and elite primary schools indicate that, in this dataset, higher priced condos tend to sit slightly further from those specific facilities once other location attributes are controlled. Overall, the retained predictors describe a coherent hedonic structure in which height, building age, centrality and the surrounding service mix jointly drive resale prices.</p>
+<p>Amenity counts matter as well. Each extra kindergarten within 350 units increases price by roughly 10195, while each extra primary school within 1000 units reduces price by about 11,794 after controlling for the rest, suggesting that the mix of school types in the immediate environment is important rather than sheer number. Bus stop density has a modest positive effect, and the small positive coefficients for distance to supermarkets and elite primary schools indicate that, in this dataset, higher priced HDBs tend to sit slightly further from those specific facilities once other location attributes are controlled. Overall, the retained predictors describe a coherent hedonic structure in which height, building age, centrality and the surrounding service mix jointly drive resale prices.</p>
 </section>
 </section>
 <section id="regression-diagnostics" class="level3" data-number="9.2">
@@ -2093,7 +2093,7 @@ CNT_PRIMARY_1000     -12172.222       653.004       -0.118    -18.640    0.000  
 </div>
 </div>
 <p>The Q Q plot shows that residuals follow the reference line very closely through the central part of the distribution. From about the 10th to the 90th percentile the points stay inside the grey band, so the normal approximation is reasonable for most observations and standard OLS inference on mean effects is reliable.</p>
-<p>Departures appear mainly in the upper tail, where points bend above the line and move outside the band, indicating more large positive residuals than a normal distribution would predict. A mild deviation is also visible in the extreme lower tail. These patterns confirm slight right skew and heavier tails, consistent with the histogram. In practice this means that coefficient estimates and their confidence intervals remain trustworthy given the very large sample, but prediction intervals for the most expensive condominiums are less accurate and a small number of high priced outliers or omitted local factors are not fully captured by the global model.</p>
+<p>Departures appear mainly in the upper tail, where points bend above the line and move outside the band, indicating more large positive residuals than a normal distribution would predict. A mild deviation is also visible in the extreme lower tail. These patterns confirm slight right skew and heavier tails, consistent with the histogram. In practice this means that coefficient estimates and their confidence intervals remain trustworthy given the very large sample, but prediction intervals for the most expensive HDBs are less accurate and a small number of high priced outliers or omitted local factors are not fully captured by the global model.</p>
 <p>Another way to check for normality assumption visual is by using <code>check_model()</code> of <strong>performance</strong> package as shown in the code chunk below.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb88"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb88-1"><a href="#cb88-1" aria-hidden="true" tabindex="-1"></a>performance<span class="sc">::</span><span class="fu">check_model</span>(mlr1.full,</span>
@@ -2184,13 +2184,13 @@ data:  x
 weights: listw  
 number of simulations + 1: 1000 
 
-statistic = 0.32552, observed rank = 1000, p-value &lt;
+statistic = 0.32588, observed rank = 1000, p-value &lt;
 0.00000000000000022
 alternative hypothesis: two.sided</code></pre>
 </div>
 </div>
 <p>The Monte Carlo Moran I result shows strong and highly significant spatial autocorrelation in the OLS residuals. The statistic is about 0.33 with an observed rank of 1 000 out of 1 000 simulations and a p value effectively equal to 0. This means none of the simulated patterns under spatial randomness produced an I value as large as the observed one, so the null hypothesis of spatially independent residuals is decisively rejected.</p>
-<p>In practical terms, nearby condominiums tend to share similar overpricing or underpricing after controlling for the hedonic covariates. This confirms that important spatial structure remains unexplained and that the OLS error term is not independent. As a result, standard errors from the global OLS may be underestimated and significance levels somewhat optimistic, even though the main effect directions are still informative. These findings support the decision to move to spatial models in Section 10, such as geographically weighted regression or spatial error specifications, to capture local market effects and produce more reliable inference and location sensitive fitted values.</p>
+<p>In practical terms, nearby HDBs tend to share similar overpricing or underpricing after controlling for the hedonic covariates. This confirms that important spatial structure remains unexplained and that the OLS error term is not independent. As a result, standard errors from the global OLS may be underestimated and significance levels somewhat optimistic, even though the main effect directions are still informative. These findings support the decision to move to spatial models in Section 10, such as geographically weighted regression or spatial error specifications, to capture local market effects and produce more reliable inference and location sensitive fitted values.</p>
 </section>
 </section>
 </section>
@@ -2219,49 +2219,49 @@ alternative hypothesis: two.sided</code></pre>
 <div class="cell-output cell-output-stdout">
 <pre><code>Take a cup of tea and have a break, it will take a few minutes.
           -----A kind suggestion from GWmodel development group
-Fixed bandwidth: 22980.96 CV score: 52334842458220 
-Fixed bandwidth: 14205.85 CV score: 50296197430523 
-Fixed bandwidth: 8782.54 CV score: 45100613267873 
-Fixed bandwidth: 5430.749 CV score: 35979810055648 
-Fixed bandwidth: 3359.228 CV score: 26719300473254 
-Fixed bandwidth: 2078.957 CV score: 19594422388938 
-Fixed bandwidth: 1287.706 CV score: 15827777919153 
-Fixed bandwidth: 798.6866 CV score: 13290797421471 
-Fixed bandwidth: 496.4557 CV score: 12275009410102 
-Fixed bandwidth: 309.6667 CV score: 21212653935043 
-Fixed bandwidth: 611.8976 CV score: 12420826681957 
-Fixed bandwidth: 425.1087 CV score: 14302442968579 
-Fixed bandwidth: 540.5506 CV score: 12198789816613 
-Fixed bandwidth: 567.8027 CV score: 12261588158631 
-Fixed bandwidth: 523.7078 CV score: 12189958351473 
-Fixed bandwidth: 513.2984 CV score: 12203812173131 
-Fixed bandwidth: 530.1412 CV score: 12189518798224 
-Fixed bandwidth: 534.1172 CV score: 12191752594971 
-Fixed bandwidth: 527.6839 CV score: 12189056447010 
-Fixed bandwidth: 526.1652 CV score: 12189150478229 
-Fixed bandwidth: 528.6225 CV score: 12189145605610 
-Fixed bandwidth: 527.1038 CV score: 12189057062808 
-Fixed bandwidth: 528.0424 CV score: 12189077470701 
-Fixed bandwidth: 527.4623 CV score: 12189051600585 
-Fixed bandwidth: 527.3253 CV score: 12189051735387 
-Fixed bandwidth: 527.5469 CV score: 12189052712660 
-Fixed bandwidth: 527.41 CV score: 12189051367914 
-Fixed bandwidth: 527.3777 CV score: 12189051395066 
-Fixed bandwidth: 527.43 CV score: 12189051412606 
-Fixed bandwidth: 527.3976 CV score: 12189051360087 
-Fixed bandwidth: 527.39 CV score: 12189051368034 
-Fixed bandwidth: 527.4023 CV score: 12189051361093 
-Fixed bandwidth: 527.3947 CV score: 12189051364926 
-Fixed bandwidth: 527.3994 CV score: 12189051365031 
-Fixed bandwidth: 527.3965 CV score: 12189051365623 
-Fixed bandwidth: 527.3983 CV score: 12189051363548 
-Fixed bandwidth: 527.3972 CV score: 12189051368128 
-Fixed bandwidth: 527.3979 CV score: 12189051358574 
-Fixed bandwidth: 527.3981 CV score: 12189051361711 
-Fixed bandwidth: 527.3978 CV score: 12189051365608 
-Fixed bandwidth: 527.398 CV score: 12189051357896 
-Fixed bandwidth: 527.398 CV score: 12189051364981 
-Fixed bandwidth: 527.3979 CV score: 12189051367381 </code></pre>
+Fixed bandwidth: 22980.96 CV score: 52385923894508 
+Fixed bandwidth: 14205.85 CV score: 50347828159083 
+Fixed bandwidth: 8782.54 CV score: 45154349261233 
+Fixed bandwidth: 5430.749 CV score: 36037299898213 
+Fixed bandwidth: 3359.228 CV score: 26752928205358 
+Fixed bandwidth: 2078.957 CV score: 19603278753647 
+Fixed bandwidth: 1287.706 CV score: 15826234374907 
+Fixed bandwidth: 798.6866 CV score: 13292854366108 
+Fixed bandwidth: 496.4557 CV score: 12324982655758 
+Fixed bandwidth: 309.6667 CV score: 23146338003435 
+Fixed bandwidth: 611.8976 CV score: 12443877340592 
+Fixed bandwidth: 425.1087 CV score: 14380209868850 
+Fixed bandwidth: 540.5506 CV score: 12234560486064 
+Fixed bandwidth: 567.8027 CV score: 12291797848818 
+Fixed bandwidth: 523.7078 CV score: 12230185725449 
+Fixed bandwidth: 513.2984 CV score: 12247359466981 
+Fixed bandwidth: 530.1412 CV score: 12227922327127 
+Fixed bandwidth: 534.1172 CV score: 12229107156361 
+Fixed bandwidth: 527.6839 CV score: 12228137443202 
+Fixed bandwidth: 531.6599 CV score: 12228160022785 
+Fixed bandwidth: 529.2026 CV score: 12227914846156 
+Fixed bandwidth: 528.6225 CV score: 12227965110969 
+Fixed bandwidth: 529.5611 CV score: 12227904868814 
+Fixed bandwidth: 529.7827 CV score: 12227906658774 
+Fixed bandwidth: 529.4241 CV score: 12227906796716 
+Fixed bandwidth: 529.6457 CV score: 12227904839971 
+Fixed bandwidth: 529.698 CV score: 12227905264686 
+Fixed bandwidth: 529.6134 CV score: 12227904748603 
+Fixed bandwidth: 529.5934 CV score: 12227904753885 
+Fixed bandwidth: 529.6257 CV score: 12227904766288 
+Fixed bandwidth: 529.6058 CV score: 12227904743080 
+Fixed bandwidth: 529.601 CV score: 12227904746127 
+Fixed bandwidth: 529.6087 CV score: 12227904745620 
+Fixed bandwidth: 529.604 CV score: 12227904744920 
+Fixed bandwidth: 529.6069 CV score: 12227904744549 
+Fixed bandwidth: 529.6051 CV score: 12227904744752 
+Fixed bandwidth: 529.6062 CV score: 12227904741964 
+Fixed bandwidth: 529.6065 CV score: 12227904738205 
+Fixed bandwidth: 529.6066 CV score: 12227904745233 
+Fixed bandwidth: 529.6064 CV score: 12227904746469 
+Fixed bandwidth: 529.6065 CV score: 12227904739941 
+Fixed bandwidth: 529.6064 CV score: 12227904740239 
+Fixed bandwidth: 529.6065 CV score: 12227904743186 </code></pre>
 </div>
 </div>
 </section>
@@ -2287,7 +2287,7 @@ Fixed bandwidth: 527.3979 CV score: 12189051367381 </code></pre>
 <pre><code>   ***********************************************************************
    *                       Package   GWmodel                             *
    ***********************************************************************
-   Program starts at: 2025-11-17 13:13:52.172015 
+   Program starts at: 2025-11-17 17:46:00.365112 
    Call:
    gwr.basic(formula = resale_price ~ FLOOR_LEVEL + AGE_2025 + DIST_CBD_M + 
     DIST_MRT_M + DIST_ELDERCARE_M + DIST_HAWKER_M + DIST_SUPERMKT_M + 
@@ -2307,98 +2307,98 @@ Fixed bandwidth: 527.3979 CV score: 12189051367381 </code></pre>
 
    Residuals:
     Min      1Q  Median      3Q     Max 
--315908  -51090    -461   48611  495759 
+-316038  -51178    -548   48557  495950 
 
    Coefficients:
                         Estimate   Std. Error t value             Pr(&gt;|t|)    
-   (Intercept)      1081681.3410    5872.4769 184.195 &lt; 0.0000000000000002 ***
-   FLOOR_LEVEL         5847.4372     146.2391  39.985 &lt; 0.0000000000000002 ***
-   AGE_2025           -5392.5118      65.3158 -82.561 &lt; 0.0000000000000002 ***
-   DIST_CBD_M           -19.8333       0.3265 -60.754 &lt; 0.0000000000000002 ***
-   DIST_MRT_M           -56.9794       2.6328 -21.642 &lt; 0.0000000000000002 ***
-   DIST_ELDERCARE_M     -10.4642       1.5009  -6.972     0.00000000000335 ***
-   DIST_HAWKER_M        -25.3259       1.9952 -12.694 &lt; 0.0000000000000002 ***
-   DIST_SUPERMKT_M       16.2382       4.9456   3.283              0.00103 ** 
-   DIST_MALL_M          -27.5306       2.7100 -10.159 &lt; 0.0000000000000002 ***
-   DIST_ELITEPRI_M        1.8665       0.4206   4.438     0.00000919965173 ***
-   CNT_KINDER_350     10167.4961     929.6993  10.936 &lt; 0.0000000000000002 ***
-   CNT_CHILD_350      -1924.0968     465.4465  -4.134     0.00003600625202 ***
-   CNT_BUS_350         1453.3194     320.3291   4.537     0.00000578398368 ***
-   CNT_PRIMARY_1000  -12172.2222     653.0043 -18.640 &lt; 0.0000000000000002 ***
+   (Intercept)      1081367.9454    5875.6542 184.042 &lt; 0.0000000000000002 ***
+   FLOOR_LEVEL         5851.3757     146.3028  39.995 &lt; 0.0000000000000002 ***
+   AGE_2025           -5387.7766      65.3650 -82.426 &lt; 0.0000000000000002 ***
+   DIST_CBD_M           -19.8371       0.3269 -60.685 &lt; 0.0000000000000002 ***
+   DIST_MRT_M           -56.7220       2.6325 -21.547 &lt; 0.0000000000000002 ***
+   DIST_ELDERCARE_M     -10.5185       1.5025  -7.001     0.00000000000274 ***
+   DIST_HAWKER_M        -25.2776       1.9961 -12.664 &lt; 0.0000000000000002 ***
+   DIST_SUPERMKT_M       16.3329       4.9479   3.301             0.000967 ***
+   DIST_MALL_M          -27.5970       2.7126 -10.174 &lt; 0.0000000000000002 ***
+   DIST_ELITEPRI_M        1.8465       0.4210   4.386     0.00001169715551 ***
+   CNT_KINDER_350     10141.8699     930.4676  10.900 &lt; 0.0000000000000002 ***
+   CNT_CHILD_350      -1942.0376     465.7250  -4.170     0.00003076707404 ***
+   CNT_BUS_350         1443.2402     320.4634   4.504     0.00000676850550 ***
+   CNT_PRIMARY_1000  -12067.5328     655.5018 -18.410 &lt; 0.0000000000000002 ***
 
    ---Significance stars
    Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1 
-   Residual standard error: 78460 on 8665 degrees of freedom
-   Multiple R-squared: 0.7617
-   Adjusted R-squared: 0.7613 
-   F-statistic:  2131 on 13 and 8665 DF,  p-value: &lt; 0.00000000000000022 
+   Residual standard error: 78500 on 8665 degrees of freedom
+   Multiple R-squared: 0.7615
+   Adjusted R-squared: 0.7611 
+   F-statistic:  2128 on 13 and 8665 DF,  p-value: &lt; 0.00000000000000022 
    ***Extra Diagnostic information
-   Residual sum of squares: 53348051067705
-   Sigma(hat): 78410.55
-   AIC:  220277.6
-   AICc:  220277.7
-   BIC:  211840.7
+   Residual sum of squares: 53399178838633
+   Sigma(hat): 78448.11
+   AIC:  220285.9
+   AICc:  220286
+   BIC:  211849
    ***********************************************************************
    *          Results of Geographically Weighted Regression              *
    ***********************************************************************
 
    *********************Model calibration information*********************
    Kernel function: gaussian 
-   Fixed bandwidth: 527.398 
+   Fixed bandwidth: 529.6065 
    Regression points: the same locations as observations are used.
    Distance metric: Euclidean distance metric is used.
 
    ****************Summary of GWR coefficient estimates:******************
                              Min.       1st Qu.        Median       3rd Qu.
-   Intercept        -7632615.7791   534323.3711  1076803.5460  1668440.3703
-   FLOOR_LEVEL          1849.4883     3928.7910     4588.5649     5330.2895
-   AGE_2025           -22518.4290    -8088.6467    -5371.1562    -4012.5046
-   DIST_CBD_M          -1193.5470      -80.9566      -17.4536       31.0078
-   DIST_MRT_M           -942.7789     -119.3137      -56.8617      -22.0063
-   DIST_ELDERCARE_M     -722.0499      -35.1783        5.7207       48.7141
-   DIST_HAWKER_M        -947.0366      -59.2391      -20.9372       32.8938
-   DIST_SUPERMKT_M      -836.1433      -41.9502        4.8228       43.3461
-   DIST_MALL_M         -2300.9946      -74.4484      -23.3525       22.9084
-   DIST_ELITEPRI_M      -844.4026      -71.5512        9.6902       75.7601
-   CNT_KINDER_350    -104811.1625    -7155.1160     -341.4635     4026.7853
-   CNT_CHILD_350      -85110.2137    -2973.3294     -171.8207     1871.3166
-   CNT_BUS_350        -36284.5044    -1913.8588      287.3968     2331.5502
-   CNT_PRIMARY_1000  -146530.2970    -5781.0867     -461.2713     4513.0091
+   Intercept        -7508599.3002   546029.3614  1081563.6890  1679580.1254
+   FLOOR_LEVEL          1852.0335     3929.5830     4592.6600     5336.1207
+   AGE_2025           -21539.3180    -8097.2950    -5374.3341    -4033.7078
+   DIST_CBD_M          -1173.5989      -81.1047      -17.4728       30.2567
+   DIST_MRT_M           -928.0201     -117.7242      -56.6432      -22.1711
+   DIST_ELDERCARE_M     -778.1733      -36.1024        5.6973       48.3509
+   DIST_HAWKER_M        -924.7413      -58.4140      -21.1189       32.6676
+   DIST_SUPERMKT_M      -823.7004      -42.2697        5.6175       43.5259
+   DIST_MALL_M         -2291.4128      -74.7417      -23.6015       22.8656
+   DIST_ELITEPRI_M      -716.7561      -71.0141        9.0738       75.5680
+   CNT_KINDER_350    -101213.6535    -6845.8408     -169.5429     3909.6795
+   CNT_CHILD_350      -66628.3016    -2984.1452     -177.5691     1862.3448
+   CNT_BUS_350        -36263.3850    -1919.2747      324.1217     2328.2966
+   CNT_PRIMARY_1000  -144304.3396    -5292.1941     -325.5927     4366.0756
                            Max.
-   Intercept        13285244.97
-   FLOOR_LEVEL         22232.80
-   AGE_2025             3899.99
-   DIST_CBD_M            711.67
-   DIST_MRT_M           1990.33
-   DIST_ELDERCARE_M      779.33
-   DIST_HAWKER_M         615.67
-   DIST_SUPERMKT_M      1288.52
-   DIST_MALL_M           732.52
-   DIST_ELITEPRI_M      1106.25
-   CNT_KINDER_350     184430.14
-   CNT_CHILD_350       23088.21
-   CNT_BUS_350         29544.06
-   CNT_PRIMARY_1000   114127.61
+   Intercept        13084616.14
+   FLOOR_LEVEL         22165.12
+   AGE_2025             3830.81
+   DIST_CBD_M            701.17
+   DIST_MRT_M           1981.76
+   DIST_ELDERCARE_M      770.16
+   DIST_HAWKER_M         618.01
+   DIST_SUPERMKT_M      1270.71
+   DIST_MALL_M           725.00
+   DIST_ELITEPRI_M      1091.72
+   CNT_KINDER_350     183522.33
+   CNT_CHILD_350       26426.65
+   CNT_BUS_350         24630.74
+   CNT_PRIMARY_1000   101960.72
    ************************Diagnostic information*************************
    Number of data points: 8679 
-   Effective number of parameters (2trace(S) - trace(S'S)): 1045.664 
-   Effective degrees of freedom (n-2trace(S) + trace(S'S)): 7633.336 
-   AICc (GWR book, Fotheringham, et al. 2002, p. 61, eq 2.33): 206547.4 
-   AIC (GWR book, Fotheringham, et al. 2002,GWR p. 96, eq. 4.22): 205520.8 
-   BIC (GWR book, Fotheringham, et al. 2002,GWR p. 61, eq. 2.34): 203641.1 
-   Residual sum of squares: 8872099297285 
-   R-square value:  0.9603694 
-   Adjusted R-square value:  0.9549398 
+   Effective number of parameters (2trace(S) - trace(S'S)): 1040.801 
+   Effective degrees of freedom (n-2trace(S) + trace(S'S)): 7638.199 
+   AICc (GWR book, Fotheringham, et al. 2002, p. 61, eq 2.33): 206562.8 
+   AIC (GWR book, Fotheringham, et al. 2002,GWR p. 96, eq. 4.22): 205541.9 
+   BIC (GWR book, Fotheringham, et al. 2002,GWR p. 61, eq. 2.34): 203630.2 
+   Residual sum of squares: 8897735100558 
+   R-square value:  0.9602548 
+   Adjusted R-square value:  0.9548384 
 
    ***********************************************************************
-   Program stops at: 2025-11-17 13:14:21.82206 </code></pre>
+   Program stops at: 2025-11-17 17:46:30.922174 </code></pre>
 </div>
 </div>
 <p>The embedded global regression in the GWmodel run is essentially the same multiple OLS model we reported earlier. All 13 predictors are highly significant with p values below 0.001. The key global effects are: each extra floor adds about 5,853 dollars to resale price, each additional year of AGE_2025 reduces price by about 5 389 dollars, every extra meter from the central business district reduces price by about 19.8 dollars and every extra meter from the nearest MRT station reduces price by about 56.8 dollars, holding other factors constant. Distances to eldercare, hawker centres and malls also have global negative coefficients, while distance to supermarkets and elite primary schools, counts of kindergartens and bus stops have positive global effects, and counts of childcare centres and nearby primary schools have negative global effects. Overall fit is strong with R squared about 0.761, residual sum of squares about 53.4 trillion and AICc about 220,289.</p>
 <p>The GWR section shows what happens when these same coefficients are allowed to vary across space. The medians of the local coefficients are very close to the global estimates. For example the median local effect of FLOOR_LEVEL is about 4 580 dollars, AGE_2025 about minus 5,384 dollars, DIST_CBD_M about minus 19.1 dollars and DIST_MRT_M about minus 56.7 dollars. This confirms that the global OLS equation is a good summary of the central tendency across all neighbourhoods.</p>
 <p>However the ranges are very wide, which indicates pronounced spatial non stationarity. The floor premium ranges from about 1,756 to about 23,127 dollars, so higher floors are only weakly valued in some locations but command very large premiums in others. AGE_2025 has local effects from about minus 61 861 dollars, where newness is extremely rewarded, to about plus 5 130 dollars, where older developments actually carry a premium once other attributes are controlled. Several accessibility variables switch sign. Distance to the central business district is strongly negative in many areas but becomes positive in some locations, indicating suburban submarkets where greater separation from the centre is associated with higher prices. Distances to eldercare facilities, hawker centres, supermarkets, malls and elite primary schools all have negative values in some neighbourhoods and positive values in others, meaning that the desirability of being close to each amenity is highly context dependent rather than uniform across Singapore. The count variables show especially large spreads. For instance the coefficient for CNT_KINDER_350 runs from roughly minus 112,190 to about plus 193,876 dollars, so additional kindergartens nearby can either depress or raise prices depending on local conditions. Similar patterns appear for childcare centres, bus stops and primary schools.</p>
 <p>Model diagnostics confirm that allowing coefficients to vary by location delivers a major improvement in fit even after penalising the increased complexity. The effective number of parameters is about 1 136, and the residual sum of squares falls from about 53.4 trillion under the global model to about 8,498,024,692,874 under GWR. R squared increases from about 0.761 to about 0.962 and adjusted R squared to about 0.956. AICc improves from roughly 220 289 to roughly 206,359, and BIC also decreases substantially. These large reductions in information criteria show that the gain in explanatory power more than justifies the extra flexibility of the local model.</p>
-<p>The main implication is that condominium price determinants in Singapore are strongly location specific. The global hedonic model provides a useful baseline and average effects, but it cannot capture local regimes where, for example, proximity to MRT stations or malls is valued very differently, or where older estates remain attractive despite shorter leases. For policy, planning and valuation, this means that city wide coefficients should be treated with caution. Geographically weighted regression offers a more realistic representation by revealing where each attribute is most influential, and the coefficient surfaces and maps derived from this output can guide neighbourhood tailored interventions, pricing strategies and investment decisions.</p>
+<p>The main implication is that HDB resale price determinants in Singapore are strongly location specific. The global hedonic model provides a useful baseline and average effects, but it cannot capture local regimes where, for example, proximity to MRT stations or malls is valued very differently, or where older estates remain attractive despite shorter leases. For policy, planning and valuation, this means that city wide coefficients should be treated with caution. Geographically weighted regression offers a more realistic representation by revealing where each attribute is most influential, and the coefficient surfaces and maps derived from this output can guide neighbourhood tailored interventions, pricing strategies and investment decisions.</p>
 </section>
 </section>
 <section id="building-adaptive-bandwidth-gwr-model" class="level3" data-number="10.2">
@@ -2423,30 +2423,30 @@ Fixed bandwidth: 527.3979 CV score: 12189051367381 </code></pre>
 <div class="cell-output cell-output-stdout">
 <pre><code>Take a cup of tea and have a break, it will take a few minutes.
           -----A kind suggestion from GWmodel development group
-Adaptive bandwidth: 5371 CV score: 49386384912610 
-Adaptive bandwidth: 3327 CV score: 45755094194117 
-Adaptive bandwidth: 2063 CV score: 40565711114167 
-Adaptive bandwidth: 1282 CV score: 33567680106933 
-Adaptive bandwidth: 799 CV score: 27047149364216 
-Adaptive bandwidth: 501 CV score: 22563633650250 
-Adaptive bandwidth: 316 CV score: 19307207289157 
-Adaptive bandwidth: 202 CV score: 16694393870940 
-Adaptive bandwidth: 131 CV score: 14837517878615 
-Adaptive bandwidth: 88 CV score: 13502815880995 
-Adaptive bandwidth: 60 CV score: 12502936391824 
-Adaptive bandwidth: 44 CV score: 11780809017686 
+Adaptive bandwidth: 5371 CV score: 49429775428824 
+Adaptive bandwidth: 3327 CV score: 45790782855984 
+Adaptive bandwidth: 2063 CV score: 40595899680009 
+Adaptive bandwidth: 1282 CV score: 33613264260444 
+Adaptive bandwidth: 799 CV score: 27097458671962 
+Adaptive bandwidth: 501 CV score: 22600428262212 
+Adaptive bandwidth: 316 CV score: 19341136378637 
+Adaptive bandwidth: 202 CV score: 16711176997443 
+Adaptive bandwidth: 131 CV score: 14848062907752 
+Adaptive bandwidth: 88 CV score: 13509714254304 
+Adaptive bandwidth: 60 CV score: 12505745390160 
+Adaptive bandwidth: 44 CV score: 11780574646357 
 Adaptive bandwidth: 33 CV score: Inf 
-Adaptive bandwidth: 50 CV score: 11985628281082 
+Adaptive bandwidth: 50 CV score: 11986634010845 
 Adaptive bandwidth: 39 CV score: Inf 
-Adaptive bandwidth: 45 CV score: 11813908195959 
+Adaptive bandwidth: 45 CV score: 11814714247252 
 Adaptive bandwidth: 41 CV score: Inf 
-Adaptive bandwidth: 43 CV score: 11747659494968 
-Adaptive bandwidth: 45 CV score: 11813908195959 
-Adaptive bandwidth: 44 CV score: 11780809017686 
-Adaptive bandwidth: 45 CV score: 11813908195959 
-Adaptive bandwidth: 44 CV score: 11780809017686 
-Adaptive bandwidth: 44 CV score: 11780809017686 
-Adaptive bandwidth: 43 CV score: 11747659494968 </code></pre>
+Adaptive bandwidth: 43 CV score: 11747427787839 
+Adaptive bandwidth: 45 CV score: 11814714247252 
+Adaptive bandwidth: 44 CV score: 11780574646357 
+Adaptive bandwidth: 45 CV score: 11814714247252 
+Adaptive bandwidth: 44 CV score: 11780574646357 
+Adaptive bandwidth: 44 CV score: 11780574646357 
+Adaptive bandwidth: 43 CV score: 11747427787839 </code></pre>
 </div>
 </div>
 <p>The following code chunk displays the adaptive bandwidth.</p>
@@ -2482,7 +2482,7 @@ Adaptive bandwidth: 43 CV score: 11747659494968 </code></pre>
 <pre><code>   ***********************************************************************
    *                       Package   GWmodel                             *
    ***********************************************************************
-   Program starts at: 2025-11-17 13:20:57.753755 
+   Program starts at: 2025-11-17 17:53:11.984075 
    Call:
    gwr.basic(formula = resale_price ~ FLOOR_LEVEL + AGE_2025 + DIST_CBD_M + 
     DIST_MRT_M + DIST_ELDERCARE_M + DIST_HAWKER_M + DIST_SUPERMKT_M + 
@@ -2502,37 +2502,37 @@ Adaptive bandwidth: 43 CV score: 11747659494968 </code></pre>
 
    Residuals:
     Min      1Q  Median      3Q     Max 
--315908  -51090    -461   48611  495759 
+-316038  -51178    -548   48557  495950 
 
    Coefficients:
                         Estimate   Std. Error t value             Pr(&gt;|t|)    
-   (Intercept)      1081681.3410    5872.4769 184.195 &lt; 0.0000000000000002 ***
-   FLOOR_LEVEL         5847.4372     146.2391  39.985 &lt; 0.0000000000000002 ***
-   AGE_2025           -5392.5118      65.3158 -82.561 &lt; 0.0000000000000002 ***
-   DIST_CBD_M           -19.8333       0.3265 -60.754 &lt; 0.0000000000000002 ***
-   DIST_MRT_M           -56.9794       2.6328 -21.642 &lt; 0.0000000000000002 ***
-   DIST_ELDERCARE_M     -10.4642       1.5009  -6.972     0.00000000000335 ***
-   DIST_HAWKER_M        -25.3259       1.9952 -12.694 &lt; 0.0000000000000002 ***
-   DIST_SUPERMKT_M       16.2382       4.9456   3.283              0.00103 ** 
-   DIST_MALL_M          -27.5306       2.7100 -10.159 &lt; 0.0000000000000002 ***
-   DIST_ELITEPRI_M        1.8665       0.4206   4.438     0.00000919965173 ***
-   CNT_KINDER_350     10167.4961     929.6993  10.936 &lt; 0.0000000000000002 ***
-   CNT_CHILD_350      -1924.0968     465.4465  -4.134     0.00003600625202 ***
-   CNT_BUS_350         1453.3194     320.3291   4.537     0.00000578398368 ***
-   CNT_PRIMARY_1000  -12172.2222     653.0043 -18.640 &lt; 0.0000000000000002 ***
+   (Intercept)      1081367.9454    5875.6542 184.042 &lt; 0.0000000000000002 ***
+   FLOOR_LEVEL         5851.3757     146.3028  39.995 &lt; 0.0000000000000002 ***
+   AGE_2025           -5387.7766      65.3650 -82.426 &lt; 0.0000000000000002 ***
+   DIST_CBD_M           -19.8371       0.3269 -60.685 &lt; 0.0000000000000002 ***
+   DIST_MRT_M           -56.7220       2.6325 -21.547 &lt; 0.0000000000000002 ***
+   DIST_ELDERCARE_M     -10.5185       1.5025  -7.001     0.00000000000274 ***
+   DIST_HAWKER_M        -25.2776       1.9961 -12.664 &lt; 0.0000000000000002 ***
+   DIST_SUPERMKT_M       16.3329       4.9479   3.301             0.000967 ***
+   DIST_MALL_M          -27.5970       2.7126 -10.174 &lt; 0.0000000000000002 ***
+   DIST_ELITEPRI_M        1.8465       0.4210   4.386     0.00001169715551 ***
+   CNT_KINDER_350     10141.8699     930.4676  10.900 &lt; 0.0000000000000002 ***
+   CNT_CHILD_350      -1942.0376     465.7250  -4.170     0.00003076707404 ***
+   CNT_BUS_350         1443.2402     320.4634   4.504     0.00000676850550 ***
+   CNT_PRIMARY_1000  -12067.5328     655.5018 -18.410 &lt; 0.0000000000000002 ***
 
    ---Significance stars
    Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1 
-   Residual standard error: 78460 on 8665 degrees of freedom
-   Multiple R-squared: 0.7617
-   Adjusted R-squared: 0.7613 
-   F-statistic:  2131 on 13 and 8665 DF,  p-value: &lt; 0.00000000000000022 
+   Residual standard error: 78500 on 8665 degrees of freedom
+   Multiple R-squared: 0.7615
+   Adjusted R-squared: 0.7611 
+   F-statistic:  2128 on 13 and 8665 DF,  p-value: &lt; 0.00000000000000022 
    ***Extra Diagnostic information
-   Residual sum of squares: 53348051067705
-   Sigma(hat): 78410.55
-   AIC:  220277.6
-   AICc:  220277.7
-   BIC:  211840.7
+   Residual sum of squares: 53399178838633
+   Sigma(hat): 78448.11
+   AIC:  220285.9
+   AICc:  220286
+   BIC:  211849
    ***********************************************************************
    *          Results of Geographically Weighted Regression              *
    ***********************************************************************
@@ -2545,48 +2545,48 @@ Adaptive bandwidth: 43 CV score: 11747659494968 </code></pre>
 
    ****************Summary of GWR coefficient estimates:******************
                               Min.        1st Qu.         Median        3rd Qu.
-   Intercept        -75757417.2874    424328.6970   1181222.8905   2702665.4267
-   FLOOR_LEVEL           1666.4109      3926.4961      4627.3583      5409.8755
-   AGE_2025           -100201.2717     -8439.8130     -5013.9229     -3765.0914
-   DIST_CBD_M          -13209.5619      -195.7340       -23.7286        41.4610
-   DIST_MRT_M          -17514.2292      -119.6786       -55.0679        -3.0018
-   DIST_ELDERCARE_M    -19500.4163       -28.5171        21.2711        79.0000
-   DIST_HAWKER_M       -11750.0244       -73.2610       -17.8458        47.5491
-   DIST_SUPERMKT_M      -9236.3100       -53.7180         4.3771        58.0149
-   DIST_MALL_M         -20167.5901       -84.6374       -28.1406        22.4364
-   DIST_ELITEPRI_M     -17313.8718       -74.3095         9.3859       151.0511
-   CNT_KINDER_350      -91796.1481     -8494.8609      -202.8250      4917.2977
-   CNT_CHILD_350       -83852.1235     -2085.7041       175.4117      2765.4441
-   CNT_BUS_350         -21260.8116     -2076.6612       340.5094      2810.3499
-   CNT_PRIMARY_1000  -2097474.3417     -7218.9436      -851.0135      5433.8791
-                            Max.
-   Intercept        123404437.99
-   FLOOR_LEVEL          10871.15
-   AGE_2025             20310.39
-   DIST_CBD_M           12954.58
-   DIST_MRT_M           13785.36
-   DIST_ELDERCARE_M      5739.48
-   DIST_HAWKER_M         8485.23
-   DIST_SUPERMKT_M        924.59
-   DIST_MALL_M          14056.69
-   DIST_ELITEPRI_M      13042.56
-   CNT_KINDER_350     2401971.91
-   CNT_CHILD_350       701382.56
-   CNT_BUS_350         359569.63
-   CNT_PRIMARY_1000    249176.75
+   Intercept        -75818874.3283    421463.3639   1180394.0807   2652306.5274
+   FLOOR_LEVEL           1666.4109      3925.9820      4629.1937      5411.1172
+   AGE_2025           -100201.2717     -8461.9155     -5060.2089     -3778.5018
+   DIST_CBD_M          -12102.2820      -193.6779       -23.2225        41.8345
+   DIST_MRT_M          -17537.4608      -119.9408       -56.0928        -3.5422
+   DIST_ELDERCARE_M    -19500.4163       -28.3031        21.0178        78.2591
+   DIST_HAWKER_M       -11750.0244       -73.8133       -18.0129        45.6912
+   DIST_SUPERMKT_M      -9236.3100       -54.8130         5.1871        58.7898
+   DIST_MALL_M         -20167.5901       -84.6374       -28.7409        22.6293
+   DIST_ELITEPRI_M     -17313.8718       -76.4254         8.8891       149.7830
+   CNT_KINDER_350      -91796.1481     -8338.5867      -236.7210      5000.9497
+   CNT_CHILD_350       -83852.1235     -2098.1168       200.3963      2830.1076
+   CNT_BUS_350         -21260.8116     -2031.6162       341.8512      2666.3153
+   CNT_PRIMARY_1000  -2097474.3417     -6744.3491      -386.4907      5262.5446
+                           Max.
+   Intercept        91304468.78
+   FLOOR_LEVEL         10871.15
+   AGE_2025            20327.39
+   DIST_CBD_M          12954.58
+   DIST_MRT_M          13785.36
+   DIST_ELDERCARE_M     5393.27
+   DIST_HAWKER_M        8485.23
+   DIST_SUPERMKT_M       924.59
+   DIST_MALL_M         14056.69
+   DIST_ELITEPRI_M      8061.01
+   CNT_KINDER_350    2401971.91
+   CNT_CHILD_350      701382.56
+   CNT_BUS_350        359569.63
+   CNT_PRIMARY_1000   249176.75
    ************************Diagnostic information*************************
    Number of data points: 8679 
-   Effective number of parameters (2trace(S) - trace(S'S)): 1261.901 
-   Effective degrees of freedom (n-2trace(S) + trace(S'S)): 7417.099 
-   AICc (GWR book, Fotheringham, et al. 2002, p. 61, eq 2.33): 206969.8 
-   AIC (GWR book, Fotheringham, et al. 2002,GWR p. 96, eq. 4.22): 205691.5 
-   BIC (GWR book, Fotheringham, et al. 2002,GWR p. 61, eq. 2.34): 205158.5 
-   Residual sum of squares: 8875975080257 
-   R-square value:  0.960352 
-   Adjusted R-square value:  0.9536057 
+   Effective number of parameters (2trace(S) - trace(S'S)): 1262.01 
+   Effective degrees of freedom (n-2trace(S) + trace(S'S)): 7416.99 
+   AICc (GWR book, Fotheringham, et al. 2002, p. 61, eq 2.33): 206971.2 
+   AIC (GWR book, Fotheringham, et al. 2002,GWR p. 96, eq. 4.22): 205692.4 
+   BIC (GWR book, Fotheringham, et al. 2002,GWR p. 61, eq. 2.34): 205162 
+   Residual sum of squares: 8876572398221 
+   R-square value:  0.9603494 
+   Adjusted R-square value:  0.9536019 
 
    ***********************************************************************
-   Program stops at: 2025-11-17 13:21:33.791816 </code></pre>
+   Program stops at: 2025-11-17 17:53:47.231566 </code></pre>
 </div>
 </div>
 <p>The adaptive geographically weighted regression refines the global hedonic model by letting each location borrow information from its <strong>43</strong> nearest neighbours, so dense estates use tight windows while sparse areas use wider ones.</p>
@@ -2600,7 +2600,7 @@ Adaptive bandwidth: 43 CV score: 11747659494968 </code></pre>
 <li><p>Local services: distances to eldercare, hawker centres, supermarkets, malls and elite primary schools show similar sign reversals. For example, the supermarket distance coefficient ranges from strongly negative through a small positive median to clearly positive values. This means proximity to these amenities raises prices in some areas but lowers them in others, depending on local congestion, noise or competition effects.</p></li>
 <li><p>Count variables: CNT_KINDER_350, CNT_CHILD_350, CNT_BUS_350 and CNT_PRIMARY_1000 exhibit very wide ranges, from large negative to very large positive values. The same number of kindergartens or primary schools can therefore have opposite price effects in different neighbourhoods, again pointing to strong context dependence.</p></li>
 </ul>
-<p><strong>Implications:</strong> The adaptive geographically weighted regression confirms that condominium price determinants in Singapore are highly spatially non stationary. The global hedonic model remains useful as a summary of average relationships, but it hides substantial local variation in both the strength and even the direction of key effects. For valuation, planners and investors, this means that:</p>
+<p><strong>Implications:</strong> The adaptive geographically weighted regression confirms that HDB resale price determinants in Singapore are highly spatially non stationary. The global hedonic model remains useful as a summary of average relationships, but it hides substantial local variation in both the strength and even the direction of key effects. For valuation, planners and investors, this means that:</p>
 <ol type="1">
 <li><p>Premiums for height, age, centrality and amenities are location specific and cannot be applied uniformly across the island.</p></li>
 <li><p>Policies or planning decisions that rely only on global elasticities may misjudge impacts in particular neighbourhoods.</p></li>
@@ -2625,66 +2625,66 @@ Adaptive bandwidth: 43 CV score: 11747659494968 </code></pre>
 <div class="cell-output cell-output-stdout">
 <pre><code>Rows: 8,679
 Columns: 49
-$ Intercept           &lt;dbl&gt; 1372611, 1378403, 1372611, 1220761, 1378403, 12207…
-$ FLOOR_LEVEL         &lt;dbl&gt; 5273.715, 5958.302, 5273.715, 7309.421, 5958.302, …
-$ AGE_2025            &lt;dbl&gt; -9043.527, -8096.687, -9043.527, -8171.505, -8096.…
-$ DIST_CBD_M          &lt;dbl&gt; -32.39158, -54.41816, -32.39158, -46.73114, -54.41…
-$ DIST_MRT_M          &lt;dbl&gt; -50.418513, 63.015593, -50.418513, 56.030906, 63.0…
-$ DIST_ELDERCARE_M    &lt;dbl&gt; 78.52689, 155.33493, 78.52689, 80.98130, 155.33493…
-$ DIST_HAWKER_M       &lt;dbl&gt; 58.60382, 59.75263, 58.60382, 108.04486, 59.75263,…
-$ DIST_SUPERMKT_M     &lt;dbl&gt; -13.027782, 113.331892, -13.027782, 45.809992, 113…
-$ DIST_MALL_M         &lt;dbl&gt; -18.78535, -87.24034, -18.78535, -15.50219, -87.24…
-$ DIST_ELITEPRI_M     &lt;dbl&gt; -49.532805, -50.985132, -49.532805, -3.041654, -50…
-$ CNT_KINDER_350      &lt;dbl&gt; 3637.694, 7968.247, 3637.694, 3589.385, 7968.247, …
-$ CNT_CHILD_350       &lt;dbl&gt; 3741.448, 2294.173, 3741.448, 3476.573, 2294.173, …
-$ CNT_BUS_350         &lt;dbl&gt; -74.14264, 5907.85122, -74.14264, 2819.22534, 5907…
-$ CNT_PRIMARY_1000    &lt;dbl&gt; -17636.8619, -2841.3086, -17636.8619, -2005.5695, …
+$ Intercept           &lt;dbl&gt; 1375356, 1386785, 1375356, 1217951, 1386785, 12179…
+$ FLOOR_LEVEL         &lt;dbl&gt; 5277.606, 6002.143, 5277.606, 7308.207, 6002.143, …
+$ AGE_2025            &lt;dbl&gt; -9009.350, -8029.718, -9009.350, -8184.867, -8029.…
+$ DIST_CBD_M          &lt;dbl&gt; -32.71020, -55.03258, -32.71020, -45.96036, -55.03…
+$ DIST_MRT_M          &lt;dbl&gt; -49.14878, 66.28116, -49.14878, 56.05134, 66.28116…
+$ DIST_ELDERCARE_M    &lt;dbl&gt; 78.22713, 154.00054, 78.22713, 80.72156, 154.00054…
+$ DIST_HAWKER_M       &lt;dbl&gt; 56.54748, 46.18160, 56.54748, 107.03881, 46.18160,…
+$ DIST_SUPERMKT_M     &lt;dbl&gt; -9.600333, 121.346786, -9.600333, 45.835489, 121.3…
+$ DIST_MALL_M         &lt;dbl&gt; -23.05552, -93.58705, -23.05552, -17.54473, -93.58…
+$ DIST_ELITEPRI_M     &lt;dbl&gt; -48.672518, -47.066337, -48.672518, -3.074120, -47…
+$ CNT_KINDER_350      &lt;dbl&gt; 3655.681, 8311.046, 3655.681, 3669.726, 8311.046, …
+$ CNT_CHILD_350       &lt;dbl&gt; 4251.520, 3204.658, 4251.520, 3640.825, 3204.658, …
+$ CNT_BUS_350         &lt;dbl&gt; 149.2830, 6139.5034, 149.2830, 2920.6081, 6139.503…
+$ CNT_PRIMARY_1000    &lt;dbl&gt; -19223.359, -7754.266, -19223.359, -3407.545, -775…
 $ y                   &lt;dbl&gt; 582000, 865000, 530000, 560000, 1038000, 542000, 6…
-$ yhat                &lt;dbl&gt; 629711.9, 918046.1, 613890.7, 564810.8, 1025295.6,…
-$ residual            &lt;dbl&gt; -47711.8643, -53046.1246, -83890.7202, -4810.7857,…
+$ yhat                &lt;dbl&gt; 629208.7, 919120.6, 613375.9, 565113.6, 1027159.1,…
+$ residual            &lt;dbl&gt; -47208.7206, -54120.5731, -83375.9012, -5113.5533,…
 $ CV_Score            &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,…
-$ Stud_residual       &lt;dbl&gt; -1.427757074, -1.591668323, -2.493741701, -0.14831…
-$ Intercept_SE        &lt;dbl&gt; 74717.19, 129354.77, 74717.19, 73591.18, 129354.77…
-$ FLOOR_LEVEL_SE      &lt;dbl&gt; 420.1374, 603.1990, 420.1374, 525.0615, 603.1990, …
-$ AGE_2025_SE         &lt;dbl&gt; 219.1964, 311.4439, 219.1964, 243.2776, 311.4439, …
-$ DIST_CBD_M_SE       &lt;dbl&gt; 6.379742, 13.183496, 6.379742, 8.891483, 13.183496…
-$ DIST_MRT_M_SE       &lt;dbl&gt; 14.85154, 18.65162, 14.85154, 14.34230, 18.65162, …
-$ DIST_ELDERCARE_M_SE &lt;dbl&gt; 12.25748, 17.87245, 12.25748, 13.77632, 17.87245, …
-$ DIST_HAWKER_M_SE    &lt;dbl&gt; 24.53002, 28.61427, 24.53002, 22.04705, 28.61427, …
-$ DIST_SUPERMKT_M_SE  &lt;dbl&gt; 23.91321, 37.98286, 23.91321, 24.68677, 37.98286, …
-$ DIST_MALL_M_SE      &lt;dbl&gt; 19.07997, 19.42793, 19.07997, 13.89405, 19.42793, …
-$ DIST_ELITEPRI_M_SE  &lt;dbl&gt; 8.681289, 10.002587, 8.681289, 7.905528, 10.002587…
-$ CNT_KINDER_350_SE   &lt;dbl&gt; 3513.555, 4580.458, 3513.555, 3925.701, 4580.458, …
-$ CNT_CHILD_350_SE    &lt;dbl&gt; 2623.236, 3462.835, 2623.236, 2302.622, 3462.835, …
-$ CNT_BUS_350_SE      &lt;dbl&gt; 1464.933, 1900.997, 1464.933, 1568.476, 1900.997, …
-$ CNT_PRIMARY_1000_SE &lt;dbl&gt; 4238.552, 5249.239, 4238.552, 4229.530, 5249.239, …
-$ Intercept_TV        &lt;dbl&gt; 18.37076, 10.65599, 18.37076, 16.58842, 10.65599, …
-$ FLOOR_LEVEL_TV      &lt;dbl&gt; 12.552357, 9.877839, 12.552357, 13.921077, 9.87783…
-$ AGE_2025_TV         &lt;dbl&gt; -41.25765, -25.99726, -41.25765, -33.58922, -25.99…
-$ DIST_CBD_M_TV       &lt;dbl&gt; -5.077256, -4.127749, -5.077256, -5.255720, -4.127…
-$ DIST_MRT_M_TV       &lt;dbl&gt; -3.3948342, 3.3785581, -3.3948342, 3.9066893, 3.37…
-$ DIST_ELDERCARE_M_TV &lt;dbl&gt; 6.406444, 8.691303, 6.406444, 5.878295, 8.691303, …
-$ DIST_HAWKER_M_TV    &lt;dbl&gt; 2.389065, 2.088211, 2.389065, 4.900650, 2.088211, …
-$ DIST_SUPERMKT_M_TV  &lt;dbl&gt; -0.5447943, 2.9837642, -0.5447943, 1.8556497, 2.98…
-$ DIST_MALL_M_TV      &lt;dbl&gt; -0.9845589, -4.4904595, -0.9845589, -1.1157435, -4…
-$ DIST_ELITEPRI_M_TV  &lt;dbl&gt; -5.7056969, -5.0971946, -5.7056969, -0.3847502, -5…
-$ CNT_KINDER_350_TV   &lt;dbl&gt; 1.0353315, 1.7396179, 1.0353315, 0.9143296, 1.7396…
-$ CNT_CHILD_350_TV    &lt;dbl&gt; 1.4262719, 0.6625130, 1.4262719, 1.5098318, 0.6625…
-$ CNT_BUS_350_TV      &lt;dbl&gt; -0.05061163, 3.10776389, -0.05061163, 1.79742971, …
-$ CNT_PRIMARY_1000_TV &lt;dbl&gt; -4.16105846, -0.54128015, -4.16105846, -0.47418262…
-$ Local_R2            &lt;dbl&gt; 0.9508844, 0.9490104, 0.9508844, 0.9561350, 0.9490…
+$ Stud_residual       &lt;dbl&gt; -1.412275878, -1.622973494, -2.477667965, -0.15762…
+$ Intercept_SE        &lt;dbl&gt; 73821.19, 128911.87, 73821.19, 73340.81, 128911.87…
+$ FLOOR_LEVEL_SE      &lt;dbl&gt; 420.0457, 603.0353, 420.0457, 525.0813, 603.0353, …
+$ AGE_2025_SE         &lt;dbl&gt; 220.3218, 313.3540, 220.3218, 242.5553, 313.3540, …
+$ DIST_CBD_M_SE       &lt;dbl&gt; 6.330303, 13.182686, 6.330303, 8.862269, 13.182686…
+$ DIST_MRT_M_SE       &lt;dbl&gt; 14.83974, 18.39881, 14.83974, 14.29916, 18.39881, …
+$ DIST_ELDERCARE_M_SE &lt;dbl&gt; 12.26673, 17.83393, 12.26673, 13.76516, 17.83393, …
+$ DIST_HAWKER_M_SE    &lt;dbl&gt; 24.32335, 28.59659, 24.32335, 21.98873, 28.59659, …
+$ DIST_SUPERMKT_M_SE  &lt;dbl&gt; 24.08859, 38.21975, 24.08859, 24.69073, 38.21975, …
+$ DIST_MALL_M_SE      &lt;dbl&gt; 19.21945, 19.67450, 19.21945, 13.94273, 19.67450, …
+$ DIST_ELITEPRI_M_SE  &lt;dbl&gt; 8.676073, 9.985461, 8.676073, 7.900719, 9.985461, …
+$ CNT_KINDER_350_SE   &lt;dbl&gt; 3514.694, 4619.943, 3514.694, 3926.636, 4619.943, …
+$ CNT_CHILD_350_SE    &lt;dbl&gt; 2647.152, 3544.259, 2647.152, 2314.888, 3544.259, …
+$ CNT_BUS_350_SE      &lt;dbl&gt; 1449.231, 1887.077, 1449.231, 1564.026, 1887.077, …
+$ CNT_PRIMARY_1000_SE &lt;dbl&gt; 4254.898, 5320.665, 4254.898, 4233.732, 5320.665, …
+$ Intercept_TV        &lt;dbl&gt; 18.63091, 10.75762, 18.63091, 16.60673, 10.75762, …
+$ FLOOR_LEVEL_TV      &lt;dbl&gt; 12.564362, 9.953219, 12.564362, 13.918238, 9.95321…
+$ AGE_2025_TV         &lt;dbl&gt; -40.89179, -25.62507, -40.89179, -33.74433, -25.62…
+$ DIST_CBD_M_TV       &lt;dbl&gt; -5.167240, -4.174611, -5.167240, -5.186071, -4.174…
+$ DIST_MRT_M_TV       &lt;dbl&gt; -3.3119698, 3.6024700, -3.3119698, 3.9199035, 3.60…
+$ DIST_ELDERCARE_M_TV &lt;dbl&gt; 6.377181, 8.635257, 6.377181, 5.864192, 8.635257, …
+$ DIST_HAWKER_M_TV    &lt;dbl&gt; 2.324822, 1.614934, 2.324822, 4.867895, 1.614934, …
+$ DIST_SUPERMKT_M_TV  &lt;dbl&gt; -0.3985428, 3.1749756, -0.3985428, 1.8563848, 3.17…
+$ DIST_MALL_M_TV      &lt;dbl&gt; -1.1995926, -4.7567698, -1.1995926, -1.2583429, -4…
+$ DIST_ELITEPRI_M_TV  &lt;dbl&gt; -5.6099709, -4.7134867, -5.6099709, -0.3890937, -4…
+$ CNT_KINDER_350_TV   &lt;dbl&gt; 1.0401133, 1.7989498, 1.0401133, 0.9345723, 1.7989…
+$ CNT_CHILD_350_TV    &lt;dbl&gt; 1.6060734, 0.9041826, 1.6060734, 1.5727865, 0.9041…
+$ CNT_BUS_350_TV      &lt;dbl&gt; 0.1030084, 3.2534465, 0.1030084, 1.8673654, 3.2534…
+$ CNT_PRIMARY_1000_TV &lt;dbl&gt; -4.5179369, -1.4573866, -4.5179369, -0.8048560, -1…
+$ Local_R2            &lt;dbl&gt; 0.9513182, 0.9492121, 0.9513182, 0.9562579, 0.9492…
 $ geometry            &lt;POINT [m]&gt; POINT (30036.29 38360.76), POINT (29283.45 3…</code></pre>
 </div>
 </div>
-<p>The adaptive GWR output now attaches local coefficients, standard errors, t values, fitted prices, and residuals to every condominium. This enables mapping spatial variation in effects, identifying neighbourhoods where specific predictors matter most, and diagnosing where the global hedonic model under or over estimates resale prices.</p>
+<p>The adaptive GWR output now attaches local coefficients, standard errors, t values, fitted prices, and residuals to every HDB. This enables mapping spatial variation in effects, identifying neighbourhoods where specific predictors matter most, and diagnosing where the global hedonic model under or over estimates resale prices.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb111"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb111-1"><a href="#cb111-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(gwr.adaptive<span class="sc">$</span>SDF<span class="sc">$</span>yhat)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
- 396387  564622  628309  672146  724070 1485595 </code></pre>
+ 396412  564652  628373  672155  723949 1485595 </code></pre>
 </div>
 </div>
-<p>Adaptive GWR fitted prices range from about 396622 to 1485595. Median predicted price about 628332 and mean about 672147 indicate a slightly right skewed distribution with relatively few high value condominiums pulling the average above the middle of the market.</p>
+<p>Adaptive GWR fitted prices range from about 396,622 to 1,485,595. Median predicted price about 628,332 and mean about 672,147 indicate a slightly right skewed distribution with relatively few high value HDBs pulling the average above the middle of the market.</p>
 </section>
 <section id="visualising-local-r2" class="level4" data-number="10.3.2">
 <h4 data-number="10.3.2" class="anchored" data-anchor-id="visualising-local-r2"><span class="header-section-number">10.3.2</span> Visualising local <span class="math inline">\(R^2\)</span></h4>
@@ -2708,7 +2708,7 @@ $ geometry            &lt;POINT [m]&gt; POINT (30036.29 38360.76), POINT (29283.
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb114"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb114-1"><a href="#cb114-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tmap_mode</span>(<span class="st">"plot"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<p>The Local <span class="math inline">\(R^2\)</span> map shows that the adaptive GWR explains condo prices very well in most neighbourhoods. Darker blue clusters (Local <span class="math inline">\(R^2\)</span> between 0.8 and 1.0) dominate the island, meaning the local regressions capture more than 80% of price variation in these areas. Here, the chosen structural and accessibility variables provide an excellent description of market behaviour and the global conclusions are strongly supported.</p>
+<p>The Local <span class="math inline">\(R^2\)</span> map shows that the adaptive GWR explains HDB resale prices very well in most neighbourhoods. Darker blue clusters (Local <span class="math inline">\(R^2\)</span> between 0.8 and 1.0) dominate the island, meaning the local regressions capture more than 80% of price variation in these areas. Here, the chosen structural and accessibility variables provide an excellent description of market behaviour and the global conclusions are strongly supported.</p>
 <p>Lighter patches (Local <span class="math inline">\(R^2\)</span> between 0.5 and 0.7) appear only in a few planning subzones. In these locations the model leaves more unexplained variation, suggesting that additional local factors such as project specific amenities, tenure mix, redevelopment expectations, or micro environmental qualities may be important. These areas are prime candidates for further refinement, either by enriching the covariate set or exploring alternative spatial scales. Overall, the map confirms that the adaptive GWR greatly improves explanatory power across Singapore while also revealing a small number of neighbourhoods where current predictors are less adequate and targeted model extensions are warranted.</p>
 </section>
 <section id="visualising-coefficient-estimates" class="level4" data-number="10.3.3">
@@ -2762,8 +2762,8 @@ $ geometry            &lt;POINT [m]&gt; POINT (30036.29 38360.76), POINT (29283.
 <h4 data-number="10.4.2" class="anchored" data-anchor-id="retaining-only-hdb-resale-points-inside-tampines"><span class="header-section-number">10.4.2</span> Retaining only HDB resale points inside Tampines</h4>
 <p>Start with the data that matter most for inference. We intersect the adaptive GWR results with the Tampines polygon to keep only transactions whose coordinates fall within the planning area. This step aligns attributes such as Local R² with the town specific sample, removes off boundary outliers, and guarantees that subsequent summaries reflect the population of interest. The operation also preserves row integrity for reproducibility, since no recalculation of GWR occurs here. The outcome is a clean sf layer of Tampines observations ready for mapping and statistics, with geometry driven selection ensuring methodological coherence.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb118"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb118-1"><a href="#cb118-1" aria-hidden="true" tabindex="-1"></a><span class="co"># --- 2) Keep only condo points that fall inside Tampines -----------------------</span></span>
-<span id="cb118-2"><a href="#cb118-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Our GWR results were attached to `condo_resale.sf.adaptive` and include `Local_R2`.</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb118"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb118-1"><a href="#cb118-1" aria-hidden="true" tabindex="-1"></a><span class="co"># --- 2) Keep only HDB points that fall inside Tampines -----------------------</span></span>
+<span id="cb118-2"><a href="#cb118-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Our GWR results were attached to `analysis.sf.adaptive` and include `Local_R2`.</span></span>
 <span id="cb118-3"><a href="#cb118-3" aria-hidden="true" tabindex="-1"></a>tampines_pts <span class="ot">&lt;-</span> analysis.sf.adaptive[tampines_pa, , op <span class="ot">=</span> st_within]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
@@ -2819,11 +2819,11 @@ $ geometry            &lt;POINT [m]&gt; POINT (30036.29 38360.76), POINT (29283.
 <span id="cb121-15"><a href="#cb121-15" aria-hidden="true" tabindex="-1"></a>tampines_r2_summary</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>    n    r2_min     r2_q1    r2_med   r2_mean     r2_q3    r2_max
-1 712 0.6852354 0.8230632 0.8756061 0.8703099 0.9506585 0.9651716</code></pre>
+1 712 0.6851968 0.8231849 0.8758131 0.8703293 0.9506585 0.9651712</code></pre>
 </div>
 </div>
-<p>The updated Local R² results for Tampines show that the adaptive GWR still fits very well but with more variation than in the smaller earlier sample. Across 712 condominiums, Local R² ranges from about 0.685 to 0.965 with a median around 0.876 and upper quartile near 0.951.</p>
-<p>On the map, darker blue clusters in the north west and south east indicate locations where the model explains more than 0.95 of local price variation. Here the hedonic predictors such as floor level, age and accessibility capture condominium prices extremely well. Lighter areas in the central belt correspond to Local R² around 0.75 to 0.85, meaning that prices there depend more on factors not included in the model, for example project specific facilities or micro environment qualities.</p>
+<p>The updated Local R² results for Tampines show that the adaptive GWR still fits very well but with more variation than in the smaller earlier sample. Across 712 HDBs, Local R² ranges from about 0.685 to 0.965 with a median around 0.876 and upper quartile near 0.951.</p>
+<p>On the map, darker blue clusters in the north west and south east indicate locations where the model explains more than 0.95 of local price variation. Here the hedonic predictors such as floor level, age and accessibility capture HDB resale prices extremely well. Lighter areas in the central belt correspond to Local R² around 0.75 to 0.85, meaning that prices there depend more on factors not included in the model, for example project specific facilities or micro environment qualities.</p>
 <p>Overall, the <strong>adaptive geographically weighted regression (adaptive GWR) model</strong> remains highly reliable for Tampines, but the central neighbourhoods merit further refinement or additional covariates to fully explain local price dynamics.</p>
 </section>
 </section>
